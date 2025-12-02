@@ -22,7 +22,7 @@ body {
 /* Header Section */
 .header-image {
     max-width: 100%;
-    border-radius: 25px;
+    border-radius: 0px 0px 20px 20px;
     box-shadow: 0 4px 20px rgba(236, 176, 7, 0.2);
 }
 
