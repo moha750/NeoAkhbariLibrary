@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>قراءة الكتاب - المكتبة الرقمية</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f5f5f5;
+            min-height: 100vh;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .back-btn {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            transition: all 0.3s;
+            backdrop-filter: blur(10px);
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.3);
+            transform: translateY(-2px);
+        }
+
+        .book-info {
+            text-align: center;
+        }
+
+        .page-indicator {
+            background: rgba(255,255,255,0.2);
+            padding: 8px 15px;
+            border-radius: 15px;
+            font-weight: bold;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        .book-header {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .book-icon {
+            font-size: 5em;
+            margin-bottom: 20px;
+        }
+
+        .book-title {
+            font-size: 2.5em;
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .book-author {
+            font-size: 1.5em;
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        .book-meta {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            color: #999;
+            font-size: 1em;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .book-description {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            color: #666;
+            line-height: 1.8;
+            font-size: 1.1em;
+            margin-top: 20px;
+        }
+
+        .reading-controls {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .font-control {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .control-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        .control-btn:hover {
+            background: #764ba2;
+        }
+
+        .control-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .font-size-display {
+            color: #667eea;
+            font-weight: bold;
+            min-width: 60px;
+            text-align: center;
+        }
+
+        .page-content {
+            background: white;
+            padding: 50px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            line-height: 2;
+            font-size: 1.2em;
+            color: #333;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            min-height: 400px;
+        }
+
+        .page-title-display {
+            font-size: 1.8em;
+            color: #667eea;
+            font-weight: bold;
+            margin-bottom: 30px;
+            text-align: center;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #f0f0f0;
+        }
+
+        .page-navigation {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 2px solid #f0f0f0;
+        }
+
+        .nav-btn {
+            background: #667eea;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+
+        .nav-btn:hover:not(:disabled) {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+
+        .nav-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        .page-info {
+            color: #667eea;
+            font-weight: bold;
+            font-size: 1.2em;
+        }
+
+        .dark-mode {
+            background: #1a1a1a;
+        }
+
+        .dark-mode .book-header,
+        .dark-mode .page-content,
+        .dark-mode .reading-controls {
+            background: #2d2d2d;
+            color: #e0e0e0;
+        }
+
+        .dark-mode .book-title,
+        .dark-mode .page-title-display {
+            color: #e0e0e0;
+        }
+
+        .dark-mode .book-description {
+            background: #3d3d3d;
+            color: #b0b0b0;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 100px 20px;
+        }
+
+        .loading-icon {
+            font-size: 5em;
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .error {
+            text-align: center;
+            padding: 100px 20px;
+        }
+
+        .error-icon {
+            font-size: 5em;
+            margin-bottom: 20px;
+        }
+
+        .error h2 {
+            color: #dc3545;
+            margin-bottom: 10px;
+        }
+
+        .error p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+
+        .no-pages {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .no-pages-icon {
+            font-size: 5em;
+            margin-bottom: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .book-title {
+                font-size: 1.8em;
+            }
+
+            .book-author {
+                font-size: 1.2em;
+            }
+
+            .page-content {
+                padding: 30px 20px;
+                font-size: 1.1em;
+            }
+
+            .reading-controls {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <a href="index.html" class="back-btn">🏠 العودة</a>
+            <div class="book-info">
+                <span id="headerTitle">قراءة الكتاب</span>
+            </div>
+            <div class="page-indicator" id="pageIndicator">صفحة 1</div>
+        </div>
+    </div>
+
+    <div class="container">
+        <div id="loadingDiv" class="loading">
+            <div class="loading-icon">📖</div>
+            <h2>جاري تحميل الكتاب...</h2>
+        </div>
+
+        <div id="errorDiv" class="error" style="display: none;">
+            <div class="error-icon">❌</div>
+            <h2>عذراً، لم يتم العثور على الكتاب</h2>
+            <p>الكتاب المطلوب غير موجود أو تم حذفه</p>
+            <a href="index.html" class="back-btn" style="display: inline-block;">العودة للصفحة الرئيسية</a>
+        </div>
+
+        <div id="bookContainer" style="display: none;">
+            <div class="book-header">
+                <div class="book-icon">📕</div>
+                <h1 class="book-title" id="bookTitle"></h1>
+                <div class="book-author" id="bookAuthor"></div>
+                <div class="book-description" id="bookDescription"></div>
+                <div class="book-meta">
+                    <span id="bookDate">📅 </span>
+                    <span id="bookPages">📄 </span>
+                    <span id="bookViews">👁️ </span>
+                </div>
+            </div>
+
+            <div class="reading-controls">
+                <div class="font-control">
+                    <button class="control-btn" onclick="decreaseFontSize()">➖</button>
+                    <span class="font-size-display" id="fontSizeDisplay">100%</span>
+                    <button class="control-btn" onclick="increaseFontSize()">➕</button>
+                </div>
+                <button class="control-btn" onclick="toggleTheme()">🌙 الوضع الليلي</button>
+            </div>
+
+            <div id="pagesContainer">
+                <!-- سيتم عرض الصفحات هنا -->
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentBook = null;
+        let currentPageIndex = 0;
+        let currentFontSize = 100;
+        let isDarkMode = false;
+
+        // الحصول على معرف الكتاب من URL
+        function getBookId() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('id');
+        }
+
+        // تحميل الكتاب
+        function loadBook() {
+            const bookId = getBookId();
+            
+            if (!bookId) {
+                showError();
+                return;
+            }
+
+            const books = JSON.parse(localStorage.getItem('books') || '[]');
+            currentBook = books.find(b => b.id === bookId);
+
+            if (!currentBook) {
+                showError();
+                return;
+            }
+
+            // التأكد من وجود صفحات
+            if (!currentBook.pages) {
+                currentBook.pages = [];
+            }
+
+            // تحديث عدد المشاهدات
+            currentBook.views = (currentBook.views || 0) + 1;
+            const bookIndex = books.findIndex(b => b.id === bookId);
+            books[bookIndex] = currentBook;
+            localStorage.setItem('books', JSON.stringify(books));
+
+            // عرض الكتاب
+            displayBook();
+        }
+
+        // عرض الكتاب
+        function displayBook() {
+            document.getElementById('loadingDiv').style.display = 'none';
+            document.getElementById('bookContainer').style.display = 'block';
+
+            document.getElementById('headerTitle').textContent = currentBook.title;
+            document.getElementById('bookTitle').textContent = currentBook.title;
+            document.getElementById('bookAuthor').textContent = '✍️ ' + currentBook.author;
+            document.getElementById('bookDescription').textContent = currentBook.description;
+            document.getElementById('bookDate').textContent = '📅 ' + currentBook.date;
+            document.getElementById('bookPages').textContent = '📄 ' + currentBook.pages.length + ' صفحة';
+            document.getElementById('bookViews').textContent = '👁️ ' + currentBook.views + ' مشاهدة';
+
+            displayCurrentPage();
+        }
+
+        // عرض الصفحة الحالية
+        function displayCurrentPage() {
+            const pagesContainer = document.getElementById('pagesContainer');
+            
+            if (currentBook.pages.length === 0) {
+                pagesContainer.innerHTML = `
+                    <div class="page-content">
+                        <div class="no-pages">
+                            <div class="no-pages-icon">📄</div>
+                            <h3>لا توجد صفحات في هذا الكتاب</h3>
+                            <p>الكتاب لا يحتوي على صفحات بعد</p>
+                        </div>
+                    </div>
+                `;
+                document.getElementById('pageIndicator').textContent = 'لا توجد صفحات';
+                return;
+            }
+
+            const page = currentBook.pages[currentPageIndex];
+            
+            pagesContainer.innerHTML = `
+                <div class="page-content" id="pageContent">
+                    ${page.title ? `<div class="page-title-display">${page.title}</div>` : ''}
+                    <div>${page.content}</div>
+                    <div class="page-navigation">
+                        <button class="nav-btn" id="prevBtn" onclick="previousPage()" ${currentPageIndex === 0 ? 'disabled' : ''}>
+                            ⏮️ الصفحة السابقة
+                        </button>
+                        <div class="page-info">
+                            صفحة ${currentPageIndex + 1} من ${currentBook.pages.length}
+                        </div>
+                        <button class="nav-btn" id="nextBtn" onclick="nextPage()" ${currentPageIndex === currentBook.pages.length - 1 ? 'disabled' : ''}>
+                            الصفحة التالية ⏭️
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            document.getElementById('pageIndicator').textContent = `صفحة ${currentPageIndex + 1}/${currentBook.pages.length}`;
+            
+            // تطبيق حجم الخط الحالي
+            updateFontSize();
+            
+            // التمرير للأعلى
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // الصفحة التالية
+        function nextPage() {
+            if (currentPageIndex < currentBook.pages.length - 1) {
+                currentPageIndex++;
+                displayCurrentPage();
+            }
+        }
+
+        // الصفحة السابقة
+        function previousPage() {
+            if (currentPageIndex > 0) {
+                currentPageIndex--;
+                displayCurrentPage();
+            }
+        }
+
+        // عرض رسالة خطأ
+        function showError() {
+            document.getElementById('loadingDiv').style.display = 'none';
+            document.getElementById('errorDiv').style.display = 'block';
+        }
+
+        // زيادة حجم الخط
+        function increaseFontSize() {
+            if (currentFontSize < 200) {
+                currentFontSize += 10;
+                updateFontSize();
+            }
+        }
+
+        // تقليل حجم الخط
+        function decreaseFontSize() {
+            if (currentFontSize > 60) {
+                currentFontSize -= 10;
+                updateFontSize();
+            }
+        }
+
+        // تحديث حجم الخط
+        function updateFontSize() {
+            const content = document.getElementById('pageContent');
+            if (content) {
+                content.style.fontSize = (1.2 * currentFontSize / 100) + 'em';
+            }
+            document.getElementById('fontSizeDisplay').textContent = currentFontSize + '%';
+            localStorage.setItem('fontSize', currentFontSize);
+        }
+
+        // تبديل الوضع الليلي
+        function toggleTheme() {
+            isDarkMode = !isDarkMode;
+            document.body.classList.toggle('dark-mode');
+            
+            const btn = document.querySelector('.control-btn:last-child');
+            if (isDarkMode) {
+                btn.textContent = '☀️ الوضع النهاري';
+            } else {
+                btn.textContent = '🌙 الوضع الليلي';
+            }
+            
+            localStorage.setItem('darkMode', isDarkMode);
+        }
+
+        // تحميل الإعدادات المحفوظة
+        function loadSettings() {
+            const savedFontSize = localStorage.getItem('fontSize');
+            if (savedFontSize) {
+                currentFontSize = parseInt(savedFontSize);
+            }
+
+            const savedDarkMode = localStorage.getItem('darkMode');
+            if (savedDarkMode === 'true') {
+                toggleTheme();
+            }
+        }
+
+        // التنقل بلوحة المفاتيح
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
+                previousPage();
+            } else if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
+                nextPage();
+            }
+        });
+
+        // تحميل الكتاب عند فتح الصفحة
+        window.addEventListener('load', function() {
+            loadSettings();
+            loadBook();
+        });
+    </script>
+</body>
+</html>

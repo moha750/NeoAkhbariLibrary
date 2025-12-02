@@ -3,126 +3,92 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>مكتبة الإخبارية الجُدد</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: fb;
-        }
-
-        @font-face {
-            font-family: fl;
-            src: url(./fonts/COMM\ -\ Lyon\ Arabic\ Display\ Light.otf);
-            }
-
-            @font-face {
-            font-family: fr;
-            src: url(./fonts/COMM\ -\ Lyon\ Arabic\ Display\ Regular.otf);
-            }
-
-            @font-face {
-            font-family: fm;
-            src: url(./fonts/COMM\ -\ Lyon\ Arabic\ Display\ Medium.otf);
-            }
-
-            @font-face {
-            font-family: fb;
-            src: url(./fonts/COMM\ -\ Lyon\ Arabic\ Display\ Bold.otf);
-            }
-
-            @font-face {
-            font-family: fbb;
-            src: url(./fonts/COMM\ -\ Lyon\ Arabic\ Display\ Black.otf);
-            }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: #e3a906;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-
-        .container {
-            text-align: center;
-            background: rgba(255, 255, 255, 0.95);
-            padding: 60px 40px;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-            max-width: 600px;
-            width: 100%;
-            animation: fadeIn 1s ease-in;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(-20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .logo {
-            width: 20rem;
-            height: auto;
-            margin-bottom: 40px;
-            animation: float 3s ease-in-out infinite;
-        }
-
-        @keyframes float {
-            0%, 100% {
-                transform: translateY(0px);
-            }
-            50% {
-                transform: translateY(-10px);
-            }
-        }
-
-        h1 {
-            font-size: 2.5rem;
-            color: #2d3748;
-            font-weight: bold;
-            line-height: 1.6;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 40px 30px;
-            }
-
-            h1 {
-                font-size: 2rem;
-            }
-
-            /* .logo {
-                max-width: 150px;
-            } */
-        }
-
-        @media (max-width: 480px) {
-            h1 {
-                font-size: 1.5rem;
-            }
-
-            /* .logo {
-                max-width: 120px;
-            } */
-        }
-    </style>
+    <title>المكتبة الرقمية</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <img src="tape.png" alt="شعار المكتبة" class="header-image">
+
     <div class="container">
-        <img src="logo.png" alt="شعار المكتبة" class="logo">
-        <h1>مكتبة الإخبارية الجُدد</h1>
-        <p style="font-family: fl;">جميع الحقوق محفوظة للإخبارية الجُدد</p>
+        <header>
+            <h1>📚 المكتبة الرقمية</h1>
+            <p class="subtitle">اكتشف عالماً من المعرفة والكتب الرائعة</p>
+            <a href="admin.html" class="admin-btn">⚙️ لوحة التحكم</a>
+        </header>
+
+        <div class="search-box">
+            <input type="text" class="search-input" id="searchInput" placeholder="🔍 ابحث عن كتاب...">
+        </div>
+
+        <div class="books-grid" id="booksGrid">
+            <!-- سيتم إضافة الكتب هنا ديناميكياً -->
+        </div>
     </div>
+
+    <footer>
+        <p>© 2024 المكتبة الرقمية - جميع الحقوق محفوظة</p>
+    </footer>
+
+    <script>
+        // تحميل الكتب من localStorage
+        function loadBooks() {
+            const books = JSON.parse(localStorage.getItem('books') || '[]');
+            // عرض الكتب المنشورة فقط
+            const publishedBooks = books.filter(book => book.published === true);
+            displayBooks(publishedBooks);
+        }
+
+        // عرض الكتب
+        function displayBooks(books) {
+            const grid = document.getElementById('booksGrid');
+            
+            if (books.length === 0) {
+                grid.innerHTML = `
+                    <div class="no-books" style="grid-column: 1 / -1;">
+                        <div class="no-books-icon">📖</div>
+                        <h2>لا توجد كتب حالياً</h2>
+                        <p>ابدأ بإضافة كتب جديدة من لوحة التحكم</p>
+                        <a href="admin.html" class="admin-btn" style="margin-top: 20px;">إضافة كتاب</a>
+                    </div>
+                `;
+                return;
+            }
+
+            grid.innerHTML = books.map(book => `
+                <div class="book-card" onclick="openBook('${book.id}')">
+                    <div class="book-icon">📕</div>
+                    <div class="book-title">${book.title}</div>
+                    <div class="book-author">✍️ ${book.author}</div>
+                    <div class="book-description">${book.description}</div>
+                    <div class="book-date">📅 ${book.date}</div>
+                    <a href="read.html?id=${book.id}" class="read-btn" onclick="event.stopPropagation()">قراءة الكتاب</a>
+                </div>
+            `).join('');
+        }
+
+        // فتح الكتاب
+        function openBook(id) {
+            window.location.href = `read.html?id=${id}`;
+        }
+
+        // البحث عن الكتب
+        document.getElementById('searchInput').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const books = JSON.parse(localStorage.getItem('books') || '[]');
+            // البحث في الكتب المنشورة فقط
+            const publishedBooks = books.filter(book => book.published === true);
+            
+            const filteredBooks = publishedBooks.filter(book => 
+                book.title.toLowerCase().includes(searchTerm) ||
+                book.author.toLowerCase().includes(searchTerm) ||
+                book.description.toLowerCase().includes(searchTerm)
+            );
+            
+            displayBooks(filteredBooks);
+        });
+
+        // تحميل الكتب عند فتح الصفحة
+        loadBooks();
+    </script>
 </body>
 </html>
