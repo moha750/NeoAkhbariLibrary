@@ -3,67 +3,148 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>المكتبة الرقمية</title>
+    <title>المكتبة الرقمية - مكتبتك الإلكترونية الشاملة</title>
+    <meta name="description" content="مكتبة رقمية شاملة تحتوي على مجموعة واسعة من الكتب في مختلف المجالات">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <img src="tape.png" alt="شعار المكتبة" class="header-image">
-
     <div class="container">
-        <header>
-            <h1>📚 المكتبة الرقمية</h1>
-            <p class="subtitle">اكتشف عالماً من المعرفة والكتب الرائعة</p>
-            <a href="admin.html" class="admin-btn">⚙️ لوحة التحكم</a>
-        </header>
 
-        <div class="search-box">
-            <input type="text" class="search-input" id="searchInput" placeholder="🔍 ابحث عن كتاب...">
+        <!-- Header Image -->
+        <img src="tape.png" alt="شعار المكتبة الرقمية" class="header-image">
+
+        <input type="text" class="search-input" id="searchInput" placeholder="🔍 ابحث عن كتاب...">
+
+        <div id="categoriesContainer">
+            <!-- سيتم عرض الأقسام والكتب هنا ديناميكياً -->
         </div>
 
-        <div class="books-grid" id="booksGrid">
-            <!-- سيتم إضافة الكتب هنا ديناميكياً -->
+        <!-- فورم تواصل معنا -->
+        <div class="contact-section">
+            <h2 class="contact-title">📧 تواصل معنا</h2>
+            <p class="contact-subtitle">نسعد بتواصلك معنا، أرسل لنا رسالتك وسنرد عليك في أقرب وقت</p>
+            
+            <form id="contactForm" class="contact-form">
+                <div class="form-row">
+                    <div class="form-group-contact">
+                        <label for="contactName">👤 الاسم</label>
+                        <input type="text" id="contactName" placeholder="أدخل اسمك" required>
+                    </div>
+                    <div class="form-group-contact">
+                        <label for="contactEmail">📧 البريد الإلكتروني</label>
+                        <input type="email" id="contactEmail" placeholder="example@email.com" required>
+                    </div>
+                </div>
+                
+                <div class="form-group-contact">
+                    <label for="contactSubject">📝 الموضوع</label>
+                    <input type="text" id="contactSubject" placeholder="موضوع الرسالة" required>
+                </div>
+                
+                <div class="form-group-contact">
+                    <label for="contactMessage">💬 الرسالة</label>
+                    <textarea id="contactMessage" rows="5" placeholder="اكتب رسالتك هنا..." required></textarea>
+                </div>
+                
+                <button type="submit" class="contact-submit-btn">📤 إرسال الرسالة</button>
+            </form>
+            
+            <div id="contactSuccessMessage" class="contact-success" style="display: none;">
+                ✅ تم إرسال رسالتك بنجاح! سنتواصل معك قريباً.
+            </div>
         </div>
     </div>
 
     <footer>
-        <p>© 2024 المكتبة الرقمية - جميع الحقوق محفوظة</p>
+        <p> جميع الحقوق محفوظة للإخبارية الجُدد <span id="currentYear"></span> © </p>
     </footer>
 
     <script>
-        // تحميل الكتب من localStorage
-        function loadBooks() {
+        // تحديث السنة تلقائياً
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+    </script>
+    <script>
+        // تحميل البيانات
+        function loadData() {
+            const categories = JSON.parse(localStorage.getItem('categories') || '[]');
             const books = JSON.parse(localStorage.getItem('books') || '[]');
-            // عرض الكتب المنشورة فقط
             const publishedBooks = books.filter(book => book.published === true);
-            displayBooks(publishedBooks);
+            
+            displayBooksByCategory(categories, publishedBooks);
         }
 
-        // عرض الكتب
-        function displayBooks(books) {
-            const grid = document.getElementById('booksGrid');
+        // عرض الكتب حسب الأقسام
+        function displayBooksByCategory(categories, books) {
+            const container = document.getElementById('categoriesContainer');
             
             if (books.length === 0) {
-                grid.innerHTML = `
-                    <div class="no-books" style="grid-column: 1 / -1;">
+                container.innerHTML = `
+                    <div class="no-books">
                         <div class="no-books-icon">📖</div>
                         <h2>لا توجد كتب حالياً</h2>
                         <p>ابدأ بإضافة كتب جديدة من لوحة التحكم</p>
-                        <a href="admin.html" class="admin-btn" style="margin-top: 20px;">إضافة كتاب</a>
                     </div>
                 `;
                 return;
             }
 
-            grid.innerHTML = books.map(book => `
+            // إذا لم تكن هناك أقسام، عرض جميع الكتب
+            if (categories.length === 0) {
+                container.innerHTML = `
+                    <div class="category-section">
+                        <div class="books-grid">
+                            ${books.map(book => createBookCard(book)).join('')}
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            // عرض الكتب حسب الأقسام
+            let html = '';
+            
+            categories.forEach(category => {
+                const categoryBooks = books.filter(book => book.categoryId === category.id);
+                
+                if (categoryBooks.length > 0) {
+                    html += `
+                        <div class="category-section">
+                            <div class="category-header">
+                                <div class="category-icon">📚</div>
+                                <div class="category-info">
+                                    <div class="category-name">${category.name}</div>
+                                    ${category.description ? `<div class="category-description">${category.description}</div>` : ''}
+                                </div>
+                                <div class="category-count">${categoryBooks.length} كتاب</div>
+                            </div>
+                            <div class="books-grid">
+                                ${categoryBooks.map(book => createBookCard(book)).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+            });
+
+            // لا نعرض الكتب بدون قسم
+            container.innerHTML = html || '<div class="no-books"><div class="no-books-icon">📖</div><h2>لا توجد كتب حالياً</h2><p>ابدأ بإضافة كتب جديدة من لوحة التحكم</p></div>';
+        }
+
+        // إنشاء بطاقة كتاب
+        function createBookCard(book) {
+            const coverHTML = book.coverImage 
+                ? `<img src="${book.coverImage}" alt="${book.title}" class="book-cover-image">`
+                : `<div class="book-icon">📕</div>`;
+            
+            return `
                 <div class="book-card" onclick="openBook('${book.id}')">
-                    <div class="book-icon">📕</div>
+                    ${coverHTML}
                     <div class="book-title">${book.title}</div>
                     <div class="book-author">✍️ ${book.author}</div>
                     <div class="book-description">${book.description}</div>
                     <div class="book-date">📅 ${book.date}</div>
                     <a href="read.html?id=${book.id}" class="read-btn" onclick="event.stopPropagation()">قراءة الكتاب</a>
                 </div>
-            `).join('');
+            `;
         }
 
         // فتح الكتاب
@@ -74,8 +155,13 @@
         // البحث عن الكتب
         document.getElementById('searchInput').addEventListener('input', function(e) {
             const searchTerm = e.target.value.toLowerCase();
+            
+            if (!searchTerm) {
+                loadData();
+                return;
+            }
+
             const books = JSON.parse(localStorage.getItem('books') || '[]');
-            // البحث في الكتب المنشورة فقط
             const publishedBooks = books.filter(book => book.published === true);
             
             const filteredBooks = publishedBooks.filter(book => 
@@ -84,11 +170,77 @@
                 book.description.toLowerCase().includes(searchTerm)
             );
             
-            displayBooks(filteredBooks);
+            // عرض نتائج البحث بدون تصنيف
+            const container = document.getElementById('categoriesContainer');
+            if (filteredBooks.length === 0) {
+                container.innerHTML = `
+                    <div class="no-books">
+                        <div class="no-books-icon">🔍</div>
+                        <h2>لا توجد نتائج</h2>
+                        <p>لم يتم العثور على كتب تطابق بحثك</p>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <div class="category-section">
+                        <div class="category-header">
+                            <div class="category-icon">🔍</div>
+                            <div class="category-info">
+                                <div class="category-name">نتائج البحث</div>
+                                <div class="category-description">عن "${searchTerm}"</div>
+                            </div>
+                            <div class="category-count">${filteredBooks.length} كتاب</div>
+                        </div>
+                        <div class="books-grid">
+                            ${filteredBooks.map(book => createBookCard(book)).join('')}
+                        </div>
+                    </div>
+                `;
+            }
         });
 
-        // تحميل الكتب عند فتح الصفحة
-        loadBooks();
+        // تحميل البيانات عند فتح الصفحة
+        loadData();
+
+        // معالجة فورم التواصل
+        document.getElementById('contactForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('contactName').value.trim();
+            const email = document.getElementById('contactEmail').value.trim();
+            const subject = document.getElementById('contactSubject').value.trim();
+            const message = document.getElementById('contactMessage').value.trim();
+            
+            if (!name || !email || !subject || !message) {
+                alert('⚠️ الرجاء ملء جميع الحقول');
+                return;
+            }
+            
+            // حفظ الرسالة في localStorage
+            const messages = JSON.parse(localStorage.getItem('contactMessages') || '[]');
+            const newMessage = {
+                id: Date.now().toString(),
+                name,
+                email,
+                subject,
+                message,
+                date: new Date().toLocaleDateString('ar-EG'),
+                time: new Date().toLocaleTimeString('ar-EG'),
+                read: false
+            };
+            
+            messages.unshift(newMessage);
+            localStorage.setItem('contactMessages', JSON.stringify(messages));
+            
+            // إظهار رسالة النجاح
+            document.getElementById('contactSuccessMessage').style.display = 'block';
+            document.getElementById('contactForm').reset();
+            
+            // إخفاء رسالة النجاح بعد 5 ثواني
+            setTimeout(() => {
+                document.getElementById('contactSuccessMessage').style.display = 'none';
+            }, 5000);
+        });
     </script>
 </body>
 </html>

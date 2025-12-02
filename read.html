@@ -81,6 +81,15 @@
             margin-bottom: 20px;
         }
 
+        .book-cover-image {
+            max-width: 300px;
+            max-height: 400px;
+            object-fit: cover;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
+            margin-bottom: 20px;
+        }
+
         .book-title {
             font-size: 2.5em;
             color: #333;
@@ -297,6 +306,11 @@
                 font-size: 1.2em;
             }
 
+            .book-cover-image {
+                max-width: 200px;
+                max-height: 300px;
+            }
+
             .page-content {
                 padding: 30px 20px;
                 font-size: 1.1em;
@@ -334,7 +348,7 @@
 
         <div id="bookContainer" style="display: none;">
             <div class="book-header">
-                <div class="book-icon">📕</div>
+                <div class="book-icon" id="bookIcon">📕</div>
                 <h1 class="book-title" id="bookTitle"></h1>
                 <div class="book-author" id="bookAuthor"></div>
                 <div class="book-description" id="bookDescription"></div>
@@ -410,6 +424,15 @@
             document.getElementById('bookContainer').style.display = 'block';
 
             document.getElementById('headerTitle').textContent = currentBook.title;
+            
+            // عرض صورة الغلاف أو الأيقونة
+            const bookIconElement = document.getElementById('bookIcon');
+            if (currentBook.coverImage) {
+                bookIconElement.innerHTML = `<img src="${currentBook.coverImage}" alt="${currentBook.title}" class="book-cover-image">`;
+            } else {
+                bookIconElement.innerHTML = '📕';
+            }
+            
             document.getElementById('bookTitle').textContent = currentBook.title;
             document.getElementById('bookAuthor').textContent = '✍️ ' + currentBook.author;
             document.getElementById('bookDescription').textContent = currentBook.description;

@@ -396,9 +396,11 @@
         <div class="tabs-container">
             <div class="tabs-header">
                 <button class="tab-btn active" onclick="switchTab('publish')">📤 إنشاء كتاب جديد</button>
+                <button class="tab-btn" onclick="switchTab('categories')">📚 إدارة الأقسام</button>
                 <button class="tab-btn" onclick="switchTab('review')">🔍 مرحلة التدقيق</button>
                 <button class="tab-btn" onclick="switchTab('publish-stage')">🚀 مرحلة النشر</button>
                 <button class="tab-btn" onclick="switchTab('published')">📚 الكتب المنشورة</button>
+                <button class="tab-btn" onclick="switchTab('messages')">📧 رسائل التواصل</button>
                 <button class="tab-btn" onclick="switchTab('stats')">📊 الإحصائيات</button>
             </div>
 
@@ -425,6 +427,22 @@
                     <div class="char-count" id="descCharCount">0 حرف</div>
                 </div>
 
+                <div class="form-group">
+                    <label for="categorySelect">📚 القسم</label>
+                    <select id="categorySelect" style="width: 100%; padding: 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 1em;">
+                        <option value="">بدون قسم</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="bookCoverInput">🖼️ صورة غلاف الكتاب</label>
+                    <input type="file" id="bookCoverInput" accept="image/*" style="width: 100%; padding: 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 1em;">
+                    <div id="coverPreview" style="margin-top: 15px; text-align: center; display: none;">
+                        <img id="coverPreviewImg" src="" alt="معاينة الغلاف" style="max-width: 200px; max-height: 300px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.2);">
+                        <button type="button" onclick="removeCover()" style="display: block; margin: 10px auto; padding: 8px 15px; background: #ff4757; color: white; border: none; border-radius: 5px; cursor: pointer;">🗑️ إزالة الصورة</button>
+                    </div>
+                </div>
+
                 <div style="background: #f0f8ff; padding: 20px; border-radius: 10px; border: 2px dashed #667eea; margin-bottom: 20px;">
                     <p style="color: #667eea; font-weight: bold; margin-bottom: 10px;">📚 ملاحظة:</p>
                     <p style="color: #666;">بعد إنشاء الكتاب، ستتمكن من إضافة صفحات متعددة للكتاب من خلال صفحة إدارة الكتاب.</p>
@@ -437,6 +455,38 @@
                         <button type="button" class="clear-btn" onclick="clearForm()">🗑️ مسح الحقول</button>
                     </div>
                 </form>
+            </div>
+
+            <!-- تبويب إدارة الأقسام -->
+            <div id="categoriesTab" class="tab-content">
+                <h2 style="color: #667eea; margin-bottom: 20px; text-align: center;">📚 إدارة الأقسام</h2>
+                <p style="text-align: center; color: #666; margin-bottom: 30px;">قم بإنشاء وإدارة أقسام الكتب</p>
+                
+                <div style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1); margin-bottom: 30px;">
+                    <h3 style="color: #667eea; margin-bottom: 20px;">➕ إضافة قسم جديد</h3>
+                    <form id="categoryForm">
+                        <div class="form-group">
+                            <label for="categoryName">📝 اسم القسم</label>
+                            <input type="text" id="categoryName" placeholder="مثال: روايات، علوم، تاريخ" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="categoryDescription">📄 وصف القسم (اختياري)</label>
+                            <textarea id="categoryDescription" placeholder="وصف مختصر عن القسم" style="min-height: 80px;"></textarea>
+                        </div>
+                        <input type="hidden" id="editingCategoryId" value="">
+                        <div class="btn-group">
+                            <button type="submit" class="publish-btn" id="categorySubmitBtn">➕ إضافة القسم</button>
+                            <button type="button" class="clear-btn" onclick="clearCategoryForm()">🗑️ مسح</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div style="background: white; padding: 30px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.1);">
+                    <h3 style="color: #667eea; margin-bottom: 20px;">📋 الأقسام الحالية</h3>
+                    <div id="categoriesList">
+                        <!-- سيتم عرض الأقسام هنا -->
+                    </div>
+                </div>
             </div>
 
             <!-- تبويب مرحلة التدقيق -->
@@ -465,6 +515,15 @@
                 </div>
             </div>
 
+            <!-- تبويب رسائل التواصل -->
+            <div id="messagesTab" class="tab-content">
+                <h2 style="color: #667eea; margin-bottom: 20px; text-align: center;">📧 رسائل التواصل</h2>
+                <p style="text-align: center; color: #666; margin-bottom: 30px;">جميع الرسائل الواردة من الزوار</p>
+                <div id="messagesList">
+                    <!-- سيتم عرض الرسائل هنا -->
+                </div>
+            </div>
+
             <!-- تبويب الإحصائيات -->
             <div id="statsTab" class="tab-content">
                 <h2 style="color: #667eea; margin-bottom: 30px; text-align: center;">📊 إحصائيات المكتبة</h2>
@@ -476,10 +535,41 @@
     </div>
 
     <script>
+        // متغير لتخزين صورة الغلاف
+        let bookCoverImage = null;
+
         // عداد الأحرف
         document.getElementById('descriptionInput').addEventListener('input', function() {
             document.getElementById('descCharCount').textContent = this.value.length + ' حرف';
         });
+
+        // معالجة رفع صورة الغلاف
+        document.getElementById('bookCoverInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                if (file.size > 5 * 1024 * 1024) { // 5MB max
+                    alert('⚠️ حجم الصورة كبير جداً. الحد الأقصى 5 ميجابايت');
+                    this.value = '';
+                    return;
+                }
+                
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    bookCoverImage = event.target.result;
+                    document.getElementById('coverPreviewImg').src = bookCoverImage;
+                    document.getElementById('coverPreview').style.display = 'block';
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // إزالة صورة الغلاف
+        function removeCover() {
+            bookCoverImage = null;
+            document.getElementById('bookCoverInput').value = '';
+            document.getElementById('coverPreview').style.display = 'none';
+            document.getElementById('coverPreviewImg').src = '';
+        }
 
         // نشر الكتاب
         document.getElementById('bookForm').addEventListener('submit', function(e) {
@@ -511,11 +601,14 @@
                 }
             } else {
                 // إضافة كتاب جديد
+                const categoryId = document.getElementById('categorySelect').value;
                 const book = {
                     id: Date.now().toString(),
                     title,
                     author,
                     description,
+                    categoryId: categoryId || null,
+                    coverImage: bookCoverImage || null,
                     pages: [],
                     date: new Date().toLocaleDateString('ar-EG'),
                     views: 0,
@@ -552,6 +645,7 @@
             document.getElementById('editingId').value = '';
             document.getElementById('descCharCount').textContent = '0 حرف';
             document.querySelector('.publish-btn').textContent = '📤 إنشاء الكتاب';
+            removeCover();
         }
 
         // تبديل التبويبات
@@ -568,21 +662,30 @@
             if (tabName === 'publish') {
                 document.getElementById('publishTab').classList.add('active');
                 document.querySelectorAll('.tab-btn')[0].classList.add('active');
+                loadCategoriesSelect();
+            } else if (tabName === 'categories') {
+                document.getElementById('categoriesTab').classList.add('active');
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+                loadCategories();
             } else if (tabName === 'review') {
                 document.getElementById('reviewTab').classList.add('active');
-                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+                document.querySelectorAll('.tab-btn')[2].classList.add('active');
                 loadReviewBooks();
             } else if (tabName === 'publish-stage') {
                 document.getElementById('publishStageTab').classList.add('active');
-                document.querySelectorAll('.tab-btn')[2].classList.add('active');
+                document.querySelectorAll('.tab-btn')[3].classList.add('active');
                 loadPublishStageBooks();
             } else if (tabName === 'published') {
                 document.getElementById('publishedTab').classList.add('active');
-                document.querySelectorAll('.tab-btn')[3].classList.add('active');
+                document.querySelectorAll('.tab-btn')[4].classList.add('active');
                 loadPublishedBooks();
+            } else if (tabName === 'messages') {
+                document.getElementById('messagesTab').classList.add('active');
+                document.querySelectorAll('.tab-btn')[5].classList.add('active');
+                loadMessages();
             } else if (tabName === 'stats') {
                 document.getElementById('statsTab').classList.add('active');
-                document.querySelectorAll('.tab-btn')[4].classList.add('active');
+                document.querySelectorAll('.tab-btn')[6].classList.add('active');
                 loadStats();
             }
         }
@@ -813,8 +916,205 @@
             }
         }
 
+        // ==================== إدارة الأقسام ====================
+        
+        // تحميل الأقسام في القائمة المنسدلة
+        function loadCategoriesSelect() {
+            const categories = JSON.parse(localStorage.getItem('categories') || '[]');
+            const select = document.getElementById('categorySelect');
+            
+            select.innerHTML = '<option value="">بدون قسم</option>';
+            categories.forEach(category => {
+                select.innerHTML += `<option value="${category.id}">📚 ${category.name}</option>`;
+            });
+        }
+
+        // تحميل قائمة الأقسام
+        function loadCategories() {
+            const categories = JSON.parse(localStorage.getItem('categories') || '[]');
+            const list = document.getElementById('categoriesList');
+            
+            if (categories.length === 0) {
+                list.innerHTML = '<div class="no-books">📂 لا توجد أقسام بعد. ابدأ بإضافة قسم جديد!</div>';
+                return;
+            }
+
+            list.innerHTML = categories.map(category => {
+                const books = JSON.parse(localStorage.getItem('books') || '[]');
+                const categoryBooksCount = books.filter(b => b.categoryId === category.id).length;
+                
+                return `
+                    <div class="book-item">
+                        <div class="book-info">
+                            <div>
+                                <span style="font-size: 2em; margin-left: 10px;">📚</span>
+                                <span class="book-item-title" style="display: inline;">${category.name}</span>
+                            </div>
+                            ${category.description ? `<div class="book-item-author">${category.description}</div>` : ''}
+                            <div class="book-item-date">📚 ${categoryBooksCount} كتاب</div>
+                        </div>
+                        <div class="book-actions">
+                            <button class="edit-btn" onclick="editCategory('${category.id}')">✏️ تعديل</button>
+                            <button class="delete-btn" onclick="deleteCategory('${category.id}')">🗑️ حذف</button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // إضافة/تعديل قسم
+        document.getElementById('categoryForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('categoryName').value.trim();
+            const description = document.getElementById('categoryDescription').value.trim();
+            const editingId = document.getElementById('editingCategoryId').value;
+            
+            if (!name) {
+                alert('⚠️ الرجاء إدخال اسم القسم');
+                return;
+            }
+
+            let categories = JSON.parse(localStorage.getItem('categories') || '[]');
+            
+            if (editingId) {
+                // تعديل قسم موجود
+                const index = categories.findIndex(c => c.id === editingId);
+                if (index !== -1) {
+                    categories[index] = {
+                        ...categories[index],
+                        name,
+                        description
+                    };
+                }
+                alert('✅ تم تحديث القسم بنجاح!');
+            } else {
+                // إضافة قسم جديد
+                const category = {
+                    id: Date.now().toString(),
+                    name,
+                    description,
+                    icon: '📚',
+                    createdDate: new Date().toLocaleDateString('ar-EG')
+                };
+                categories.push(category);
+                alert('✅ تم إضافة القسم بنجاح!');
+            }
+            
+            localStorage.setItem('categories', JSON.stringify(categories));
+            clearCategoryForm();
+            loadCategories();
+            loadCategoriesSelect();
+        });
+
+        // تعديل قسم
+        function editCategory(id) {
+            const categories = JSON.parse(localStorage.getItem('categories') || '[]');
+            const category = categories.find(c => c.id === id);
+            
+            if (category) {
+                document.getElementById('categoryName').value = category.name;
+                document.getElementById('categoryDescription').value = category.description || '';
+                document.getElementById('editingCategoryId').value = category.id;
+                document.getElementById('categorySubmitBtn').textContent = '💾 تحديث القسم';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }
+
+        // حذف قسم
+        function deleteCategory(id) {
+            const books = JSON.parse(localStorage.getItem('books') || '[]');
+            const categoryBooks = books.filter(b => b.categoryId === id);
+            
+            if (categoryBooks.length > 0) {
+                if (!confirm(`⚠️ هذا القسم يحتوي على ${categoryBooks.length} كتاب. هل تريد حذفه؟ سيتم نقل الكتب إلى "بدون قسم".`)) {
+                    return;
+                }
+                // إزالة القسم من الكتب
+                books.forEach(book => {
+                    if (book.categoryId === id) {
+                        book.categoryId = null;
+                    }
+                });
+                localStorage.setItem('books', JSON.stringify(books));
+            } else {
+                if (!confirm('⚠️ هل أنت متأكد من حذف هذا القسم؟')) {
+                    return;
+                }
+            }
+            
+            let categories = JSON.parse(localStorage.getItem('categories') || '[]');
+            categories = categories.filter(c => c.id !== id);
+            localStorage.setItem('categories', JSON.stringify(categories));
+            loadCategories();
+            loadCategoriesSelect();
+            alert('✅ تم حذف القسم بنجاح!');
+        }
+
+        // مسح نموذج القسم
+        function clearCategoryForm() {
+            document.getElementById('categoryForm').reset();
+            document.getElementById('editingCategoryId').value = '';
+            document.getElementById('categorySubmitBtn').textContent = '➕ إضافة القسم';
+        }
+
+        // ==================== رسائل التواصل ====================
+        
+        // تحميل الرسائل
+        function loadMessages() {
+            const messages = JSON.parse(localStorage.getItem('contactMessages') || '[]');
+            const list = document.getElementById('messagesList');
+            
+            if (messages.length === 0) {
+                list.innerHTML = '<div class="no-books">📭 لا توجد رسائل بعد</div>';
+                return;
+            }
+
+            list.innerHTML = messages.map(message => `
+                <div class="book-item" style="background: ${message.read ? '#f8f9fa' : '#fff'}; border-right: 4px solid ${message.read ? '#6c757d' : '#667eea'};">
+                    <div class="book-info">
+                        <div>
+                            <span class="status-badge" style="background: ${message.read ? '#6c757d' : '#667eea'};">${message.read ? 'مقروءة' : 'جديدة'}</span>
+                            <span class="book-item-title" style="display: inline;">${message.subject}</span>
+                        </div>
+                        <div class="book-item-author">👤 ${message.name} | 📧 ${message.email}</div>
+                        <div class="book-item-date">📅 ${message.date} | 🕐 ${message.time}</div>
+                        <div style="margin-top: 10px; padding: 15px; background: #f8f9fa; border-radius: 8px; color: #555; line-height: 1.6;">
+                            ${message.message}
+                        </div>
+                    </div>
+                    <div class="book-actions">
+                        ${!message.read ? `<button class="verify-btn" onclick="markAsRead('${message.id}')">✅ تعليم كمقروءة</button>` : ''}
+                        <button class="delete-btn" onclick="deleteMessage('${message.id}')">🗑️ حذف</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // تعليم الرسالة كمقروءة
+        function markAsRead(id) {
+            let messages = JSON.parse(localStorage.getItem('contactMessages') || '[]');
+            const index = messages.findIndex(m => m.id === id);
+            if (index !== -1) {
+                messages[index].read = true;
+                localStorage.setItem('contactMessages', JSON.stringify(messages));
+                loadMessages();
+            }
+        }
+
+        // حذف رسالة
+        function deleteMessage(id) {
+            if (confirm('⚠️ هل أنت متأكد من حذف هذه الرسالة؟')) {
+                let messages = JSON.parse(localStorage.getItem('contactMessages') || '[]');
+                messages = messages.filter(m => m.id !== id);
+                localStorage.setItem('contactMessages', JSON.stringify(messages));
+                loadMessages();
+            }
+        }
+
         // تحميل الكتب عند فتح الصفحة
         loadAllTabs();
+        loadCategoriesSelect();
     </script>
 </body>
 </html>
