@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>القسم - الإخبارية الجُدد</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #FCFCF9;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
+            color: white;
+            padding: 30px 0;
+            box-shadow: 0 4px 20px rgba(236, 176, 7, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url('tape.png') center/cover;
+            opacity: 0.1;
+            pointer-events: none;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .header-title {
+            text-align: center;
+            flex: 1;
+        }
+
+        .header-title h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            background: white;
+            padding: 15px 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(236, 176, 7, 0.1);
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .breadcrumb-item {
+            color: #ECB007;
+            text-decoration: none;
+            font-size: 0.95em;
+            transition: all 0.3s ease;
+            padding: 5px 10px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .breadcrumb-item:hover {
+            background: rgba(236, 176, 7, 0.1);
+            color: #d49f06;
+            transform: translateY(-1px);
+        }
+
+        .breadcrumb-item.active {
+            color: #333;
+            font-weight: bold;
+            cursor: default;
+        }
+
+        .breadcrumb-separator {
+            color: #999;
+            font-size: 1.2em;
+            user-select: none;
+        }
+
+        /* Category Info */
+        .category-info-card {
+            background: white;
+            padding: 50px 40px;
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(236, 176, 7, 0.15);
+            margin-bottom: 40px;
+            text-align: center;
+            animation: fadeInUp 0.6s ease-out;
+            border: 1px solid rgba(236, 176, 7, 0.1);
+        }
+
+        .category-icon-large {
+            font-size: 5em;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 4px 8px rgba(236, 176, 7, 0.3));
+        }
+
+        .category-title {
+            font-size: 2.5em;
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .category-description {
+            font-size: 1.2em;
+            color: #666;
+            line-height: 1.8;
+            max-width: 800px;
+            margin: 0 auto 20px;
+        }
+
+        .category-stats {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        .category-stats span {
+            background: rgba(236, 176, 7, 0.1);
+            color: #666;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 1em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(236, 176, 7, 0.2);
+        }
+
+        .category-stats span:hover {
+            background: rgba(236, 176, 7, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(236, 176, 7, 0.2);
+        }
+
+        /* Books Section */
+        .books-section {
+            animation: fadeInUp 0.6s ease-out 0.2s both;
+        }
+
+        .section-title {
+            font-size: 2em;
+            color: #333;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid rgba(236, 176, 7, 0.3);
+            font-weight: bold;
+        }
+
+        /* Books Grid */
+        .books-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .book-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(236, 176, 7, 0.15);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            height: 450px;
+            display: flex;
+            flex-direction: column;
+            animation: fadeIn 0.5s ease-out;
+            border: 1px solid rgba(236, 176, 7, 0.1);
+        }
+
+        .book-card:hover {
+            transform: translateY(-5px) scale(1.01);
+            box-shadow: 0 20px 50px rgba(236, 176, 7, 0.3);
+        }
+
+        .book-icon {
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
+            color: white;
+            margin: 0;
+            border-radius: 20px 20px 0 0;
+            flex: 1;
+            position: relative;
+            filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+            padding: 20px;
+        }
+
+        .icon-emoji {
+            font-size: 5em;
+        }
+
+        .icon-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            line-height: 1.4;
+            max-width: 90%;
+        }
+
+        .book-cover-wrapper {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .book-cover-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            transition: transform 0.8s ease;
+        }
+
+        .book-card:hover .book-cover-image {
+            transform: scale(1.05);
+        }
+
+        .book-title-overlay {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 70%, transparent 100%);
+            color: white;
+            padding: 30px 15px 15px;
+            font-size: 1.1em;
+            font-weight: bold;
+            text-align: center;
+            line-height: 1.4;
+            transition: all 0.3s ease;
+        }
+
+        .read-btn {
+            display: block;
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
+            color: white;
+            text-align: center;
+            padding: 18px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(236, 176, 7, 0.3);
+        }
+
+        .read-btn:hover {
+            background: linear-gradient(135deg, #f5c842 0%, #ECB007 100%);
+            box-shadow: 0 5px 20px rgba(236, 176, 7, 0.4);
+        }
+
+        /* No Books */
+        .no-books {
+            text-align: center;
+            padding: 100px 20px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(236, 176, 7, 0.15);
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .no-books-icon {
+            font-size: 6em;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 4px 8px rgba(236, 176, 7, 0.2));
+        }
+
+        .no-books h2 {
+            color: #333;
+            font-size: 2em;
+            margin-bottom: 15px;
+        }
+
+        .no-books p {
+            color: #666;
+            font-size: 1.2em;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 100px 20px;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Error */
+        .error {
+            text-align: center;
+            padding: 100px 20px;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .error-icon {
+            font-size: 5em;
+            margin-bottom: 20px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .error h2 {
+            color: #dc3545;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        .error p {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #f5c842 0%, #ECB007 100%);
+        }
+
+        /* Selection */
+        ::selection {
+            background: rgba(236, 176, 7, 0.3);
+            color: #333;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-title h1 {
+                font-size: 1.8em;
+            }
+
+            .category-title {
+                font-size: 2em;
+            }
+
+            .category-description {
+                font-size: 1em;
+            }
+
+            .books-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 20px;
+            }
+
+            .book-card {
+                height: 400px;
+            }
+
+            .icon-emoji {
+                font-size: 4em;
+            }
+
+            .icon-title {
+                font-size: 1em;
+            }
+
+            .book-title-overlay {
+                font-size: 1em;
+                padding: 25px 12px 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .books-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .category-stats {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="header-content">
+            <div class="header-title">
+                <h1 id="headerTitle">القسم</h1>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Loading -->
+        <div id="loadingDiv" class="loading">
+            <h2>جاري التحميل...</h2>
+        </div>
+
+        <!-- Error -->
+        <div id="errorDiv" class="error" style="display: none;">
+            <div class="error-icon">❌</div>
+            <h2>عذراً، القسم غير موجود</h2>
+            <p>لم نتمكن من العثور على القسم المطلوب</p>
+            <a href="index.html" class="back-btn">العودة للرئيسية</a>
+        </div>
+
+        <!-- Category Content -->
+        <div id="categoryContainer" style="display: none;">
+            <!-- Breadcrumb -->
+            <div class="breadcrumb">
+                <a href="index.html" class="breadcrumb-item"><i class="fas fa-home"></i> الصفحة الرئيسية</a>
+                <span class="breadcrumb-separator">›</span>
+                <span class="breadcrumb-item active" id="breadcrumbCategory"><i class="fas fa-book-open"></i> القسم</span>
+            </div>
+
+            <!-- Category Info -->
+            <div class="category-info-card">
+                <div class="category-icon-large"></div>
+                <h1 class="category-title" id="categoryTitle">القسم</h1>
+                <p class="category-description" id="categoryDescription"></p>
+                <div class="category-stats">
+                    <span id="booksCount"><i class="fas fa-book"></i> 0 كتاب</span>
+                </div>
+            </div>
+
+            <!-- Books Section -->
+            <div class="books-section">
+                <h2 class="section-title"> كتب القسم</h2>
+                <div class="books-grid" id="booksGrid"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ملفات Supabase -->
+    <script src="supabase-config.js"></script>
+    <script src="supabase-api.js"></script>
+    
+    <script>
+        let currentCategory = null;
+        let categoryBooks = [];
+
+        // تحميل القسم عند فتح الصفحة
+        window.addEventListener('load', async function() {
+            try {
+                await api.init();
+                await loadCategory();
+            } catch (error) {
+                console.error('خطأ في الاتصال:', error);
+                showError();
+            }
+        });
+
+        // تحميل القسم
+        async function loadCategory() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const categoryId = urlParams.get('id');
+
+            if (!categoryId) {
+                showError();
+                return;
+            }
+
+            try {
+                currentCategory = await api.getCategory(categoryId);
+
+                if (!currentCategory) {
+                    showError();
+                    return;
+                }
+
+                categoryBooks = await api.getBooksByCategory(categoryId);
+                displayCategory();
+            } catch (error) {
+                console.error('خطأ في تحميل القسم:', error);
+                showError();
+            }
+        }
+
+        // عرض القسم
+        function displayCategory() {
+            document.getElementById('loadingDiv').style.display = 'none';
+            document.getElementById('categoryContainer').style.display = 'block';
+
+            // تحديث العنوان
+            document.getElementById('headerTitle').textContent = currentCategory.name;
+            document.getElementById('categoryTitle').textContent = currentCategory.name;
+            document.getElementById('breadcrumbCategory').innerHTML = '<i class="fas fa-book-open"></i> ' + currentCategory.name;
+            document.title = currentCategory.name + ' - الإخبارية الجُدد';
+
+            // عرض الوصف
+            const descriptionElement = document.getElementById('categoryDescription');
+            if (currentCategory.description) {
+                descriptionElement.textContent = currentCategory.description;
+                descriptionElement.style.display = 'block';
+            } else {
+                descriptionElement.style.display = 'none';
+            }
+
+            // عرض عدد الكتب
+            document.getElementById('booksCount').innerHTML = '<i class="fas fa-book"></i> ' + categoryBooks.length + ' كتاب';
+
+            // عرض الكتب
+            displayBooks();
+        }
+
+        // عرض الكتب
+        function displayBooks() {
+            const booksGrid = document.getElementById('booksGrid');
+
+            if (categoryBooks.length === 0) {
+                booksGrid.innerHTML = `
+                    <div class="no-books">
+                        <div class="no-books-icon"><i class="fas fa-book-open"></i></div>
+                        <h2>لا توجد كتب في هذا القسم</h2>
+                        <p>لم يتم نشر أي كتب في هذا القسم بعد</p>
+                    </div>
+                `;
+                return;
+            }
+
+            booksGrid.innerHTML = categoryBooks.map(book => createBookCard(book)).join('');
+        }
+
+        // إنشاء بطاقة كتاب
+        function createBookCard(book) {
+            const coverImage = book.cover_image || book.coverImage;
+            const coverHTML = coverImage 
+                ? `<div class="book-cover-wrapper">
+                    <img src="${coverImage}" alt="${book.title}" class="book-cover-image">
+                    <div class="book-title-overlay">${book.title}</div>
+                   </div>`
+                : `<div class="book-icon">
+                    <div class="icon-emoji"><i class="fas fa-book"></i></div>
+                    <div class="icon-title">${book.title}</div>
+                   </div>`;
+            
+            return `
+                <div class="book-card" onclick="openBook('${book.id}')">
+                    ${coverHTML}
+                    <a href="read.html?id=${book.id}" class="read-btn" onclick="event.stopPropagation()">قراءة الكتاب</a>
+                </div>
+            `;
+        }
+
+        // فتح الكتاب
+        function openBook(id) {
+            window.location.href = `read.html?id=${id}`;
+        }
+
+        // عرض الخطأ
+        function showError() {
+            document.getElementById('loadingDiv').style.display = 'none';
+            document.getElementById('errorDiv').style.display = 'block';
+        }
+    </script>
+</body>
+</html>

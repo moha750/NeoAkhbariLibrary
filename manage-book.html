@@ -144,12 +144,6 @@
             margin-left: 10px;
         }
 
-        .page-title {
-            font-size: 1.3em;
-            color: #333;
-            margin-bottom: 5px;
-        }
-
         .page-preview {
             color: #666;
             font-size: 0.95em;
@@ -348,10 +342,6 @@
             </div>
             <form id="pageForm">
                 <div class="form-group">
-                    <label for="pageTitle">📝 عنوان الصفحة (اختياري)</label>
-                    <input type="text" id="pageTitle" placeholder="أدخل عنوان الصفحة">
-                </div>
-                <div class="form-group">
                     <label for="pageContent">📄 محتوى الصفحة</label>
                     <textarea id="pageContent" placeholder="أدخل محتوى الصفحة..." required></textarea>
                     <div class="char-count" id="pageCharCount">0 حرف</div>
@@ -405,8 +395,6 @@
             bookInfoCard.innerHTML = `
                 <div class="book-title">📕 ${currentBook.title}</div>
                 <div class="book-meta">
-                    <strong>✍️ المؤلف:</strong> ${currentBook.author}<br>
-                    <strong>📝 الوصف:</strong> ${currentBook.description}<br>
                     <strong>📄 عدد الصفحات:</strong> ${currentBook.pages.length} صفحة
                 </div>
             `;
@@ -430,9 +418,8 @@
             pagesList.innerHTML = currentBook.pages.map((page, index) => `
                 <div class="page-item">
                     <div class="page-info">
-                        <div class="page-title">
+                        <div>
                             <span class="page-number">صفحة ${index + 1}</span>
-                            ${page.title ? page.title : 'بدون عنوان'}
                         </div>
                         <div class="page-preview">${page.content.substring(0, 100)}...</div>
                     </div>
@@ -458,8 +445,7 @@
         // فتح نافذة تعديل صفحة
         function editPage(index) {
             const page = currentBook.pages[index];
-            document.getElementById('modalTitle').textContent = `✏️ تعديل الصفحة ${index + 1}`;
-            document.getElementById('pageTitle').value = page.title || '';
+            document.getElementById('modalTitle').textContent = `✒️ تعديل الصفحة ${index + 1}`;
             document.getElementById('pageContent').value = page.content;
             document.getElementById('editingPageIndex').value = index;
             document.getElementById('pageCharCount').textContent = page.content.length + ' حرف';
@@ -475,7 +461,6 @@
         document.getElementById('pageForm').addEventListener('submit', function(e) {
             e.preventDefault();
             
-            const title = document.getElementById('pageTitle').value.trim();
             const content = document.getElementById('pageContent').value.trim();
             const editingIndex = document.getElementById('editingPageIndex').value;
 
@@ -485,9 +470,7 @@
             }
 
             const page = {
-                title: title,
-                content: content,
-                createdDate: new Date().toLocaleDateString('ar-EG')
+                content: content
             };
 
             if (editingIndex !== '') {

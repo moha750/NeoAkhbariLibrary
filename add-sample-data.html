@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إضافة بيانات تجريبية</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .log {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            max-height: 400px;
+            overflow-y: auto;
+            margin-top: 20px;
+        }
+
+        .log-entry {
+            margin-bottom: 5px;
+        }
+
+        .success {
+            color: #00ff00;
+        }
+
+        .error {
+            color: #ff0000;
+        }
+
+        .info {
+            color: #00bfff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><i class="fas fa-database"></i> إضافة بيانات تجريبية</h1>
+
+        <button class="btn" id="addBtn" onclick="addSampleData()">
+            <i class="fas fa-plus"></i> إضافة بيانات تجريبية
+        </button>
+
+        <button class="btn" onclick="location.href='index.html'" style="background: #6c757d;">
+            <i class="fas fa-home"></i> العودة للرئيسية
+        </button>
+
+        <div class="log" id="log"></div>
+    </div>
+
+    <script src="supabase-config.js"></script>
+    <script src="supabase-api.js"></script>
+    
+    <script>
+        function addLog(message, type = 'info') {
+            const log = document.getElementById('log');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+            log.appendChild(entry);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        async function addSampleData() {
+            const btn = document.getElementById('addBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> جاري الإضافة...';
+
+            try {
+                // تهيئة الاتصال
+                addLog('جاري الاتصال بـ Supabase...', 'info');
+                await api.init();
+                addLog('✓ تم الاتصال بنجاح', 'success');
+
+                // إضافة قسم
+                addLog('جاري إضافة قسم...', 'info');
+                const category = await api.addCategory(
+                    'الكتب الإسلامية',
+                    'كتب في العلوم الشرعية والدراسات الإسلامية'
+                );
+                addLog(`✓ تم إضافة القسم: ${category.name} (ID: ${category.id})`, 'success');
+
+                // إضافة كتاب
+                addLog('جاري إضافة كتاب...', 'info');
+                const book = await api.addBook({
+                    title: 'الكافي الشريف للكليني',
+                    category_id: category.id,
+                    published: true,
+                    views: 0
+                });
+                addLog(`✓ تم إضافة الكتاب: ${book.title} (ID: ${book.id})`, 'success');
+
+                // إضافة صفحات
+                addLog('جاري إضافة صفحات...', 'info');
+                
+                const pages = [
+                    {
+                        number: 1,
+                        content: `<h2>مقدمة الكتاب</h2>
+                        <p>بسم الله الرحمن الرحيم</p>
+                        <p>الحمد لله رب العالمين، والصلاة والسلام على أشرف الأنبياء والمرسلين، محمد وآله الطاهرين.</p>
+                        <p>هذا كتاب الكافي في علم الدين، جمعه الشيخ الجليل أبو جعفر محمد بن يعقوب الكليني رحمه الله.</p>`
+                    },
+                    {
+                        number: 2,
+                        content: `<h2>كتاب العقل والجهل</h2>
+                        <p>باب العقل والجهل</p>
+                        <p>عن أبي عبد الله عليه السلام قال: إن الله تبارك وتعالى لما خلق العقل استنطقه ثم قال له: أقبل فأقبل، ثم قال له: أدبر فأدبر.</p>
+                        <p>ثم قال: وعزتي وجلالي ما خلقت خلقا هو أحب إلي منك، ولا أكملتك إلا فيمن أحب.</p>`
+                    },
+                    {
+                        number: 3,
+                        content: `<h2>فضل العلم</h2>
+                        <p>عن أبي جعفر عليه السلام قال: قال رسول الله صلى الله عليه وآله: من سلك طريقا يطلب فيه علما سلك الله به طريقا إلى الجنة.</p>
+                        <p>وإن الملائكة لتضع أجنحتها لطالب العلم رضا بما يصنع.</p>
+                        <p>وإن العالم ليستغفر له من في السماوات ومن في الأرض حتى الحيتان في البحر.</p>`
+                    }
+                ];
+
+                for (const page of pages) {
+                    await api.addPage(book.id, page.number, page.content);
+                    addLog(`  ✓ تم إضافة الصفحة ${page.number}`, 'success');
+                }
+
+                addLog('', 'info');
+                addLog('✓✓✓ تم إضافة جميع البيانات التجريبية بنجاح!', 'success');
+                addLog('', 'info');
+                addLog('📊 الملخص:', 'info');
+                addLog(`  - الأقسام: 1`, 'info');
+                addLog(`  - الكتب: 1`, 'info');
+                addLog(`  - الصفحات: ${pages.length}`, 'info');
+                addLog('', 'info');
+                addLog('يمكنك الآن العودة للصفحة الرئيسية لرؤية البيانات', 'success');
+
+                btn.innerHTML = '<i class="fas fa-check"></i> تم الإضافة بنجاح!';
+                btn.style.background = '#28a745';
+
+            } catch (error) {
+                addLog(`✗ خطأ: ${error.message}`, 'error');
+                console.error('تفاصيل الخطأ:', error);
+                
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-plus"></i> إضافة بيانات تجريبية';
+                btn.style.background = '#667eea';
+            }
+        }
+    </script>
+</body>
+</html>

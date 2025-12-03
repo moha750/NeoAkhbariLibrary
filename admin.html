@@ -179,11 +179,6 @@
             margin-bottom: 5px;
         }
 
-        .book-item-author {
-            color: #667eea;
-            margin-bottom: 5px;
-        }
-
         .book-item-date {
             color: #999;
             font-size: 0.9em;
@@ -417,17 +412,6 @@
                 </div>
 
                 <div class="form-group">
-                    <label for="authorInput">✍️ اسم المؤلف</label>
-                    <input type="text" id="authorInput" placeholder="أدخل اسم المؤلف" required>
-                </div>
-
-                <div class="form-group">
-                    <label for="descriptionInput">📝 وصف مختصر</label>
-                    <textarea id="descriptionInput" placeholder="أدخل وصفاً مختصراً عن الكتاب" required></textarea>
-                    <div class="char-count" id="descCharCount">0 حرف</div>
-                </div>
-
-                <div class="form-group">
                     <label for="categorySelect">📚 القسم</label>
                     <select id="categorySelect" style="width: 100%; padding: 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 1em;">
                         <option value="">بدون قسم</option>
@@ -538,11 +522,6 @@
         // متغير لتخزين صورة الغلاف
         let bookCoverImage = null;
 
-        // عداد الأحرف
-        document.getElementById('descriptionInput').addEventListener('input', function() {
-            document.getElementById('descCharCount').textContent = this.value.length + ' حرف';
-        });
-
         // معالجة رفع صورة الغلاف
         document.getElementById('bookCoverInput').addEventListener('change', function(e) {
             const file = e.target.files[0];
@@ -576,12 +555,10 @@
             e.preventDefault();
             
             const title = document.getElementById('titleInput').value.trim();
-            const author = document.getElementById('authorInput').value.trim();
-            const description = document.getElementById('descriptionInput').value.trim();
             const editingId = document.getElementById('editingId').value;
             
-            if (!title || !author || !description) {
-                alert('⚠️ الرجاء ملء جميع الحقول');
+            if (!title) {
+                alert('⚠️ الرجاء إدخال عنوان الكتاب');
                 return;
             }
             
@@ -593,10 +570,7 @@
                 if (index !== -1) {
                     books[index] = {
                         ...books[index],
-                        title,
-                        author,
-                        description,
-                        updatedDate: new Date().toLocaleDateString('ar-EG')
+                        title
                     };
                 }
             } else {
@@ -605,17 +579,12 @@
                 const book = {
                     id: Date.now().toString(),
                     title,
-                    author,
-                    description,
                     categoryId: categoryId || null,
                     coverImage: bookCoverImage || null,
                     pages: [],
-                    date: new Date().toLocaleDateString('ar-EG'),
                     views: 0,
                     verified: false,
-                    published: false,
-                    verifiedDate: null,
-                    publishedDate: null
+                    published: false
                 };
                 books.unshift(book);
             }
@@ -643,7 +612,6 @@
         function clearForm() {
             document.getElementById('bookForm').reset();
             document.getElementById('editingId').value = '';
-            document.getElementById('descCharCount').textContent = '0 حرف';
             document.querySelector('.publish-btn').textContent = '📤 إنشاء الكتاب';
             removeCover();
         }
@@ -708,8 +676,7 @@
                             <span class="status-badge status-pending">قيد التدقيق</span>
                             <span class="book-item-title">${book.title}</span>
                         </div>
-                        <div class="book-item-author">✍️ ${book.author}</div>
-                        <div class="book-item-date">📅 ${book.date} | 📄 ${book.pages ? book.pages.length : 0} صفحة</div>
+                        <div class="book-item-date">📄 ${book.pages ? book.pages.length : 0} صفحة</div>
                     </div>
                     <div class="book-actions">
                         <button class="edit-btn preview-btn" onclick="manageBook('${book.id}')">📚 إدارة الصفحات</button>
@@ -739,8 +706,7 @@
                             <span class="status-badge status-verified">مدقق</span>
                             <span class="book-item-title">${book.title}</span>
                         </div>
-                        <div class="book-item-author">✍️ ${book.author}</div>
-                        <div class="book-item-date">📅 تدقيق: ${book.verifiedDate || book.date} | 📄 ${book.pages ? book.pages.length : 0} صفحة</div>
+                        <div class="book-item-date">📄 ${book.pages ? book.pages.length : 0} صفحة</div>
                     </div>
                     <div class="book-actions">
                         <button class="edit-btn preview-btn" onclick="manageBook('${book.id}')">📚 إدارة الصفحات</button>
@@ -770,8 +736,7 @@
                             <span class="status-badge status-verified">منشور</span>
                             <span class="book-item-title">${book.title}</span>
                         </div>
-                        <div class="book-item-author">✍️ ${book.author}</div>
-                        <div class="book-item-date">📅 نشر: ${book.publishedDate || book.date} | 📄 ${book.pages ? book.pages.length : 0} صفحة | 👁️ ${book.views || 0} مشاهدة</div>
+                        <div class="book-item-date">📄 ${book.pages ? book.pages.length : 0} صفحة | 👁️ ${book.views || 0} مشاهدة</div>
                     </div>
                     <div class="book-actions">
                         <button class="edit-btn preview-btn" onclick="manageBook('${book.id}')">📚 إدارة الصفحات</button>
@@ -831,11 +796,7 @@
             
             if (book) {
                 document.getElementById('titleInput').value = book.title;
-                document.getElementById('authorInput').value = book.author;
-                document.getElementById('descriptionInput').value = book.description;
                 document.getElementById('editingId').value = book.id;
-                
-                document.getElementById('descCharCount').textContent = book.description.length + ' حرف';
                 
                 document.querySelector('.publish-btn').textContent = '💾 تحديث الكتاب';
                 
@@ -852,7 +813,6 @@
                 
                 if (index !== -1) {
                     books[index].verified = true;
-                    books[index].verifiedDate = new Date().toLocaleDateString('ar-EG');
                     localStorage.setItem('books', JSON.stringify(books));
                     loadAllTabs();
                     switchTab('publish-stage');
@@ -870,7 +830,6 @@
                 
                 if (index !== -1) {
                     books[index].published = true;
-                    books[index].publishedDate = new Date().toLocaleDateString('ar-EG');
                     localStorage.setItem('books', JSON.stringify(books));
                     loadAllTabs();
                     

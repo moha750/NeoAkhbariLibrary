@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار الاتصال بـ Supabase</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 10px 50px rgba(0,0,0,0.3);
+            max-width: 800px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #667eea;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .status {
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 1.1em;
+        }
+
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 2px solid #c3e6cb;
+        }
+
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 2px solid #f5c6cb;
+        }
+
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 2px solid #bee5eb;
+        }
+
+        .data-section {
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+
+        .data-section h3 {
+            color: #667eea;
+            margin-bottom: 15px;
+        }
+
+        .data-item {
+            padding: 10px;
+            margin-bottom: 10px;
+            background: white;
+            border-radius: 5px;
+            border-left: 4px solid #667eea;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1em;
+            margin: 10px 5px;
+            transition: all 0.3s;
+        }
+
+        .btn:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+
+        .code-block {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+
+        pre {
+            margin: 0;
+            white-space: pre-wrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1><i class="fas fa-database"></i> اختبار الاتصال بـ Supabase</h1>
+
+        <div id="statusContainer"></div>
+
+        <div style="text-align: center;">
+            <button class="btn" onclick="testConnection()">
+                <i class="fas fa-sync"></i> اختبار الاتصال
+            </button>
+            <button class="btn" onclick="location.href='index.html'">
+                <i class="fas fa-home"></i> العودة للرئيسية
+            </button>
+        </div>
+
+        <div id="dataContainer"></div>
+    </div>
+
+    <script src="supabase-config.js"></script>
+    <script src="supabase-api.js"></script>
+    
+    <script>
+        function showStatus(message, type = 'info') {
+            const container = document.getElementById('statusContainer');
+            container.innerHTML = `
+                <div class="status ${type}">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'times-circle' : 'info-circle'}"></i>
+                    ${message}
+                </div>
+            `;
+        }
+
+        function showData(title, data) {
+            const container = document.getElementById('dataContainer');
+            container.innerHTML = `
+                <div class="data-section">
+                    <h3>${title}</h3>
+                    <div class="code-block">
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function testConnection() {
+            try {
+                showStatus('جاري الاتصال بـ Supabase...', 'info');
+
+                // 1. اختبار التهيئة
+                await api.init();
+                showStatus('✅ تم الاتصال بـ Supabase بنجاح!', 'success');
+
+                // 2. اختبار جلب الأقسام
+                console.log('جاري جلب الأقسام...');
+                const categories = await api.getCategories();
+                console.log('الأقسام:', categories);
+
+                // 3. اختبار جلب الكتب
+                console.log('جاري جلب الكتب...');
+                const books = await api.getPublishedBooks();
+                console.log('الكتب:', books);
+
+                // عرض النتائج
+                const results = {
+                    connection: '✅ متصل',
+                    supabase_url: SUPABASE_CONFIG.url,
+                    categories_count: categories.length,
+                    books_count: books.length,
+                    categories: categories,
+                    books: books.map(book => ({
+                        id: book.id,
+                        title: book.title,
+                        category_id: book.category_id,
+                        published: book.published,
+                        views: book.views
+                    }))
+                };
+
+                showData('نتائج الاختبار', results);
+
+                // رسالة تفصيلية
+                let detailMessage = `
+                    <strong>✅ الاتصال ناجح!</strong><br><br>
+                    📊 الإحصائيات:<br>
+                    - عدد الأقسام: ${categories.length}<br>
+                    - عدد الكتب: ${books.length}<br><br>
+                `;
+
+                if (categories.length === 0) {
+                    detailMessage += `
+                        ⚠️ <strong>لا توجد أقسام في قاعدة البيانات</strong><br>
+                        يرجى إضافة أقسام من لوحة التحكم أو باستخدام:<br>
+                        <div class="code-block" style="margin-top: 10px;">
+                            <pre>await api.addCategory('اسم القسم', 'الوصف');</pre>
+                        </div>
+                    `;
+                }
+
+                if (books.length === 0) {
+                    detailMessage += `
+                        ⚠️ <strong>لا توجد كتب في قاعدة البيانات</strong><br>
+                        يرجى إضافة كتب من لوحة التحكم أو باستخدام:<br>
+                        <div class="code-block" style="margin-top: 10px;">
+                            <pre>await api.addBook({
+    title: 'عنوان الكتاب',
+    category_id: 'معرف القسم',
+    published: true
+});</pre>
+                        </div>
+                    `;
+                }
+
+                if (books.length > 0) {
+                    detailMessage += `<br>📚 <strong>الكتب الموجودة:</strong><br>`;
+                    books.forEach((book, index) => {
+                        detailMessage += `${index + 1}. ${book.title} (${book.published ? 'منشور' : 'غير منشور'})<br>`;
+                    });
+                }
+
+                showStatus(detailMessage, 'success');
+
+            } catch (error) {
+                console.error('خطأ في الاختبار:', error);
+                
+                let errorMessage = `
+                    <strong>❌ فشل الاتصال</strong><br><br>
+                    الخطأ: ${error.message}<br><br>
+                    <strong>الحلول المقترحة:</strong><br>
+                    1. تحقق من صحة URL و API Key في supabase-config.js<br>
+                    2. تأكد من تنفيذ database-setup.sql<br>
+                    3. نفذ fix-rls-policies.sql لإصلاح الصلاحيات<br>
+                    4. افتح Console (F12) لمزيد من التفاصيل
+                `;
+                
+                showStatus(errorMessage, 'error');
+                
+                showData('تفاصيل الخطأ', {
+                    error: error.message,
+                    stack: error.stack,
+                    config: {
+                        url: SUPABASE_CONFIG.url,
+                        hasAnonKey: !!SUPABASE_CONFIG.anonKey
+                    }
+                });
+            }
+        }
+
+        // اختبار تلقائي عند التحميل
+        window.addEventListener('load', function() {
+            testConnection();
+        });
+    </script>
+</body>
+</html>

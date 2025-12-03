@@ -2,10 +2,10 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: #FCFCF9;
     min-height: 100vh;
 }
@@ -13,7 +13,7 @@ body {
 /* Header Section */
 .header-image {
     max-width: 100%;
-    border-radius: 0px 0px 20px 20px;
+    border-radius: 0px 0px 20px 20px; 
     box-shadow: 0 4px 20px rgba(236, 176, 7, 0.2);
 }
 
@@ -27,6 +27,7 @@ body {
 .category-section {
     margin-bottom: 60px;
     animation: fadeInUp 0.6s ease-out;
+    scroll-margin-top: 30px;
 }
 
 @keyframes fadeInUp {
@@ -61,6 +62,10 @@ body {
 .category-icon {
     font-size: 3em;
     filter: drop-shadow(2px 2px 4px rgba(0,0,0,0.2));
+}
+
+.category-icon i {
+    font-size: 1em;
 }
 
 .category-info {
@@ -137,7 +142,6 @@ body {
     height: 450px;
     display: flex;
     flex-direction: column;
-    border: 3px solid transparent;
     animation: fadeIn 0.5s ease-out;
 }
 
@@ -156,9 +160,8 @@ body {
 }
 
 .book-card:hover {
-    transform: translateY(-15px) scale(1.02);
+    transform: translateY(-5px) scale(1.01);
     box-shadow: 0 20px 50px rgba(236, 176, 7, 0.3);
-    border-color: #ECB007;
 }
 
 .book-card:hover::before {
@@ -166,11 +169,12 @@ body {
 }
 
 .book-icon {
-    font-size: 6em;
     text-align: center;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 15px;
     background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
     color: white;
     margin: 0;
@@ -178,35 +182,53 @@ body {
     flex: 1;
     position: relative;
     filter: drop-shadow(0 4px 8px rgba(0,0,0,0.1));
+    padding: 20px;
+}
+
+.icon-emoji {
+    font-size: 5em;
+}
+
+.icon-emoji i {
+    font-size: 1em;
+}
+
+.icon-title {
+    font-size: 1.2em;
+    font-weight: bold;
+    line-height: 1.4;
+    max-width: 90%;
+}
+
+.book-cover-wrapper {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    border-radius: 20px 20px 0 0;
 }
 
 .book-cover-image {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    border-radius: 20px 20px 0 0;
     display: block;
-    transition: transform 0.4s ease;
+    transition: transform 0.8s ease;
 }
 
-.book-card:hover .book-cover-image {
-    transform: scale(1.05);
-}
-
-.book-title {
-    display: none;
-}
-
-.book-author {
-    display: none;
-}
-
-.book-description {
-    display: none;
-}
-
-.book-date {
-    display: none;
+.book-title-overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.7) 70%, transparent 100%);
+    color: white;
+    padding: 30px 15px 15px;
+    font-size: 1.1em;
+    font-weight: bold;
+    text-align: center;
+    line-height: 1.4;
+    transition: all 0.3s ease;
 }
 
 .read-btn {
@@ -229,7 +251,6 @@ body {
 
 .read-btn:hover {
     background: linear-gradient(135deg, #f5c842 0%, #ECB007 100%);
-    transform: translateY(-3px);
     box-shadow: 0 5px 20px rgba(236, 176, 7, 0.4);
 }
 
@@ -243,9 +264,14 @@ body {
 }
 
 .no-books-icon {
+    color: #ECB007;
     font-size: 6em;
     margin-bottom: 25px;
     filter: drop-shadow(2px 2px 4px rgba(236, 176, 7, 0.3));
+}
+
+.no-books-icon i {
+    font-size: 1em;
 }
 
 .no-books h2 {
@@ -329,7 +355,7 @@ body {
     border: 2px solid #ECB007;
     border-radius: 12px;
     font-size: 1.05em;
-    font-family: 'Kufam', 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     transition: all 0.3s ease;
     background: #FCFCF9;
 }
@@ -446,12 +472,21 @@ footer {
         height: 400px;
     }
 
+    .book-title-overlay {
+        font-size: 1em;
+        padding: 25px 12px 12px;
+    }
+
     .book-card:hover {
         transform: translateY(-10px) scale(1.01);
     }
 
-    .book-icon {
-        font-size: 5em;
+    .icon-emoji {
+        font-size: 4em;
+    }
+
+    .icon-title {
+        font-size: 1em;
     }
 
     .read-btn {
@@ -535,6 +570,20 @@ footer {
 /* Smooth Scrolling */
 html {
     scroll-behavior: smooth;
+}
+
+/* Font Awesome Icons Styling */
+i.fas, i.far, i.fab {
+    margin-left: 5px;
+    margin-right: 5px;
+}
+
+label i.fas {
+    margin-left: 8px;
+}
+
+.contact-submit-btn i.fas {
+    margin-left: 8px;
 }
 
 /* Selection Color */
