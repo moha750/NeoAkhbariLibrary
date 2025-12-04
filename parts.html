@@ -1,0 +1,697 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أجزاء الكتاب - الإخبارية الجُدد</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #FCFCF9;
+            min-height: 100vh;
+        }
+
+        /* Header Section */
+        .header-image {
+            max-width: 100%;
+            border-radius: 0px 0px 20px 20px; 
+            box-shadow: 0 4px 20px rgba(236, 176, 7, 0.2);
+        }
+
+        /* Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 20px;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            background: white;
+            padding: 15px 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(236, 176, 7, 0.1);
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .breadcrumb-item {
+            color: #ECB007;
+            text-decoration: none;
+            font-size: 0.95em;
+            transition: all 0.3s ease;
+            padding: 5px 10px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .breadcrumb-item:hover {
+            background: rgba(236, 176, 7, 0.1);
+            color: #d49f06;
+            transform: translateY(-1px);
+        }
+
+        .breadcrumb-item.active {
+            color: #333;
+            font-weight: bold;
+            cursor: default;
+        }
+
+        .breadcrumb-separator {
+            color: #999;
+            font-size: 1.2em;
+            user-select: none;
+        }
+
+        /* Book Info */
+        .book-info-card {
+            background: white;
+            padding: 50px 40px;
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(236, 176, 7, 0.15);
+            margin-bottom: 40px;
+            text-align: center;
+            animation: fadeInUp 0.6s ease-out;
+            border: 1px solid rgba(236, 176, 7, 0.1);
+        }
+
+        .book-cover-display {
+            max-width: 300px;
+            max-height: 400px;
+            margin: 0 auto 30px;
+            border-radius: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .book-icon-large {
+            font-size: 5em;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 4px 8px rgba(236, 176, 7, 0.3));
+        }
+
+        .book-title {
+            font-size: 2.5em;
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+
+        .book-stats {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 25px;
+            flex-wrap: wrap;
+        }
+
+        .book-stats span {
+            background: rgba(236, 176, 7, 0.1);
+            color: #666;
+            padding: 10px 20px;
+            border-radius: 25px;
+            font-size: 1em;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(236, 176, 7, 0.2);
+        }
+
+        .book-stats span:hover {
+            background: rgba(236, 176, 7, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(236, 176, 7, 0.2);
+        }
+
+        /* Parts Section */
+        .parts-section {
+            animation: fadeInUp 0.6s ease-out 0.2s both;
+        }
+
+        .section-title {
+            font-size: 2em;
+            color: #333;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid rgba(236, 176, 7, 0.3);
+            font-weight: bold;
+        }
+
+        /* Parts Grid - Row Layout */
+        .parts-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .part-card {
+            background: white;
+            border-radius: 15px;
+            overflow: visible;
+            box-shadow: 0 4px 20px rgba(236, 176, 7, 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            animation: slideInRight 0.6s ease-out both;
+            border: 2px solid rgba(236, 176, 7, 0.1);
+            position: relative;
+        }
+
+        .part-card:hover {
+            transform: translateX(-5px);
+            box-shadow: 0 8px 30px rgba(236, 176, 7, 0.25);
+            border-color: rgba(236, 176, 7, 0.3);
+        }
+
+        .part-card:hover::before {
+            opacity: 1;
+        }
+
+        .part-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
+            color: white;
+            padding: 30px 20px;
+            min-width: 200px;
+            position: relative;
+            border-radius: 15px 0 0 15px;
+        }
+
+        .part-number {
+            font-size: 2.5em;
+            font-weight: bold;
+            line-height: 1;
+        }
+
+        .part-label {
+            font-size: 1.2em;
+            font-weight: 600;
+        }
+
+        .part-info {
+            flex: 1;
+            padding: 0px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 20px;
+        }
+
+        .part-details {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .part-title {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #333;
+            display: flex;
+            gap: 12px;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+
+        .part-badge {
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7em;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .read-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
+            color: white;
+            padding: 12px 20px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1em;
+            transition: all 0.3s ease;
+            border: none;
+            cursor: pointer;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(236, 176, 7, 0.2);
+        }
+
+        .read-btn:hover {
+            background: linear-gradient(135deg, #f5c842 0%, #ECB007 100%);
+            box-shadow: 0 6px 20px rgba(236, 176, 7, 0.35);
+            transform: translateX(-4px);
+        }
+
+        .part-arrow {
+            color: #ECB007;
+            font-size: 1.5em;
+            margin-left: 15px;
+            transition: transform 0.3s ease;
+        }
+
+        .part-card:hover .part-arrow {
+            transform: translateX(-5px);
+        }
+
+        .part-card:active {
+            transform: translateX(-3px) scale(0.98);
+        }
+
+        /* No Parts */
+        .no-parts {
+            text-align: center;
+            padding: 100px 20px;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(236, 176, 7, 0.15);
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .no-parts-icon {
+            font-size: 6em;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 4px 8px rgba(236, 176, 7, 0.2));
+        }
+
+        .no-parts h2 {
+            color: #333;
+            font-size: 2em;
+            margin-bottom: 15px;
+        }
+
+        .no-parts p {
+            color: #666;
+            font-size: 1.2em;
+            margin-bottom: 30px;
+        }
+
+        .back-btn {
+            display: inline-block;
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
+            color: white;
+            padding: 15px 40px;
+            border-radius: 25px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 1.1em;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(236, 176, 7, 0.3);
+        }
+
+        .back-btn:hover {
+            background: linear-gradient(135deg, #f5c842 0%, #ECB007 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(236, 176, 7, 0.4);
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 100px 20px;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Error */
+        .error {
+            text-align: center;
+            padding: 100px 20px;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .error-icon {
+            font-size: 5em;
+            margin-bottom: 20px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .error h2 {
+            color: #dc3545;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        .error p {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideInRight {
+            from {
+                opacity: 0;
+                transform: translateX(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar {
+            width: 12px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #f5c842 0%, #ECB007 100%);
+        }
+
+        /* Selection */
+        ::selection {
+            background: rgba(236, 176, 7, 0.3);
+            color: #333;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .book-title {
+                font-size: 2em;
+            }
+
+            .part-card {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .part-icon {
+                min-width: auto;
+                padding: 25px 30px;
+                flex-direction: row;
+                justify-content: center;
+                border-radius: 15px 15px 0px 0px;
+            }
+
+            .part-number {
+                font-size: 2em;
+            }
+
+            .part-label {
+                font-size: 1em;
+            }
+
+            .part-info {
+                flex-direction: column;
+                gap: 15px;
+                padding: 20px;
+            }
+
+            .part-details {
+                text-align: center;
+            }
+
+            .read-btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .part-arrow {
+                display: none;
+            }
+
+            .part-title {
+                align-items: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .part-icon {
+                padding: 20px;
+            }
+
+            .part-number {
+                font-size: 1.8em;
+            }
+
+            .part-title {
+                font-size: 1.2em;
+                justify-content: center;
+            }
+
+            .part-badge {
+                font-size: 0.65em;
+            }
+
+            .book-stats {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header Image -->
+    <img src="tape.png" alt="شعار المكتبة الرقمية" class="header-image">
+
+    <div class="container">
+        <!-- Loading -->
+        <div id="loadingDiv" class="loading">
+            <h2>جاري التحميل...</h2>
+        </div>
+
+        <!-- Error -->
+        <div id="errorDiv" class="error" style="display: none;">
+            <div class="error-icon">❌</div>
+            <h2>عذراً، الكتاب غير موجود</h2>
+            <p>لم نتمكن من العثور على الكتاب المطلوب</p>
+            <a href="index.html" class="back-btn">العودة للرئيسية</a>
+        </div>
+
+        <!-- Book Content -->
+        <div id="bookContainer" style="display: none;">
+            <!-- Breadcrumb -->
+            <div class="breadcrumb">
+                <a href="index.html" class="breadcrumb-item"><i class="fas fa-home"></i> الصفحة الرئيسية</a>
+                <span class="breadcrumb-separator">›</span>
+                <span class="breadcrumb-item active" id="breadcrumbBook"><i class="fas fa-book"></i> الكتاب</span>
+            </div>
+
+            <!-- Book Info -->
+            <div class="book-info-card">
+                <div id="bookCoverContainer"></div>
+                <h1 class="book-title" id="bookTitle">الكتاب</h1>
+                <div class="book-stats">
+                    <span id="partsCount"><i class="fas fa-layer-group"></i> 0 جزء</span>
+                </div>
+            </div>
+
+            <!-- Parts Section -->
+            <div class="parts-section">
+                <h2 class="section-title">أجزاء الكتاب</h2>
+                <div class="parts-grid" id="partsGrid"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ملفات Supabase -->
+    <script src="supabase-config.js"></script>
+    <script src="supabase-api.js"></script>
+    
+    <script>
+        let currentBook = null;
+        let bookParts = [];
+
+        // تحميل الكتاب عند فتح الصفحة
+        window.addEventListener('load', async function() {
+            try {
+                await api.init();
+                await loadBook();
+            } catch (error) {
+                console.error('خطأ في الاتصال:', error);
+                showError();
+            }
+        });
+
+        // تحميل الكتاب
+        async function loadBook() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const bookId = urlParams.get('id');
+
+            if (!bookId) {
+                showError();
+                return;
+            }
+
+            try {
+                currentBook = await api.getBook(bookId);
+
+                if (!currentBook) {
+                    showError();
+                    return;
+                }
+
+                bookParts = await api.getBookParts(bookId);
+                
+                // إذا لم يكن للكتاب أجزاء، انتقل مباشرة لصفحة القراءة
+                if (bookParts.length === 0) {
+                    window.location.href = `read.html?id=${bookId}`;
+                    return;
+                }
+
+                displayBook();
+            } catch (error) {
+                console.error('خطأ في تحميل الكتاب:', error);
+                showError();
+            }
+        }
+
+        // عرض الكتاب
+        function displayBook() {
+            document.getElementById('loadingDiv').style.display = 'none';
+            document.getElementById('bookContainer').style.display = 'block';
+
+            // تحديث العنوان
+            document.getElementById('bookTitle').textContent = currentBook.title;
+            document.getElementById('breadcrumbBook').innerHTML = '<i class="fas fa-book"></i> ' + currentBook.title;
+            document.title = currentBook.title + ' - الإخبارية الجُدد';
+
+            // عرض الغلاف
+            const coverContainer = document.getElementById('bookCoverContainer');
+            if (currentBook.cover_image) {
+                coverContainer.innerHTML = `<img src="${currentBook.cover_image}" alt="${currentBook.title}" class="book-cover-display">`;
+            } else {
+                coverContainer.innerHTML = `<div class="book-icon-large"><i class="fas fa-book"></i></div>`;
+            }
+
+            // عرض عدد الأجزاء
+            document.getElementById('partsCount').innerHTML = '<i class="fas fa-layer-group"></i> ' + bookParts.length + ' جزء';
+
+            // عرض الأجزاء
+            displayParts();
+        }
+
+        // عرض الأجزاء
+        async function displayParts() {
+            const partsGrid = document.getElementById('partsGrid');
+
+            if (bookParts.length === 0) {
+                partsGrid.innerHTML = `
+                    <div class="no-parts">
+                        <div class="no-parts-icon"><i class="fas fa-layer-group"></i></div>
+                        <h2>لا توجد أجزاء لهذا الكتاب</h2>
+                        <p>سيتم توجيهك لصفحة القراءة المباشرة</p>
+                        <a href="read.html?id=${currentBook.id}" class="back-btn">قراءة الكتاب</a>
+                    </div>
+                `;
+                return;
+            }
+
+            // جلب عدد الصفحات لكل جزء
+            const partsWithPageCount = await Promise.all(
+                bookParts.map(async (part) => {
+                    const pages = await api.getPartPages(part.id);
+                    return { ...part, pageCount: pages.length };
+                })
+            );
+
+            partsGrid.innerHTML = partsWithPageCount.map((part, index) => createPartCard(part, index)).join('');
+        }
+
+        // إنشاء بطاقة جزء
+        function createPartCard(part, index) {
+            const animationDelay = index * 0.1;
+            const pageCountText = part.pageCount ? `${part.pageCount} صفحة` : 'لا توجد صفحات';
+            return `
+                <div class="part-card" onclick="openPart('${part.id}')" style="animation-delay: ${animationDelay}s;">
+                    <div class="part-icon">
+                        <div class="part-label">الجزء</div>
+                        <div class="part-number">${part.part_number}</div>
+                    </div>
+                    <div class="part-info">
+                        <div class="part-details">
+                            <div class="part-title">
+                                <span>${currentBook.title}</span>
+                                <span class="part-badge">
+                                    <i class="fas fa-file-alt"></i>
+                                    ${pageCountText}
+                                </span>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <a href="read.html?id=${currentBook.id}&part=${part.id}" class="read-btn" onclick="event.stopPropagation()">
+                                <i class="fas fa-book-open"></i> قراءة الجزء
+                            </a>
+                            <i class="fas fa-chevron-left part-arrow"></i>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // فتح الجزء
+        function openPart(partId) {
+            window.location.href = `read.html?id=${currentBook.id}&part=${partId}`;
+        }
+
+        // عرض الخطأ
+        function showError() {
+            document.getElementById('loadingDiv').style.display = 'none';
+            document.getElementById('errorDiv').style.display = 'block';
+        }
+    </script>
+</body>
+</html>

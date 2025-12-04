@@ -22,48 +22,11 @@
             min-height: 100vh;
         }
 
-        /* Header */
-        .header {
-            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
-            color: white;
-            padding: 30px 0;
-            box-shadow: 0 4px 20px rgba(236, 176, 7, 0.3);
-            position: relative;
-            overflow: hidden;
-        }
-
-        .header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('tape.png') center/cover;
-            opacity: 0.1;
-            pointer-events: none;
-        }
-
-        .header-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 20px;
-            position: relative;
-            z-index: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .header-title {
-            text-align: center;
-            flex: 1;
-        }
-
-        .header-title h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        /* Header Section */
+        .header-image {
+            max-width: 100%;
+            border-radius: 0px 0px 20px 20px; 
+            box-shadow: 0 4px 20px rgba(236, 176, 7, 0.2);
         }
 
         /* Container */
@@ -414,9 +377,6 @@
 
         /* Responsive */
         @media (max-width: 768px) {
-            .header-title h1 {
-                font-size: 1.8em;
-            }
 
             .category-title {
                 font-size: 2em;
@@ -462,13 +422,8 @@
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="header-content">
-            <div class="header-title">
-                <h1 id="headerTitle">القسم</h1>
-            </div>
-        </div>
-    </div>
+        <!-- Header Image -->
+        <img src="tape.png" alt="شعار المكتبة الرقمية" class="header-image">
 
     <div class="container">
         <!-- Loading -->
@@ -562,7 +517,6 @@
             document.getElementById('categoryContainer').style.display = 'block';
 
             // تحديث العنوان
-            document.getElementById('headerTitle').textContent = currentCategory.name;
             document.getElementById('categoryTitle').textContent = currentCategory.name;
             document.getElementById('breadcrumbCategory').innerHTML = '<i class="fas fa-book-open"></i> ' + currentCategory.name;
             document.title = currentCategory.name + ' - الإخبارية الجُدد';
@@ -624,7 +578,7 @@
 
         // فتح الكتاب
         function openBook(id) {
-            window.location.href = `read.html?id=${id}`;
+            window.location.href = `parts.html?id=${id}`;
         }
 
         // عرض الخطأ

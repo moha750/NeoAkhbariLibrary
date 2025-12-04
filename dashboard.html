@@ -1,0 +1,1399 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة التحكم - المكتبة الرقمية</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .header h1 {
+            color: #667eea;
+            font-size: 2em;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #764ba2;
+            transform: translateY(-2px);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: all 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8em;
+            color: white;
+        }
+
+        .stat-icon.books {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .stat-icon.categories {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .stat-icon.pages {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .stat-icon.messages {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+
+        .stat-info h3 {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .stat-info .number {
+            color: #333;
+            font-size: 2em;
+            font-weight: bold;
+        }
+
+        /* Tabs */
+        .tabs {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
+            color: #666;
+            border-radius: 10px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-btn:hover {
+            background: #f0f0f0;
+        }
+
+        .tab-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Forms */
+        .form-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        /* Items List */
+        .items-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .item-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s;
+        }
+
+        .item-card:hover {
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transform: translateX(-5px);
+        }
+
+        .item-info h3 {
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .item-info p {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 0.9em;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-state i {
+            font-size: 4em;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #667eea;
+        }
+
+        .loading i {
+            font-size: 3em;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Badge */
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .badge-info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .item-card {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <div>
+                <h1><i class="fas fa-tachometer-alt"></i> لوحة التحكم</h1>
+                <p style="color: #666; margin-top: 5px;">إدارة المكتبة الرقمية</p>
+            </div>
+            <div class="header-actions">
+                <a href="index.html" class="btn btn-secondary">
+                    <i class="fas fa-home"></i> الصفحة الرئيسية
+                </a>
+            </div>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+                <div class="stat-icon books">
+                    <i class="fas fa-book"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>إجمالي الكتب</h3>
+                    <div class="number" id="totalBooks">0</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon categories">
+                    <i class="fas fa-folder"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>الأقسام</h3>
+                    <div class="number" id="totalCategories">0</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon pages">
+                    <i class="fas fa-file-alt"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>الصفحات</h3>
+                    <div class="number" id="totalPages">0</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon messages">
+                    <i class="fas fa-envelope"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>الرسائل</h3>
+                    <div class="number" id="totalMessages">0</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <div class="tab-buttons">
+                <button class="tab-btn active" onclick="switchTab('categories')">
+                    <i class="fas fa-folder"></i> الأقسام
+                </button>
+                <button class="tab-btn" onclick="switchTab('books')">
+                    <i class="fas fa-book"></i> الكتب
+                </button>
+                <button class="tab-btn" onclick="switchTab('parts')">
+                    <i class="fas fa-bookmark"></i> الأجزاء
+                </button>
+                <button class="tab-btn" onclick="switchTab('pages')">
+                    <i class="fas fa-file-alt"></i> الصفحات
+                </button>
+                <button class="tab-btn" onclick="switchTab('messages')">
+                    <i class="fas fa-envelope"></i> الرسائل
+                </button>
+            </div>
+
+            <!-- Categories Tab -->
+            <div id="categories-tab" class="tab-content active">
+                <div class="form-section">
+                    <h2 style="color: #667eea; margin-bottom: 20px;">
+                        <i class="fas fa-plus-circle"></i> إضافة قسم جديد
+                    </h2>
+                    <form id="categoryForm" onsubmit="saveCategory(event)">
+                        <div class="form-group">
+                            <label><i class="fas fa-tag"></i> اسم القسم</label>
+                            <input type="text" id="categoryName" placeholder="مثال: الكتب الإسلامية" required>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-align-right"></i> الوصف</label>
+                            <textarea id="categoryDescription" placeholder="وصف مختصر للقسم"></textarea>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> حفظ القسم
+                            </button>
+                            <button type="button" class="btn btn-secondary" onclick="clearCategoryForm()">
+                                <i class="fas fa-times"></i> إلغاء
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <h3 style="margin: 20px 0; color: #333;">
+                    <i class="fas fa-list"></i> قائمة الأقسام
+                </h3>
+                <div id="categoriesList" class="items-list">
+                    <div class="loading">
+                        <i class="fas fa-spinner"></i>
+                        <p>جاري التحميل...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Books Tab -->
+            <div id="books-tab" class="tab-content">
+                <div class="form-section">
+                    <h2 style="color: #667eea; margin-bottom: 20px;">
+                        <i class="fas fa-plus-circle"></i> إضافة كتاب جديد
+                    </h2>
+                    <form id="bookForm" onsubmit="saveBook(event)">
+                        <div class="form-group">
+                            <label><i class="fas fa-book"></i> عنوان الكتاب</label>
+                            <input type="text" id="bookTitle" placeholder="مثال: الكافي الشريف" required>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-folder"></i> القسم</label>
+                            <select id="bookCategory" required>
+                                <option value="">اختر القسم</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-image"></i> رابط صورة الغلاف (اختياري)</label>
+                            <input type="url" id="bookCover" placeholder="https://example.com/cover.jpg">
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <input type="checkbox" id="bookPublished" checked>
+                                نشر الكتاب مباشرة
+                            </label>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> حفظ الكتاب
+                            </button>
+                            <button type="button" class="btn btn-secondary" onclick="clearBookForm()">
+                                <i class="fas fa-times"></i> إلغاء
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <h3 style="margin: 20px 0; color: #333;">
+                    <i class="fas fa-list"></i> قائمة الكتب
+                </h3>
+                <div id="booksList" class="items-list">
+                    <div class="loading">
+                        <i class="fas fa-spinner"></i>
+                        <p>جاري التحميل...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Parts Management Tab -->
+            <div id="parts-tab" class="tab-content">
+                <div class="form-section">
+                    <h2 style="color: #667eea; margin-bottom: 20px;">
+                        <i class="fas fa-bookmark"></i> إدارة أجزاء الكتاب
+                    </h2>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-book"></i> اختر الكتاب</label>
+                        <select id="partBookSelect" onchange="loadBookParts()" required>
+                            <option value="">اختر كتاباً لإدارة أجزائه</option>
+                        </select>
+                    </div>
+
+                    <div id="partEditorSection" style="display: none;">
+                        <h3 style="color: #667eea; margin: 30px 0 20px;">
+                            <i class="fas fa-plus-circle"></i> إضافة جزء جديد
+                        </h3>
+                        <form id="partForm" onsubmit="savePart(event)">
+                            <div class="form-group">
+                                <label><i class="fas fa-hashtag"></i> رقم الجزء</label>
+                                <input type="number" id="partNumber" min="1" placeholder="1" required>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> حفظ الجزء
+                                </button>
+                                <button type="button" class="btn btn-secondary" onclick="clearPartForm()">
+                                    <i class="fas fa-times"></i> إلغاء
+                                </button>
+                            </div>
+                        </form>
+
+                        <h3 style="margin: 30px 0 20px; color: #333;">
+                            <i class="fas fa-list"></i> أجزاء الكتاب
+                        </h3>
+                        <div id="partsList" class="items-list">
+                            <div class="empty-state">
+                                <i class="fas fa-bookmark"></i>
+                                <h3>لا توجد أجزاء</h3>
+                                <p>ابدأ بإضافة جزء جديد أو اترك الكتاب بدون أجزاء</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pages Management Tab -->
+            <div id="pages-tab" class="tab-content">
+                <div class="form-section">
+                    <h2 style="color: #667eea; margin-bottom: 20px;">
+                        <i class="fas fa-book-open"></i> إدارة صفحات الكتاب
+                    </h2>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-book"></i> اختر الكتاب</label>
+                        <select id="pageBookSelect" onchange="onBookSelectForPages()" required>
+                            <option value="">اختر كتاباً لإدارة صفحاته</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="pagePartSelectGroup" style="display: none;">
+                        <label><i class="fas fa-bookmark"></i> اختر الجزء <span style="color: red;">*</span></label>
+                        <select id="pagePartSelect">
+                            <option value="">اختر الجزء...</option>
+                        </select>
+                        <small style="color: #d32f2f; display: block; margin-top: 5px; font-weight: bold;">
+                            ⚠️ هذا الكتاب مقسم إلى أجزاء - يجب اختيار الجزء
+                        </small>
+                    </div>
+
+                    <div id="pageEditorSection" style="display: none;">
+                        <h3 style="color: #667eea; margin: 30px 0 20px;">
+                            <i class="fas fa-plus-circle"></i> إضافة صفحة جديدة
+                        </h3>
+                        <form id="pageForm" onsubmit="savePage(event)">
+                            <div class="form-group">
+                                <label><i class="fas fa-hashtag"></i> رقم الصفحة</label>
+                                <input type="number" id="pageNumber" min="1" placeholder="1" required>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-align-right"></i> محتوى الصفحة</label>
+                                <textarea id="pageContent" rows="10" placeholder="اكتب محتوى الصفحة هنا... يمكنك استخدام HTML" required></textarea>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> حفظ الصفحة
+                                </button>
+                                <button type="button" class="btn btn-secondary" onclick="clearPageForm()">
+                                    <i class="fas fa-times"></i> إلغاء
+                                </button>
+                            </div>
+                        </form>
+
+                        <h3 style="margin: 30px 0 20px; color: #333;">
+                            <i class="fas fa-list"></i> صفحات الكتاب
+                        </h3>
+                        <div id="pagesList" class="items-list">
+                            <div class="empty-state">
+                                <i class="fas fa-file-alt"></i>
+                                <h3>لا توجد صفحات</h3>
+                                <p>ابدأ بإضافة صفحة جديدة</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Messages Tab -->
+            <div id="messages-tab" class="tab-content">
+                <h3 style="margin-bottom: 20px; color: #333;">
+                    <i class="fas fa-envelope"></i> رسائل التواصل
+                </h3>
+                <div id="messagesList" class="items-list">
+                    <div class="loading">
+                        <i class="fas fa-spinner"></i>
+                        <p>جاري التحميل...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Supabase Files -->
+    <script src="supabase-config.js"></script>
+    <script src="supabase-api.js"></script>
+
+    <script>
+        let currentEditingCategoryId = null;
+        let currentEditingBookId = null;
+
+        // تهيئة التطبيق
+        window.addEventListener('load', async function() {
+            try {
+                await api.init();
+                console.log('✅ تم الاتصال بـ Supabase');
+                await loadStats();
+                await loadCategories();
+                await loadCategoriesSelect();
+                await loadBooks();
+                await loadBooksForParts();
+                await loadBooksForPages();
+                await loadMessages();
+            } catch (error) {
+                console.error('❌ خطأ في التهيئة:', error);
+                alert('❌ فشل الاتصال بقاعدة البيانات');
+            }
+        });
+
+        // تبديل التبويبات
+        function switchTab(tabName) {
+            // إخفاء جميع التبويبات
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+
+            // إظهار التبويب المحدد
+            document.getElementById(tabName + '-tab').classList.add('active');
+            event.target.closest('.tab-btn').classList.add('active');
+        }
+
+        // تحميل الإحصائيات
+        async function loadStats() {
+            try {
+                const [categories, books, messages] = await Promise.all([
+                    api.getCategories(),
+                    api.getPublishedBooks(),
+                    api.getContactMessages()
+                ]);
+
+                let totalPages = 0;
+                for (const book of books) {
+                    const pages = await api.getBookPages(book.id);
+                    totalPages += pages.length;
+                }
+
+                document.getElementById('totalBooks').textContent = books.length;
+                document.getElementById('totalCategories').textContent = categories.length;
+                document.getElementById('totalPages').textContent = totalPages;
+                document.getElementById('totalMessages').textContent = messages.length;
+            } catch (error) {
+                console.error('خطأ في تحميل الإحصائيات:', error);
+            }
+        }
+
+        // ===================================
+        // الأقسام
+        // ===================================
+
+        async function loadCategories() {
+            try {
+                const categories = await api.getCategories();
+                const container = document.getElementById('categoriesList');
+
+                if (categories.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-folder-open"></i>
+                            <h3>لا توجد أقسام</h3>
+                            <p>ابدأ بإضافة قسم جديد</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = categories.map(category => `
+                    <div class="item-card">
+                        <div class="item-info">
+                            <h3><i class="fas fa-folder"></i> ${category.name}</h3>
+                            <p>${category.description || 'لا يوجد وصف'}</p>
+                        </div>
+                        <div class="item-actions">
+                            <button class="btn btn-warning btn-small" onclick="editCategory('${category.id}')">
+                                <i class="fas fa-edit"></i> تعديل
+                            </button>
+                            <button class="btn btn-danger btn-small" onclick="deleteCategory('${category.id}')">
+                                <i class="fas fa-trash"></i> حذف
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('خطأ في تحميل الأقسام:', error);
+            }
+        }
+
+        async function saveCategory(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('categoryName').value.trim();
+            const description = document.getElementById('categoryDescription').value.trim();
+
+            if (!name) {
+                alert('⚠️ الرجاء إدخال اسم القسم');
+                return;
+            }
+
+            try {
+                if (currentEditingCategoryId) {
+                    await api.updateCategory(currentEditingCategoryId, { name, description });
+                    alert('✅ تم تحديث القسم بنجاح');
+                } else {
+                    await api.addCategory(name, description);
+                    alert('✅ تم إضافة القسم بنجاح');
+                }
+
+                clearCategoryForm();
+                await loadCategories();
+                await loadCategoriesSelect();
+                await loadStats();
+            } catch (error) {
+                console.error('خطأ في حفظ القسم:', error);
+                alert('❌ حدث خطأ: ' + error.message);
+            }
+        }
+
+        async function editCategory(id) {
+            try {
+                const category = await api.getCategory(id);
+                if (category) {
+                    document.getElementById('categoryName').value = category.name;
+                    document.getElementById('categoryDescription').value = category.description || '';
+                    currentEditingCategoryId = id;
+                    document.querySelector('#categoryForm button[type="submit"]').innerHTML = '<i class="fas fa-save"></i> تحديث القسم';
+                }
+            } catch (error) {
+                console.error('خطأ في تحميل القسم:', error);
+            }
+        }
+
+        async function deleteCategory(id) {
+            if (!confirm('⚠️ هل أنت متأكد من حذف هذا القسم؟')) return;
+
+            try {
+                await api.deleteCategory(id);
+                alert('✅ تم حذف القسم بنجاح');
+                await loadCategories();
+                await loadCategoriesSelect();
+                await loadStats();
+            } catch (error) {
+                console.error('خطأ في حذف القسم:', error);
+                alert('❌ حدث خطأ: ' + error.message);
+            }
+        }
+
+        function clearCategoryForm() {
+            document.getElementById('categoryForm').reset();
+            currentEditingCategoryId = null;
+            document.querySelector('#categoryForm button[type="submit"]').innerHTML = '<i class="fas fa-save"></i> حفظ القسم';
+        }
+
+        // ===================================
+        // الكتب
+        // ===================================
+
+        async function loadCategoriesSelect() {
+            try {
+                const categories = await api.getCategories();
+                const select = document.getElementById('bookCategory');
+                
+                select.innerHTML = '<option value="">اختر القسم</option>' +
+                    categories.map(cat => `<option value="${cat.id}">${cat.name}</option>`).join('');
+            } catch (error) {
+                console.error('خطأ في تحميل الأقسام:', error);
+            }
+        }
+
+        async function loadBooks() {
+            try {
+                const books = await api.getAllBooks();
+                const container = document.getElementById('booksList');
+
+                if (books.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-book"></i>
+                            <h3>لا توجد كتب</h3>
+                            <p>ابدأ بإضافة كتاب جديد</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = books.map(book => `
+                    <div class="item-card">
+                        <div class="item-info">
+                            <h3><i class="fas fa-book"></i> ${book.title}</h3>
+                            <p>
+                                ${book.published ? '<span class="badge badge-success">منشور</span>' : '<span class="badge badge-warning">غير منشور</span>'}
+                                <span style="margin: 0 10px;">|</span>
+                                <i class="fas fa-eye"></i> ${book.views || 0} مشاهدة
+                            </p>
+                        </div>
+                        <div class="item-actions">
+                            <button class="btn btn-primary btn-small" onclick="openPagesTab('${book.id}')">
+                                <i class="fas fa-file-alt"></i> الصفحات
+                            </button>
+                            ${book.published ? 
+                                `<button class="btn btn-warning btn-small" onclick="togglePublish('${book.id}', false)">
+                                    <i class="fas fa-eye-slash"></i> إخفاء
+                                </button>` :
+                                `<button class="btn btn-success btn-small" onclick="togglePublish('${book.id}', true)">
+                                    <i class="fas fa-eye"></i> نشر
+                                </button>`
+                            }
+                            <button class="btn btn-danger btn-small" onclick="deleteBook('${book.id}')">
+                                <i class="fas fa-trash"></i> حذف
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('خطأ في تحميل الكتب:', error);
+            }
+        }
+
+        async function saveBook(event) {
+            event.preventDefault();
+
+            const title = document.getElementById('bookTitle').value.trim();
+            const category_id = document.getElementById('bookCategory').value;
+            const cover_image = document.getElementById('bookCover').value.trim();
+            const published = document.getElementById('bookPublished').checked;
+
+            if (!title || !category_id) {
+                alert('⚠️ الرجاء إدخال عنوان الكتاب واختيار القسم');
+                return;
+            }
+
+            try {
+                const bookData = {
+                    title,
+                    category_id,
+                    cover_image: cover_image || null,
+                    published,
+                    views: 0
+                };
+
+                await api.addBook(bookData);
+                alert('✅ تم إضافة الكتاب بنجاح');
+
+                clearBookForm();
+                await loadBooks();
+                await loadStats();
+            } catch (error) {
+                console.error('خطأ في حفظ الكتاب:', error);
+                alert('❌ حدث خطأ: ' + error.message);
+            }
+        }
+
+        async function togglePublish(id, publish) {
+            try {
+                await api.updateBook(id, { published: publish });
+                alert(publish ? '✅ تم نشر الكتاب' : '✅ تم إخفاء الكتاب');
+                await loadBooks();
+                await loadStats();
+            } catch (error) {
+                console.error('خطأ في تحديث الكتاب:', error);
+                alert('❌ حدث خطأ: ' + error.message);
+            }
+        }
+
+        async function deleteBook(id) {
+            if (!confirm('⚠️ هل أنت متأكد من حذف هذا الكتاب؟ سيتم حذف جميع صفحاته أيضاً.')) return;
+
+            try {
+                await api.deleteBook(id);
+                alert('✅ تم حذف الكتاب بنجاح');
+                await loadBooks();
+                await loadStats();
+            } catch (error) {
+                console.error('خطأ في حذف الكتاب:', error);
+                alert('❌ حدث خطأ: ' + error.message);
+            }
+        }
+
+        function clearBookForm() {
+            document.getElementById('bookForm').reset();
+        }
+
+        // ===================================
+        // الرسائل
+        // ===================================
+
+        async function loadMessages() {
+            try {
+                const messages = await api.getContactMessages();
+                const container = document.getElementById('messagesList');
+
+                if (messages.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-envelope-open"></i>
+                            <h3>لا توجد رسائل</h3>
+                            <p>لم يتم استلام أي رسائل بعد</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = messages.map(msg => `
+                    <div class="item-card">
+                        <div class="item-info">
+                            <h3><i class="fas fa-user"></i> ${msg.name}</h3>
+                            <p><strong>${msg.subject}</strong></p>
+                            <p style="margin-top: 5px;">${msg.message}</p>
+                            <p style="margin-top: 10px; color: #999; font-size: 0.85em;">
+                                <i class="fas fa-envelope"></i> ${msg.email} | 
+                                <i class="fas fa-clock"></i> ${new Date(msg.created_at).toLocaleString('ar-EG')}
+                            </p>
+                        </div>
+                        <div class="item-actions">
+                            <button class="btn btn-danger btn-small" onclick="deleteMessage('${msg.id}')">
+                                <i class="fas fa-trash"></i> حذف
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('خطأ في تحميل الرسائل:', error);
+            }
+        }
+
+        async function deleteMessage(id) {
+            if (!confirm('⚠️ هل أنت متأكد من حذف هذه الرسالة؟')) return;
+
+            try {
+                await api.deleteContactMessage(id);
+                alert('✅ تم حذف الرسالة بنجاح');
+                await loadMessages();
+                await loadStats();
+            } catch (error) {
+                console.error('خطأ في حذف الرسالة:', error);
+                alert('❌ حدث خطأ: ' + error.message);
+            }
+        }
+
+        // ===================================
+        // إدارة الصفحات
+        // ===================================
+
+        let currentSelectedBookId = null;
+        let currentEditingPageId = null;
+
+        // فتح تبويب الصفحات مع تحديد كتاب
+        async function openPagesTab(bookId) {
+            switchTab('pages');
+            
+            // تحميل قائمة الكتب في القائمة المنسدلة
+            await loadBooksForPages();
+            
+            // تحديد الكتاب
+            document.getElementById('pageBookSelect').value = bookId;
+            currentSelectedBookId = bookId;
+            
+            // تحميل صفحات الكتاب
+            await loadBookPages();
+        }
+
+        // تحميل قائمة الكتب للاختيار
+        async function loadBooksForPages() {
+            try {
+                const books = await api.getAllBooks();
+                const select = document.getElementById('pageBookSelect');
+                
+                select.innerHTML = '<option value="">اختر كتاباً لإدارة صفحاته</option>' +
+                    books.map(book => `<option value="${book.id}">${book.title}</option>`).join('');
+            } catch (error) {
+                console.error('خطأ في تحميل الكتب:', error);
+            }
+        }
+
+        // تحميل صفحات الكتاب المحدد
+        async function loadBookPages() {
+            const bookId = document.getElementById('pageBookSelect').value;
+            
+            if (!bookId) {
+                document.getElementById('pageEditorSection').style.display = 'none';
+                return;
+            }
+
+            currentSelectedBookId = bookId;
+            document.getElementById('pageEditorSection').style.display = 'block';
+
+            try {
+                const pages = await api.getBookPages(bookId);
+                const container = document.getElementById('pagesList');
+
+                if (pages.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-file-alt"></i>
+                            <h3>لا توجد صفحات</h3>
+                            <p>ابدأ بإضافة صفحة جديدة</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = pages.map(page => `
+                    <div class="item-card">
+                        <div class="item-info">
+                            <h3><i class="fas fa-file-alt"></i> صفحة ${page.page_number}</h3>
+                            <p style="color: #666; margin-top: 5px;">
+                                ${page.content.substring(0, 100)}${page.content.length > 100 ? '...' : ''}
+                            </p>
+                        </div>
+                        <div class="item-actions">
+                            <button class="btn btn-warning btn-small" onclick="editPage('${page.id}', ${page.page_number}, \`${page.content.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`)">
+                                <i class="fas fa-edit"></i> تعديل
+                            </button>
+                            <button class="btn btn-danger btn-small" onclick="deletePage('${page.id}')">
+                                <i class="fas fa-trash"></i> حذف
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('خطأ في تحميل الصفحات:', error);
+            }
+        }
+
+        // حفظ صفحة
+        async function savePage(event) {
+            event.preventDefault();
+
+            if (!currentSelectedBookId) {
+                alert('⚠️ الرجاء اختيار كتاب أولاً');
+                return;
+            }
+
+            const pageNumber = parseInt(document.getElementById('pageNumber').value);
+            const content = document.getElementById('pageContent').value.trim();
+
+            if (!content) {
+                alert('⚠️ الرجاء إدخال محتوى الصفحة');
+                return;
+            }
+
+            try {
+                if (currentEditingPageId) {
+                    await api.updatePage(currentEditingPageId, content);
+                    alert('✅ تم تحديث الصفحة بنجاح');
+                } else {
+                    await api.addPage(currentSelectedBookId, pageNumber, content);
+                    alert('✅ تم إضافة الصفحة بنجاح');
+                }
+
+                clearPageForm();
+                await loadBookPages();
+                await loadStats();
+            } catch (error) {
+                console.error('خطأ في حفظ الصفحة:', error);
+                alert('❌ حدث خطأ: ' + error.message);
+            }
+        }
+
+        // تعديل صفحة
+        function editPage(pageId, pageNumber, content) {
+            currentEditingPageId = pageId;
+            document.getElementById('pageNumber').value = pageNumber;
+            document.getElementById('pageContent').value = content;
+            document.querySelector('#pageForm button[type="submit"]').innerHTML = '<i class="fas fa-save"></i> تحديث الصفحة';
+            
+            // التمرير للنموذج
+            document.getElementById('pageForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // حذف صفحة
+        async function deletePage(pageId) {
+            if (!confirm('⚠️ هل أنت متأكد من حذف هذه الصفحة؟')) return;
+
+            try {
+                await api.deletePage(pageId);
+                alert('✅ تم حذف الصفحة بنجاح');
+                await loadBookPages();
+                await loadStats();
+            } catch (error) {
+                console.error('خطأ في حذف الصفحة:', error);
+                alert('❌ حدث خطأ: ' + error.message);
+            }
+        }
+
+        // مسح نموذج الصفحة
+        function clearPageForm() {
+            document.getElementById('pageForm').reset();
+            currentEditingPageId = null;
+            document.querySelector('#pageForm button[type="submit"]').innerHTML = '<i class="fas fa-save"></i> حفظ الصفحة';
+        }
+
+        // ===================================
+        // إدارة الأجزاء
+        // ===================================
+
+        let currentSelectedBookIdForParts = null;
+        let currentEditingPartId = null;
+
+        // تحميل قائمة الكتب لاختيار الأجزاء
+        async function loadBooksForParts() {
+            try {
+                const books = await api.getAllBooks();
+                const select = document.getElementById('partBookSelect');
+                
+                select.innerHTML = '<option value="">اختر كتاباً لإدارة أجزائه</option>' +
+                    books.map(book => `<option value="${book.id}">${book.title}</option>`).join('');
+            } catch (error) {
+                console.error('خطأ في تحميل الكتب:', error);
+            }
+        }
+
+        // تحميل أجزاء الكتاب المحدد
+        async function loadBookParts() {
+            const bookId = document.getElementById('partBookSelect').value;
+            
+            if (!bookId) {
+                document.getElementById('partEditorSection').style.display = 'none';
+                return;
+            }
+
+            currentSelectedBookIdForParts = bookId;
+            document.getElementById('partEditorSection').style.display = 'block';
+
+            try {
+                const parts = await api.getBookParts(bookId);
+                const container = document.getElementById('partsList');
+
+                if (parts.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-bookmark"></i>
+                            <h3>لا توجد أجزاء</h3>
+                            <p>ابدأ بإضافة جزء جديد أو اترك الكتاب بدون أجزاء</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = parts.map(part => `
+                    <div class="item-card">
+                        <div class="item-info">
+                            <h3><i class="fas fa-bookmark"></i> الجزء ${part.part_number}</h3>
+                        </div>
+                        <div class="item-actions">
+                            <button class="btn btn-warning btn-small" onclick="editPart('${part.id}', ${part.part_number})">
+                                <i class="fas fa-edit"></i> تعديل
+                            </button>
+                            <button class="btn btn-danger btn-small" onclick="deletePart('${part.id}')">
+                                <i class="fas fa-trash"></i> حذف
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('خطأ في تحميل الأجزاء:', error);
+            }
+        }
+
+        // حفظ جزء
+        async function savePart(event) {
+            event.preventDefault();
+
+            if (!currentSelectedBookIdForParts) {
+                alert('⚠️ الرجاء اختيار كتاب أولاً');
+                return;
+            }
+
+            const partNumber = parseInt(document.getElementById('partNumber').value);
+
+            try {
+                if (currentEditingPartId) {
+                    await api.updatePart(currentEditingPartId, { part_number: partNumber });
+                    alert('✅ تم تحديث الجزء بنجاح');
+                } else {
+                    await api.addPart(currentSelectedBookIdForParts, partNumber);
+                    alert('✅ تم إضافة الجزء بنجاح');
+                }
+
+                clearPartForm();
+                await loadBookParts();
+            } catch (error) {
+                console.error('خطأ في حفظ الجزء:', error);
+                alert('❌ حدث خطأ: ' + error.message);
+            }
+        }
+
+        // تعديل جزء
+        function editPart(partId, partNumber) {
+            currentEditingPartId = partId;
+            document.getElementById('partNumber').value = partNumber;
+            document.querySelector('#partForm button[type="submit"]').innerHTML = '<i class="fas fa-save"></i> تحديث الجزء';
+            
+            document.getElementById('partForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // حذف جزء
+        async function deletePart(partId) {
+            if (!confirm('⚠️ هل أنت متأكد من حذف هذا الجزء؟ سيتم فك ارتباط صفحاته من الجزء.')) return;
+
+            try {
+                await api.deletePart(partId);
+                alert('✅ تم حذف الجزء بنجاح');
+                await loadBookParts();
+            } catch (error) {
+                console.error('خطأ في حذف الجزء:', error);
+                alert('❌ حدث خطأ: ' + error.message);
+            }
+        }
+
+        // مسح نموذج الجزء
+        function clearPartForm() {
+            document.getElementById('partForm').reset();
+            currentEditingPartId = null;
+            document.querySelector('#partForm button[type="submit"]').innerHTML = '<i class="fas fa-save"></i> حفظ الجزء';
+        }
+
+        // ===================================
+        // تحديثات إدارة الصفحات لدعم الأجزاء
+        // ===================================
+
+        // عند اختيار كتاب في تبويب الصفحات
+        async function onBookSelectForPages() {
+            const bookId = document.getElementById('pageBookSelect').value;
+            
+            if (!bookId) {
+                document.getElementById('pagePartSelectGroup').style.display = 'none';
+                document.getElementById('pageEditorSection').style.display = 'none';
+                return;
+            }
+
+            currentSelectedBookId = bookId;
+
+            // تحميل أجزاء الكتاب
+            try {
+                const parts = await api.getBookParts(bookId);
+                const partSelect = document.getElementById('pagePartSelect');
+                
+                if (parts.length > 0) {
+                    // الكتاب له أجزاء - عرض القائمة وجعلها إجبارية
+                    document.getElementById('pagePartSelectGroup').style.display = 'block';
+                    partSelect.innerHTML = '<option value="">اختر الجزء...</option>' +
+                        parts.map(part => `<option value="${part.id}">الجزء ${part.part_number}</option>`).join('');
+                    partSelect.required = true;
+                } else {
+                    // الكتاب ليس له أجزاء - إخفاء القائمة
+                    document.getElementById('pagePartSelectGroup').style.display = 'none';
+                    partSelect.required = false;
+                }
+            } catch (error) {
+                console.error('خطأ في تحميل الأجزاء:', error);
+            }
+
+            // تحميل الصفحات
+            await loadBookPages();
+        }
+
+        // تحديث دالة حفظ الصفحة لدعم الجزء
+        async function savePage(event) {
+            event.preventDefault();
+
+            if (!currentSelectedBookId) {
+                alert('⚠️ الرجاء اختيار كتاب أولاً');
+                return;
+            }
+
+            const pageNumber = parseInt(document.getElementById('pageNumber').value);
+            const content = document.getElementById('pageContent').value.trim();
+            const partSelect = document.getElementById('pagePartSelect');
+            const partId = partSelect?.value || null;
+
+            if (!content) {
+                alert('⚠️ الرجاء إدخال محتوى الصفحة');
+                return;
+            }
+
+            // التحقق من اختيار الجزء إذا كان الكتاب يحتوي على أجزاء
+            if (partSelect && partSelect.required && !partId) {
+                alert('⚠️ الرجاء اختيار الجزء - هذا الكتاب مقسم إلى أجزاء');
+                return;
+            }
+
+            try {
+                if (currentEditingPageId) {
+                    await api.updatePage(currentEditingPageId, content);
+                    alert('✅ تم تحديث الصفحة بنجاح');
+                } else {
+                    await api.addPage(currentSelectedBookId, pageNumber, content, partId);
+                    alert('✅ تم إضافة الصفحة بنجاح');
+                }
+
+                clearPageForm();
+                await loadBookPages();
+                await loadStats();
+            } catch (error) {
+                console.error('خطأ في حفظ الصفحة:', error);
+                alert('❌ حدث خطأ: ' + error.message);
+            }
+        }
+    </script>
+</body>
+</html>

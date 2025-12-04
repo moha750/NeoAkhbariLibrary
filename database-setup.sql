@@ -27,11 +27,24 @@ CREATE TABLE IF NOT EXISTS books (
 );
 
 -- ===================================
--- 3. إنشاء جدول الصفحات (Pages)
+-- 3. إنشاء جدول الأجزاء (Parts) - اختياري
+-- ===================================
+CREATE TABLE IF NOT EXISTS parts (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    book_id UUID REFERENCES books(id) ON DELETE CASCADE,
+    part_number INTEGER NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    UNIQUE(book_id, part_number)
+);
+
+-- ===================================
+-- 4. إنشاء جدول الصفحات (Pages)
 -- ===================================
 CREATE TABLE IF NOT EXISTS pages (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
     book_id UUID REFERENCES books(id) ON DELETE CASCADE,
+    part_id UUID REFERENCES parts(id) ON DELETE SET NULL,
     page_number INTEGER NOT NULL,
     content TEXT NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
@@ -40,7 +53,7 @@ CREATE TABLE IF NOT EXISTS pages (
 );
 
 -- ===================================
--- 4. إنشاء جدول رسائل التواصل (Contact Messages)
+-- 5. إنشاء جدول رسائل التواصل (Contact Messages)
 -- ===================================
 CREATE TABLE IF NOT EXISTS contact_messages (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -53,17 +66,20 @@ CREATE TABLE IF NOT EXISTS contact_messages (
 );
 
 -- ===================================
--- 5. إنشاء الفهارس (Indexes) لتحسين الأداء
+-- 6. إنشاء الفهارس (Indexes) لتحسين الأداء
 -- ===================================
 CREATE INDEX IF NOT EXISTS idx_books_category ON books(category_id);
 CREATE INDEX IF NOT EXISTS idx_books_published ON books(published);
+CREATE INDEX IF NOT EXISTS idx_parts_book ON parts(book_id);
+CREATE INDEX IF NOT EXISTS idx_parts_number ON parts(book_id, part_number);
 CREATE INDEX IF NOT EXISTS idx_pages_book ON pages(book_id);
+CREATE INDEX IF NOT EXISTS idx_pages_part ON pages(part_id);
 CREATE INDEX IF NOT EXISTS idx_pages_number ON pages(book_id, page_number);
 CREATE INDEX IF NOT EXISTS idx_contact_read ON contact_messages(read);
 CREATE INDEX IF NOT EXISTS idx_contact_created ON contact_messages(created_at DESC);
 
 -- ===================================
--- 6. إنشاء دالة لتحديث updated_at تلقائياً
+-- 7. إنشاء دالة لتحديث updated_at تلقائياً
 -- ===================================
 CREATE OR REPLACE FUNCTION update_updated_at_column()
 RETURNS TRIGGER AS $$
@@ -74,7 +90,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- ===================================
--- 7. إنشاء Triggers لتحديث updated_at
+-- 8. إنشاء Triggers لتحديث updated_at
 -- ===================================
 CREATE TRIGGER update_categories_updated_at
     BEFORE UPDATE ON categories
@@ -86,16 +102,22 @@ CREATE TRIGGER update_books_updated_at
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
+CREATE TRIGGER update_parts_updated_at
+    BEFORE UPDATE ON parts
+    FOR EACH ROW
+    EXECUTE FUNCTION update_updated_at_column();
+
 CREATE TRIGGER update_pages_updated_at
     BEFORE UPDATE ON pages
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
 
 -- ===================================
--- 8. تفعيل Row Level Security (RLS)
+-- 9. تفعيل Row Level Security (RLS)
 -- ===================================
 ALTER TABLE categories ENABLE ROW LEVEL SECURITY;
 ALTER TABLE books ENABLE ROW LEVEL SECURITY;
+ALTER TABLE parts ENABLE ROW LEVEL SECURITY;
 ALTER TABLE pages ENABLE ROW LEVEL SECURITY;
 ALTER TABLE contact_messages ENABLE ROW LEVEL SECURITY;
 
@@ -141,6 +163,24 @@ CREATE POLICY "Allow public update to books"
 
 CREATE POLICY "Allow public delete to books"
     ON books FOR DELETE
+    USING (true);
+
+-- سياسات الأجزاء
+CREATE POLICY "Allow public read access to parts"
+    ON parts FOR SELECT
+    USING (true);
+
+CREATE POLICY "Allow public insert to parts"
+    ON parts FOR INSERT
+    WITH CHECK (true);
+
+CREATE POLICY "Allow public update to parts"
+    ON parts FOR UPDATE
+    USING (true)
+    WITH CHECK (true);
+
+CREATE POLICY "Allow public delete to parts"
+    ON parts FOR DELETE
     USING (true);
 
 -- سياسات الصفحات

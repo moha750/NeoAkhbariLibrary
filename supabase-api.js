@@ -140,6 +140,22 @@ class SupabaseAPI {
         }
     }
 
+    // جلب جميع الكتب (منشورة وغير منشورة)
+    async getAllBooks() {
+        try {
+            const { data, error } = await this.supabase
+                .from(SUPABASE_CONFIG.tables.books)
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) throw error;
+            return data || [];
+        } catch (error) {
+            console.error('خطأ في جلب الكتب:', error);
+            return [];
+        }
+    }
+
     // جلب كتب قسم معين
     async getBooksByCategory(categoryId) {
         try {
@@ -259,6 +275,78 @@ class SupabaseAPI {
     }
 
     // ===================================
+    // دوال الأجزاء (Parts)
+    // ===================================
+
+    // جلب أجزاء كتاب
+    async getBookParts(bookId) {
+        try {
+            const { data, error } = await this.supabase
+                .from(SUPABASE_CONFIG.tables.parts)
+                .select('*')
+                .eq('book_id', bookId)
+                .order('part_number', { ascending: true });
+
+            if (error) throw error;
+            return data || [];
+        } catch (error) {
+            console.error('خطأ في جلب أجزاء الكتاب:', error);
+            return [];
+        }
+    }
+
+    // إضافة جزء
+    async addPart(bookId, partNumber) {
+        try {
+            const { data, error } = await this.supabase
+                .from(SUPABASE_CONFIG.tables.parts)
+                .insert([{ book_id: bookId, part_number: partNumber }])
+                .select()
+                .single();
+
+            if (error) throw error;
+            return data;
+        } catch (error) {
+            console.error('خطأ في إضافة الجزء:', error);
+            throw error;
+        }
+    }
+
+    // تحديث جزء
+    async updatePart(partId, updates) {
+        try {
+            const { data, error } = await this.supabase
+                .from(SUPABASE_CONFIG.tables.parts)
+                .update(updates)
+                .eq('id', partId)
+                .select()
+                .single();
+
+            if (error) throw error;
+            return data;
+        } catch (error) {
+            console.error('خطأ في تحديث الجزء:', error);
+            throw error;
+        }
+    }
+
+    // حذف جزء
+    async deletePart(partId) {
+        try {
+            const { error } = await this.supabase
+                .from(SUPABASE_CONFIG.tables.parts)
+                .delete()
+                .eq('id', partId);
+
+            if (error) throw error;
+            return true;
+        } catch (error) {
+            console.error('خطأ في حذف الجزء:', error);
+            throw error;
+        }
+    }
+
+    // ===================================
     // دوال الصفحات (Pages)
     // ===================================
 
@@ -279,12 +367,40 @@ class SupabaseAPI {
         }
     }
 
-    // إضافة صفحة
-    async addPage(bookId, pageNumber, content) {
+    // جلب صفحات جزء معين
+    async getPartPages(partId) {
         try {
             const { data, error } = await this.supabase
                 .from(SUPABASE_CONFIG.tables.pages)
-                .insert([{ book_id: bookId, page_number: pageNumber, content }])
+                .select('*')
+                .eq('part_id', partId)
+                .order('page_number', { ascending: true });
+
+            if (error) throw error;
+            return data || [];
+        } catch (error) {
+            console.error('خطأ في جلب صفحات الجزء:', error);
+            return [];
+        }
+    }
+
+    // إضافة صفحة
+    async addPage(bookId, pageNumber, content, partId = null) {
+        try {
+            const pageData = {
+                book_id: bookId,
+                page_number: pageNumber,
+                content: content
+            };
+            
+            // إضافة part_id فقط إذا كان موجوداً
+            if (partId) {
+                pageData.part_id = partId;
+            }
+
+            const { data, error } = await this.supabase
+                .from(SUPABASE_CONFIG.tables.pages)
+                .insert([pageData])
                 .select()
                 .single();
 
@@ -354,15 +470,37 @@ class SupabaseAPI {
     async addContactMessage(messageData) {
         try {
             const { data, error } = await this.supabase
-                .from(SUPABASE_CONFIG.tables.contact_messages)
-                .insert([messageData])
+                .from(SUPABASE_CONFIG.tables.contactMessages)
+                .insert([{
+                    name: messageData.name,
+                    email: messageData.email,
+                    subject: messageData.subject,
+                    message: messageData.message,
+                    read: false
+                }])
                 .select()
                 .single();
 
             if (error) throw error;
             return data;
         } catch (error) {
-            console.error('خطأ في إرسال الرسالة:', error);
+            console.error('خطأ في إضافة الرسالة:', error);
+            throw error;
+        }
+    }
+
+    // حذف رسالة تواصل
+    async deleteContactMessage(messageId) {
+        try {
+            const { error } = await this.supabase
+                .from(SUPABASE_CONFIG.tables.contactMessages)
+                .delete()
+                .eq('id', messageId);
+
+            if (error) throw error;
+            return true;
+        } catch (error) {
+            console.error('خطأ في حذف الرسالة:', error);
             throw error;
         }
     }

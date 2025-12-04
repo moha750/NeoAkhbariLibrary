@@ -22,71 +22,22 @@
             min-height: 100vh;
         }
 
-        .header {
-            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
-            color: white;
-            padding: 30px 0;
-            box-shadow: 0 4px 20px rgba(236, 176, 7, 0.3);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            overflow: hidden;
-        }
-
-        .header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('tape.png') center/cover;
-            opacity: 0.1;
-            pointer-events: none;
-        }
-
-        .header-content {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 20px;
-            position: relative;
-            z-index: 1;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .book-info {
-            text-align: right;
-        }
-
-        .book-info h1 {
-            font-size: 2.5em;
-            margin-bottom: 10px;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-        }
-
-        .page-indicator {
-            background: rgba(255,255,255,0.2);
-            padding: 10px 20px;
-            border-radius: 20px;
-            font-weight: bold;
-            font-size: 1.1em;
-            backdrop-filter: blur(10px);
-            border: 2px solid rgba(255,255,255,0.3);
-            min-width: 120px;
-            text-align: center;
-        }
-
         .container {
             max-width: 1400px;
             margin: 0 auto;
             padding: 40px 20px;
         }
 
+        /* Header Section */
+        .header-image {
+            max-width: 100%;
+            border-radius: 0px 0px 20px 20px; 
+            box-shadow: 0 4px 20px rgba(236, 176, 7, 0.2);
+        }
+
         .breadcrumb {
             background: white;
-            padding: 15px 25px;
+            padding: 15px;
             border-radius: 15px;
             box-shadow: 0 4px 15px rgba(236, 176, 7, 0.1);
             margin-bottom: 20px;
@@ -125,78 +76,12 @@
             user-select: none;
         }
 
-        .book-header {
-            background: white;
-            padding: 50px 40px;
-            border-radius: 20px;
-            box-shadow: 0 8px 30px rgba(236, 176, 7, 0.15);
-            margin-bottom: 30px;
-            text-align: center;
-            animation: fadeInUp 0.6s ease-out;
-            border: 1px solid rgba(236, 176, 7, 0.1);
-        }
-
-        .book-icon {
-            font-size: 5em;
-        }
-
-        .book-cover-image {
-            max-width: 300px;
-            max-height: 400px;
-            object-fit: cover;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.2);
-        }
-
-        .book-title {
-            font-size: 2.5em;
-            color: #333;
-            margin: 20px 0;
-            font-weight: bold;
-            line-height: 1.3;
-        }
-
-        .book-meta {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            margin-top: 25px;
-            flex-wrap: wrap;
-        }
-
-        .book-meta span {
-            background: rgba(236, 176, 7, 0.1);
-            color: #666;
-            padding: 10px 20px;
-            border-radius: 25px;
-            font-size: 1em;
-            font-weight: 500;
-            transition: all 0.3s ease;
-            border: 2px solid rgba(236, 176, 7, 0.2);
-        }
-
-        .book-meta span:hover {
-            background: rgba(236, 176, 7, 0.2);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(236, 176, 7, 0.2);
-        }
-
-        .dark-mode .book-meta span {
-            background: rgba(236, 176, 7, 0.15);
-            color: #e0e0e0;
-            border-color: rgba(236, 176, 7, 0.3);
-        }
-
-        .dark-mode .book-meta span:hover {
-            background: rgba(236, 176, 7, 0.25);
-        }
 
         /* Search Section */
         .search-section {
-            background: white;
-            padding: 30px;
             border-radius: 20px;
             box-shadow: 0 8px 30px rgba(236, 176, 7, 0.15);
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             animation: fadeInUp 0.6s ease-out;
             border: 1px solid rgba(236, 176, 7, 0.1);
         }
@@ -204,14 +89,13 @@
         .search-container {
             display: flex;
             gap: 10px;
-            margin-bottom: 15px;
             flex-wrap: wrap;
         }
 
         .search-input {
             flex: 1;
             min-width: 250px;
-            padding: 15px 20px;
+            padding: 0px 20px;
             border: 2px solid #ECB007;
             border-radius: 12px;
             font-size: 1.05em;
@@ -230,7 +114,7 @@
             background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
             color: white;
             border: none;
-            padding: 15px 30px;
+            padding: 15px 25px;
             border-radius: 12px;
             cursor: pointer;
             font-size: 1.05em;
@@ -360,10 +244,10 @@
 
         .reading-controls {
             background: white;
-            padding: 25px;
+            padding: 15px;
             border-radius: 20px;
             box-shadow: 0 8px 30px rgba(236, 176, 7, 0.15);
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -412,7 +296,7 @@
 
         .page-content {
             background: white;
-            padding: 50px;
+            padding: 0px 50px;
             border-radius: 20px;
             box-shadow: 0 8px 30px rgba(236, 176, 7, 0.15);
             line-height: 2;
@@ -434,6 +318,56 @@
             padding-top: 30px;
             border-top: 3px solid rgba(236, 176, 7, 0.2);
             flex-wrap: wrap;
+        }
+
+        .page-jump {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-right: 15px;
+        }
+
+        .page-jump-label {
+            color: #ECB007;
+            font-weight: bold;
+            font-size: 0.95em;
+        }
+
+        .page-jump-input {
+            width: 70px;
+            padding: 8px 12px;
+            border: 2px solid #ECB007;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .page-jump-input:focus {
+            outline: none;
+            border-color: #ECB007;
+            box-shadow: 0 0 0 3px rgba(236, 176, 7, 0.2);
+        }
+
+        .page-jump-btn {
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95em;
+            font-weight: bold;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(236, 176, 7, 0.3);
+        }
+
+        .page-jump-btn:hover {
+            background: linear-gradient(135deg, #f5c842 0%, #ECB007 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(236, 176, 7, 0.4);
         }
 
         .page-number {
@@ -526,14 +460,9 @@
             color: #666;
         }
 
-        .dark-mode .book-header,
         .dark-mode .page-content,
         .dark-mode .reading-controls {
             background: #2d2d2d;
-            color: #e0e0e0;
-        }
-
-        .dark-mode .book-title {
             color: #e0e0e0;
         }
 
@@ -571,6 +500,16 @@
         .dark-mode .nav-arrow:disabled {
             border-color: #555;
             color: #555;
+        }
+
+        .dark-mode .page-jump-label {
+            color: #f5c842;
+        }
+
+        .dark-mode .page-jump-input {
+            background: #2d2d2d;
+            color: #e0e0e0;
+            border-color: #ECB007;
         }
 
         .loading {
@@ -711,24 +650,7 @@
                 font-size: 1em;
             }
 
-            .book-info h1 {
-                font-size: 1.8em;
-            }
 
-            .page-indicator {
-                font-size: 0.9em;
-                padding: 8px 15px;
-                min-width: 100px;
-            }
-
-            .book-title {
-                font-size: 1.8em;
-            }
-
-            .book-cover-image {
-                max-width: 200px;
-                max-height: 300px;
-            }
 
             .search-section {
                 padding: 20px 15px;
@@ -795,19 +717,34 @@
             .page-navigation {
                 gap: 6px;
             }
+
+            .page-jump {
+                width: 100%;
+                justify-content: center;
+                margin-bottom: 10px;
+                margin-right: 0;
+            }
+
+            .page-jump-input {
+                width: 60px;
+                padding: 6px 8px;
+                font-size: 0.9em;
+            }
+
+            .page-jump-btn {
+                padding: 6px 12px;
+                font-size: 0.85em;
+            }
+
+            .page-jump-label {
+                font-size: 0.85em;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="header-content">
-            <div class="book-info">
-                <h1 id="headerTitle">قراءة الكتاب</h1>
-            </div>
-        <div class="page-indicator" id="pageIndicator">صفحة 1</div>
-
-        </div>
-    </div>
+    <!-- Header Image -->
+    <img src="tape.png" alt="شعار المكتبة الرقمية" class="header-image">
 
     <div class="container">
         <div id="loadingDiv" class="loading">
@@ -831,14 +768,6 @@
                 <span class="breadcrumb-item active" id="bookBreadcrumb"><i class="fas fa-book"></i> الكتاب</span>
             </div>
 
-            <div class="book-header">
-                <div class="book-icon" id="bookIcon"><i class="fas fa-book"></i></div>
-                <h1 class="book-title" id="bookTitle"></h1>
-                <div class="book-meta">
-                    <span id="bookPages"><i class="fas fa-file-alt"></i> </span>
-                    <span id="bookViews"><i class="fas fa-eye"></i> </span>
-                </div>
-            </div>
 
             <div class="search-section">
                 <div class="search-container">
@@ -892,9 +821,16 @@
             return urlParams.get('id');
         }
 
+        // الحصول على معرف الجزء من URL
+        function getPartId() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('part');
+        }
+
         // تحميل الكتاب
         async function loadBook() {
             const bookId = getBookId();
+            const partId = getPartId();
             
             if (!bookId) {
                 showError();
@@ -909,8 +845,14 @@
                     return;
                 }
 
-                // تحميل صفحات الكتاب
-                currentBookPages = await api.getBookPages(bookId);
+                // تحميل صفحات الكتاب أو الجزء
+                if (partId) {
+                    // تحميل صفحات جزء معين
+                    currentBookPages = await api.getPartPages(partId);
+                } else {
+                    // تحميل جميع صفحات الكتاب
+                    currentBookPages = await api.getBookPages(bookId);
+                }
 
                 // تحديث عدد المشاهدات
                 await api.incrementBookViews(bookId);
@@ -927,47 +869,76 @@
         function displayBook() {
             document.getElementById('loadingDiv').style.display = 'none';
             document.getElementById('bookContainer').style.display = 'block';
-
-            document.getElementById('headerTitle').textContent = currentBook.title;
             
             // تحديث breadcrumb
             updateBreadcrumb();
-            
-            // عرض صورة الغلاف أو الأيقونة
-            const bookIconElement = document.getElementById('bookIcon');
-            const coverImage = currentBook.cover_image || currentBook.coverImage;
-            if (coverImage) {
-                bookIconElement.innerHTML = `<img src="${coverImage}" alt="${currentBook.title}" class="book-cover-image">`;
-            } else {
-                bookIconElement.innerHTML = '<i class="fas fa-book"></i>';
-            }
-            
-            document.getElementById('bookTitle').textContent = currentBook.title;
-            document.getElementById('bookPages').innerHTML = '<i class="fas fa-file-alt"></i> ' + currentBookPages.length + ' صفحة';
-            document.getElementById('bookViews').innerHTML = '<i class="fas fa-eye"></i> ' + (currentBook.views || 0) + ' مشاهدة';
 
             displayCurrentPage();
         }
 
         // تحديث breadcrumb
         async function updateBreadcrumb() {
+            const partId = getPartId();
             let category = null;
             if (currentBook.category_id) {
                 category = await api.getCategory(currentBook.category_id);
             }
             
             const categoryLink = document.getElementById('categoryLink');
-            const bookBreadcrumb = document.getElementById('bookBreadcrumb');
+            const breadcrumb = document.getElementById('breadcrumb');
             
+            // بناء breadcrumb
+            let breadcrumbHTML = `
+                <a href="index.html" class="breadcrumb-item"><i class="fas fa-home"></i> الصفحة الرئيسية</a>
+                <span class="breadcrumb-separator">›</span>
+            `;
+            
+            // إضافة القسم
             if (category) {
-                categoryLink.innerHTML = `<i class="fas fa-book-open"></i> ${category.name}`;
-                categoryLink.href = `category.html?id=${category.id}`;
-            } else {
-                categoryLink.innerHTML = '<i class="fas fa-book-open"></i> بدون قسم';
-                categoryLink.href = 'index.html';
+                breadcrumbHTML += `
+                    <a href="category.html?id=${category.id}" class="breadcrumb-item"><i class="fas fa-book-open"></i> ${category.name}</a>
+                    <span class="breadcrumb-separator">›</span>
+                `;
             }
             
-            bookBreadcrumb.innerHTML = `<i class="fas fa-book"></i> ${currentBook.title}`;
+            // إضافة الكتاب
+            if (partId) {
+                // إذا كنا في جزء، اجعل الكتاب رابطاً للأجزاء
+                const bookParts = await api.getBookParts(currentBook.id);
+                if (bookParts.length > 0) {
+                    breadcrumbHTML += `
+                        <a href="parts.html?id=${currentBook.id}" class="breadcrumb-item"><i class="fas fa-book"></i> ${currentBook.title}</a>
+                        <span class="breadcrumb-separator">›</span>
+                    `;
+                    
+                    // إضافة الجزء الحالي
+                    const currentPart = bookParts.find(p => p.id === partId);
+                    if (currentPart) {
+                        breadcrumbHTML += `
+                            <span class="breadcrumb-item active"><i class="fas fa-layer-group"></i> الجزء ${currentPart.part_number}</span>
+                        `;
+                    }
+                } else {
+                    breadcrumbHTML += `
+                        <span class="breadcrumb-item active"><i class="fas fa-book"></i> ${currentBook.title}</span>
+                    `;
+                }
+            } else {
+                breadcrumbHTML += `
+                    <span class="breadcrumb-item active"><i class="fas fa-book"></i> ${currentBook.title}</span>
+                `;
+            }
+            
+            // إضافة رقم الصفحة الحالية
+            if (currentBookPages.length > 0) {
+                const currentPage = currentBookPages[currentPageIndex];
+                breadcrumbHTML += `
+                    <span class="breadcrumb-separator">›</span>
+                    <span class="breadcrumb-item active"><i class="fas fa-file-alt"></i> صفحة ${currentPage.page_number}</span>
+                `;
+            }
+            
+            breadcrumb.innerHTML = breadcrumbHTML;
         }
 
         // عرض الصفحة الحالية
@@ -984,7 +955,6 @@
                         </div>
                     </div>
                 `;
-                document.getElementById('pageIndicator').textContent = 'لا توجد صفحات';
                 return;
             }
 
@@ -999,11 +969,11 @@
                 </div>
             `;
 
-            // تحديث مؤشر الصفحة
-            document.getElementById('pageIndicator').textContent = `صفحة ${currentPageIndex + 1}/${currentBookPages.length}`;
-
             // تطبيق حجم الخط الحالي
             updateFontSize();
+            
+            // تحديث breadcrumb لعرض رقم الصفحة الحالية
+            updateBreadcrumb();
             
             // إعادة تطبيق البحث إذا كان هناك نتائج
             originalPageContent = '';
@@ -1012,6 +982,18 @@
                     highlightSearchResults();
                 }, 100);
             }
+            
+            // إضافة حدث Enter لحقل البحث بأرقام الصفحات
+            setTimeout(() => {
+                const pageJumpInput = document.getElementById('pageJumpInput');
+                if (pageJumpInput) {
+                    pageJumpInput.addEventListener('keypress', function(e) {
+                        if (e.key === 'Enter') {
+                            jumpToPage();
+                        }
+                    });
+                }
+            }, 100);
             
             // التمرير للأعلى
             window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -1051,13 +1033,24 @@
                     return `<span class="page-ellipsis">...</span>`;
                 }
                 const isActive = pageIndex === current ? 'active' : '';
-                return `<button class="page-number ${isActive}" onclick="goToPage(${pageIndex})">${pageIndex + 1}</button>`;
+                const actualPageNumber = currentBookPages[pageIndex].page_number;
+                return `<button class="page-number ${isActive}" onclick="goToPage(${pageIndex})">${actualPageNumber}</button>`;
             }).join('');
             
             // زر التالي
             const nextButton = `<button class="nav-arrow" onclick="nextPage()" ${current === totalPages - 1 ? 'disabled' : ''}>التالي <i class="fas fa-chevron-left"></i></button>`;
             
-            return prevButton + pageNumbers + nextButton;
+            // حقل البحث بأرقام الصفحات
+            const currentPageNumber = currentBookPages[current].page_number;
+            const pageJump = `
+                <div class="page-jump">
+                    <span class="page-jump-label">انتقل إلى:</span>
+                    <input type="number" class="page-jump-input" id="pageJumpInput" min="1" max="${totalPages}" placeholder="${currentPageNumber}">
+                    <button class="page-jump-btn" onclick="jumpToPage()"><i class="fas fa-arrow-left"></i> اذهب</button>
+                </div>
+            `;
+            
+            return pageJump + prevButton + pageNumbers + nextButton;
         }
 
         // الذهاب لصفحة محددة
@@ -1065,6 +1058,34 @@
             if (pageIndex >= 0 && pageIndex < currentBookPages.length) {
                 currentPageIndex = pageIndex;
                 displayCurrentPage();
+            }
+        }
+
+        // الانتقال إلى صفحة معينة من حقل البحث
+        function jumpToPage() {
+            const input = document.getElementById('pageJumpInput');
+            if (!input) return;
+            
+            const pageNumber = parseInt(input.value);
+            
+            if (isNaN(pageNumber)) {
+                alert('⚠️ الرجاء إدخال رقم صفحة صحيح');
+                return;
+            }
+            
+            if (pageNumber < 1 || pageNumber > currentBookPages.length) {
+                alert(`⚠️ رقم الصفحة يجب أن يكون بين 1 و ${currentBookPages.length}`);
+                return;
+            }
+            
+            // البحث عن الصفحة برقمها
+            const targetIndex = currentBookPages.findIndex(page => page.page_number === pageNumber);
+            
+            if (targetIndex !== -1) {
+                goToPage(targetIndex);
+                input.value = ''; // مسح الحقل بعد الانتقال
+            } else {
+                alert(`⚠️ لم يتم العثور على صفحة برقم ${pageNumber}`);
             }
         }
 

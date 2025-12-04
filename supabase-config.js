@@ -14,6 +14,7 @@ const SUPABASE_CONFIG = {
     tables: {
         categories: 'categories',
         books: 'books',
+        parts: 'parts',
         pages: 'pages',
         contact_messages: 'contact_messages'
     }
