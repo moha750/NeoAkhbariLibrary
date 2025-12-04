@@ -285,6 +285,15 @@
             font-size: 0.9em;
         }
 
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn-info:hover {
+            background: #138496;
+        }
+
         .btn-success {
             background: #28a745;
             color: white;
@@ -292,6 +301,54 @@
 
         .btn-success:hover {
             background: #218838;
+        }
+
+        /* Page Order Controls */
+        .page-order-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            margin-left: 15px;
+            padding-left: 15px;
+            border-left: 2px solid #e0e0e0;
+        }
+
+        .page-order-number {
+            font-weight: bold;
+            color: #667eea;
+            font-size: 1.1em;
+            padding: 5px 10px;
+            background: rgba(102, 126, 234, 0.1);
+            border-radius: 5px;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .btn-icon {
+            background: white;
+            border: 2px solid #667eea;
+            color: #667eea;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            font-size: 0.9em;
+        }
+
+        .btn-icon:hover:not(:disabled) {
+            background: #667eea;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .btn-icon:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
         }
 
         .btn-danger {
@@ -361,6 +418,113 @@
             color: #856404;
         }
 
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            max-width: 900px;
+            width: 90%;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            padding: 20px 30px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.5em;
+        }
+
+        .modal-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            font-size: 1.2em;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 30px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .modal-footer {
+            padding: 20px 30px;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .preview-content {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+            min-height: 300px;
+            line-height: 1.8;
+            font-size: 1.1em;
+            color: #333;
+            text-align: right;
+            direction: rtl;
+        }
+
+        .preview-content p {
+            margin-bottom: 15px;
+        }
+
         .badge-info {
             background: #d1ecf1;
             color: #0c5460;
@@ -387,6 +551,155 @@
             .form-actions {
                 flex-direction: column;
             }
+
+            /* جعل أزرار الصفحات تحت المحتوى في الموبايل */
+            .page-order-controls {
+                flex-direction: row;
+                border-left: none;
+                border-top: 2px solid #e0e0e0;
+                margin-left: 0;
+                margin-top: 15px;
+                padding-left: 0;
+                padding-top: 15px;
+                width: 100%;
+                justify-content: center;
+            }
+
+            .item-actions {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .btn-small {
+                flex: 1;
+                min-width: 100px;
+            }
+
+            .modal-content {
+                width: 95%;
+                max-height: 95vh;
+            }
+
+            .modal-body {
+                padding: 20px;
+            }
+
+            .preview-content {
+                padding: 20px;
+                font-size: 1em;
+            }
+        }
+
+        /* Analytics Styles */
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+            min-height: 200px;
+        }
+
+        .chart-bar {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            gap: 15px;
+        }
+
+        .chart-label {
+            min-width: 120px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .chart-bar-container {
+            flex: 1;
+            background: #f0f0f0;
+            border-radius: 5px;
+            height: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-bar-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 5px;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 10px;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .visitors-table {
+            background: white;
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+            overflow: hidden;
+        }
+
+        .visitors-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .visitors-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: right;
+            font-weight: 600;
+        }
+
+        .visitors-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e0e0e0;
+            color: #333;
+        }
+
+        .visitors-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .visitors-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .device-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+
+        .device-desktop {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .device-mobile {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .device-tablet {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+
+        .visitor-new {
+            color: #f5576c;
+            font-weight: 600;
+        }
+
+        .visitor-returning {
+            color: #4facfe;
+            font-weight: 600;
         }
     </style>
 </head>
@@ -463,6 +776,12 @@
                 <button class="tab-btn" onclick="switchTab('pages')">
                     <i class="fas fa-file-alt"></i> الصفحات
                 </button>
+                <button class="tab-btn" onclick="switchTab('publish')">
+                    <i class="fas fa-globe"></i> النشر
+                </button>
+                <button class="tab-btn" onclick="switchTab('analytics')">
+                    <i class="fas fa-chart-bar"></i> الإحصائيات
+                </button>
                 <button class="tab-btn" onclick="switchTab('messages')">
                     <i class="fas fa-envelope"></i> الرسائل
                 </button>
@@ -526,12 +845,6 @@
                             <label><i class="fas fa-image"></i> رابط صورة الغلاف (اختياري)</label>
                             <input type="url" id="bookCover" placeholder="https://example.com/cover.jpg">
                         </div>
-                        <div class="form-group">
-                            <label>
-                                <input type="checkbox" id="bookPublished" checked>
-                                نشر الكتاب مباشرة
-                            </label>
-                        </div>
                         <div class="form-actions">
                             <button type="submit" class="btn btn-primary">
                                 <i class="fas fa-save"></i> حفظ الكتاب
@@ -575,7 +888,7 @@
                         <form id="partForm" onsubmit="savePart(event)">
                             <div class="form-group">
                                 <label><i class="fas fa-hashtag"></i> رقم الجزء</label>
-                                <input type="number" id="partNumber" min="1" placeholder="1" required>
+                                <input type="number" id="partNumber" min="1" placeholder="أختر رقم الجزء" required>
                             </div>
                             <div class="form-actions">
                                 <button type="submit" class="btn btn-primary">
@@ -631,12 +944,11 @@
                         </h3>
                         <form id="pageForm" onsubmit="savePage(event)">
                             <div class="form-group">
-                                <label><i class="fas fa-hashtag"></i> رقم الصفحة</label>
-                                <input type="number" id="pageNumber" min="1" placeholder="1" required>
-                            </div>
-                            <div class="form-group">
                                 <label><i class="fas fa-align-right"></i> محتوى الصفحة</label>
                                 <textarea id="pageContent" rows="10" placeholder="اكتب محتوى الصفحة هنا... يمكنك استخدام HTML" required></textarea>
+                                <small style="color: #999; display: block; margin-top: 5px;">
+                                    <i class="fas fa-info-circle"></i> سيتم ترقيم الصفحات تلقائياً حسب ترتيب الإضافة
+                                </small>
                             </div>
                             <div class="form-actions">
                                 <button type="submit" class="btn btn-primary">
@@ -658,6 +970,112 @@
                                 <p>ابدأ بإضافة صفحة جديدة</p>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Page Preview Modal -->
+            <div id="pagePreviewModal" class="modal" onclick="closePreviewModal(event)">
+                <div class="modal-content" onclick="event.stopPropagation()">
+                    <div class="modal-header">
+                        <h2><i class="fas fa-eye"></i> معاينة الصفحة <span id="previewPageNumber"></span></h2>
+                        <button class="modal-close" onclick="closePreviewModal()">
+                            <i class="fas fa-times"></i>
+                        </button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="previewContent" class="preview-content"></div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-secondary" onclick="closePreviewModal()">
+                            <i class="fas fa-times"></i> إغلاق
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Publish Tab -->
+            <div id="publish-tab" class="tab-content">
+                <div class="form-section">
+                    <h2 style="color: #667eea; margin-bottom: 20px;">
+                        <i class="fas fa-globe"></i> نشر الكتب
+                    </h2>
+                    <p style="color: #666; margin-bottom: 30px;">
+                        <i class="fas fa-info-circle"></i> يمكنك نشر أو إلغاء نشر الكتب من هنا. الكتب المنشورة فقط تظهر للزوار.
+                    </p>
+
+                    <h3 style="margin: 20px 0; color: #333;">
+                        <i class="fas fa-list"></i> جميع الكتب
+                    </h3>
+                    <div id="publishBooksList" class="items-list">
+                        <div class="loading">
+                            <i class="fas fa-spinner"></i>
+                            <p>جاري التحميل...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics Tab -->
+            <div id="analytics-tab" class="tab-content">
+                <div class="form-section">
+                    <h2 style="color: #667eea; margin-bottom: 20px;">
+                        <i class="fas fa-chart-bar"></i> إحصائيات الزوار
+                    </h2>
+
+                    <!-- إحصائيات عامة -->
+                    <div class="stats-grid" style="margin-bottom: 30px;">
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>إجمالي الزوار</h3>
+                                <div class="number" id="totalVisitors">0</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
+                                <i class="fas fa-user-plus"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>زوار جدد</h3>
+                                <div class="number" id="newVisitors">0</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
+                                <i class="fas fa-user-check"></i>
+                            </div>
+                            <div class="stat-info">
+                                <h3>زوار عائدون</h3>
+                                <div class="number" id="returningVisitors">0</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- الزوار حسب الدولة -->
+                    <div style="margin-bottom: 30px;">
+                        <h3 style="color: #333; margin-bottom: 15px;">
+                            <i class="fas fa-globe-americas"></i> الزوار حسب الدولة
+                        </h3>
+                        <div id="countriesChart" class="chart-container"></div>
+                    </div>
+
+                    <!-- الزوار حسب نوع الجهاز -->
+                    <div style="margin-bottom: 30px;">
+                        <h3 style="color: #333; margin-bottom: 15px;">
+                            <i class="fas fa-mobile-alt"></i> الزوار حسب نوع الجهاز
+                        </h3>
+                        <div id="devicesChart" class="chart-container"></div>
+                    </div>
+
+                    <!-- جدول تفاصيل الزوار -->
+                    <div>
+                        <h3 style="color: #333; margin-bottom: 15px;">
+                            <i class="fas fa-list"></i> تفاصيل الزوار
+                        </h3>
+                        <div id="visitorsTable" class="visitors-table"></div>
                     </div>
                 </div>
             </div>
@@ -696,6 +1114,8 @@
                 await loadBooks();
                 await loadBooksForParts();
                 await loadBooksForPages();
+                await loadBooksForPublish();
+                await loadAnalytics();
                 await loadMessages();
             } catch (error) {
                 console.error('❌ خطأ في التهيئة:', error);
@@ -891,17 +1311,6 @@
                             </p>
                         </div>
                         <div class="item-actions">
-                            <button class="btn btn-primary btn-small" onclick="openPagesTab('${book.id}')">
-                                <i class="fas fa-file-alt"></i> الصفحات
-                            </button>
-                            ${book.published ? 
-                                `<button class="btn btn-warning btn-small" onclick="togglePublish('${book.id}', false)">
-                                    <i class="fas fa-eye-slash"></i> إخفاء
-                                </button>` :
-                                `<button class="btn btn-success btn-small" onclick="togglePublish('${book.id}', true)">
-                                    <i class="fas fa-eye"></i> نشر
-                                </button>`
-                            }
                             <button class="btn btn-danger btn-small" onclick="deleteBook('${book.id}')">
                                 <i class="fas fa-trash"></i> حذف
                             </button>
@@ -919,7 +1328,6 @@
             const title = document.getElementById('bookTitle').value.trim();
             const category_id = document.getElementById('bookCategory').value;
             const cover_image = document.getElementById('bookCover').value.trim();
-            const published = document.getElementById('bookPublished').checked;
 
             if (!title || !category_id) {
                 alert('⚠️ الرجاء إدخال عنوان الكتاب واختيار القسم');
@@ -931,30 +1339,19 @@
                     title,
                     category_id,
                     cover_image: cover_image || null,
-                    published,
+                    published: false, // الكتب غير منشورة افتراضياً
                     views: 0
                 };
 
                 await api.addBook(bookData);
-                alert('✅ تم إضافة الكتاب بنجاح');
+                alert('✅ تم إضافة الكتاب بنجاح. يمكنك نشره من تبويب النشر.');
 
                 clearBookForm();
                 await loadBooks();
+                await loadBooksForPublish();
                 await loadStats();
             } catch (error) {
                 console.error('خطأ في حفظ الكتاب:', error);
-                alert('❌ حدث خطأ: ' + error.message);
-            }
-        }
-
-        async function togglePublish(id, publish) {
-            try {
-                await api.updateBook(id, { published: publish });
-                alert(publish ? '✅ تم نشر الكتاب' : '✅ تم إخفاء الكتاب');
-                await loadBooks();
-                await loadStats();
-            } catch (error) {
-                console.error('خطأ في تحديث الكتاب:', error);
                 alert('❌ حدث خطأ: ' + error.message);
             }
         }
@@ -975,6 +1372,136 @@
 
         function clearBookForm() {
             document.getElementById('bookForm').reset();
+        }
+
+        // ===================================
+        // الإحصائيات
+        // ===================================
+
+        async function loadAnalytics() {
+            try {
+                // جلب إحصائيات الزوار
+                const counts = await api.getVisitorCounts();
+                const countries = await api.getVisitorsByCountry();
+                const devices = await api.getVisitorsByDevice();
+                const visitors = await api.getVisitorStats();
+
+                // تحديث الأرقام
+                document.getElementById('totalVisitors').textContent = counts.total;
+                document.getElementById('newVisitors').textContent = counts.new;
+                document.getElementById('returningVisitors').textContent = counts.returning;
+
+                // رسم مخطط الدول
+                renderCountriesChart(countries);
+
+                // رسم مخطط الأجهزة
+                renderDevicesChart(devices);
+
+                // عرض جدول الزوار
+                renderVisitorsTable(visitors);
+
+            } catch (error) {
+                console.error('خطأ في تحميل الإحصائيات:', error);
+            }
+        }
+
+        function renderCountriesChart(countries) {
+            const container = document.getElementById('countriesChart');
+            
+            if (countries.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #999;">لا توجد بيانات</p>';
+                return;
+            }
+
+            const maxCount = Math.max(...countries.map(c => c.count));
+            
+            container.innerHTML = countries.slice(0, 10).map(item => `
+                <div class="chart-bar">
+                    <div class="chart-label">${item.country}</div>
+                    <div class="chart-bar-container">
+                        <div class="chart-bar-fill" style="width: ${(item.count / maxCount) * 100}%">
+                            ${item.count}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderDevicesChart(devices) {
+            const container = document.getElementById('devicesChart');
+            
+            if (devices.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #999;">لا توجد بيانات</p>';
+                return;
+            }
+
+            const maxCount = Math.max(...devices.map(d => d.count));
+            const deviceIcons = {
+                'Desktop': 'fa-desktop',
+                'Mobile': 'fa-mobile-alt',
+                'Tablet': 'fa-tablet-alt'
+            };
+            
+            container.innerHTML = devices.map(item => `
+                <div class="chart-bar">
+                    <div class="chart-label">
+                        <i class="fas ${deviceIcons[item.device] || 'fa-question'}"></i> ${item.device}
+                    </div>
+                    <div class="chart-bar-container">
+                        <div class="chart-bar-fill" style="width: ${(item.count / maxCount) * 100}%">
+                            ${item.count}
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderVisitorsTable(visitors) {
+            const container = document.getElementById('visitorsTable');
+            
+            if (visitors.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">لا توجد زيارات مسجلة</p>';
+                return;
+            }
+
+            const deviceClass = {
+                'Desktop': 'device-desktop',
+                'Mobile': 'device-mobile',
+                'Tablet': 'device-tablet'
+            };
+
+            container.innerHTML = `
+                <table>
+                    <thead>
+                        <tr>
+                            <th>التاريخ</th>
+                            <th>النوع</th>
+                            <th>الدولة</th>
+                            <th>الجهاز</th>
+                            <th>المتصفح</th>
+                            <th>نظام التشغيل</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${visitors.slice(0, 50).map(v => `
+                            <tr>
+                                <td>${new Date(v.created_at).toLocaleString('ar-EG')}</td>
+                                <td class="${v.is_returning ? 'visitor-returning' : 'visitor-new'}">
+                                    ${v.is_returning ? 'عائد' : 'جديد'}
+                                </td>
+                                <td>${v.country}</td>
+                                <td>
+                                    <span class="device-badge ${deviceClass[v.device_type] || ''}">
+                                        ${v.device_type}
+                                    </span>
+                                </td>
+                                <td>${v.browser}</td>
+                                <td>${v.os}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            `;
         }
 
         // ===================================
@@ -1030,6 +1557,66 @@
                 await loadStats();
             } catch (error) {
                 console.error('خطأ في حذف الرسالة:', error);
+                alert('❌ حدث خطأ: ' + error.message);
+            }
+        }
+
+        // ===================================
+        // النشر
+        // ===================================
+
+        async function loadBooksForPublish() {
+            try {
+                const books = await api.getAllBooks();
+                const container = document.getElementById('publishBooksList');
+
+                if (books.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-book"></i>
+                            <h3>لا توجد كتب</h3>
+                            <p>ابدأ بإضافة كتاب جديد من تبويب الكتب</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = books.map(book => `
+                    <div class="item-card">
+                        <div class="item-info">
+                            <h3><i class="fas fa-book"></i> ${book.title}</h3>
+                            <p style="color: #666;">
+                                ${book.published ? 
+                                    '<span class="badge badge-success"><i class="fas fa-check-circle"></i> منشور</span>' : 
+                                    '<span class="badge badge-warning"><i class="fas fa-clock"></i> غير منشور</span>'
+                                }
+                            </p>
+                        </div>
+                        <div class="item-actions">
+                            ${book.published ? 
+                                `<button class="btn btn-warning btn-small" onclick="togglePublish('${book.id}', false)">
+                                    <i class="fas fa-eye-slash"></i> إلغاء النشر
+                                </button>` :
+                                `<button class="btn btn-success btn-small" onclick="togglePublish('${book.id}', true)">
+                                    <i class="fas fa-globe"></i> نشر الكتاب
+                                </button>`
+                            }
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('خطأ في تحميل الكتب:', error);
+            }
+        }
+
+        async function togglePublish(id, publish) {
+            try {
+                await api.updateBook(id, { published: publish });
+                alert(publish ? '✅ تم نشر الكتاب بنجاح' : '✅ تم إلغاء نشر الكتاب');
+                await loadBooksForPublish();
+                await loadStats();
+            } catch (error) {
+                console.error('خطأ في تحديث حالة النشر:', error);
                 alert('❌ حدث خطأ: ' + error.message);
             }
         }
@@ -1096,16 +1683,28 @@
                     return;
                 }
 
-                container.innerHTML = pages.map(page => `
-                    <div class="item-card">
+                container.innerHTML = pages.map((page, index) => `
+                    <div class="item-card" data-page-id="${page.id}">
+                        <div class="page-order-controls">
+                            <button class="btn-icon" onclick="movePageUp(${index})" ${index === 0 ? 'disabled' : ''} title="تحريك لأعلى">
+                                <i class="fas fa-chevron-up"></i>
+                            </button>
+                            <span class="page-order-number">${index + 1}</span>
+                            <button class="btn-icon" onclick="movePageDown(${index})" ${index === pages.length - 1 ? 'disabled' : ''} title="تحريك لأسفل">
+                                <i class="fas fa-chevron-down"></i>
+                            </button>
+                        </div>
                         <div class="item-info">
-                            <h3><i class="fas fa-file-alt"></i> صفحة ${page.page_number}</h3>
+                            <h3><i class="fas fa-file-alt"></i> صفحة ${index + 1}</h3>
                             <p style="color: #666; margin-top: 5px;">
                                 ${page.content.substring(0, 100)}${page.content.length > 100 ? '...' : ''}
                             </p>
                         </div>
                         <div class="item-actions">
-                            <button class="btn btn-warning btn-small" onclick="editPage('${page.id}', ${page.page_number}, \`${page.content.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`)">
+                            <button class="btn btn-info btn-small" onclick="previewPage('${page.id}', ${index + 1}, \`${page.content.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`)">
+                                <i class="fas fa-eye"></i> معاينة
+                            </button>
+                            <button class="btn btn-warning btn-small" onclick="editPage('${page.id}', \`${page.content.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`)">
                                 <i class="fas fa-edit"></i> تعديل
                             </button>
                             <button class="btn btn-danger btn-small" onclick="deletePage('${page.id}')">
@@ -1128,20 +1727,38 @@
                 return;
             }
 
-            const pageNumber = parseInt(document.getElementById('pageNumber').value);
             const content = document.getElementById('pageContent').value.trim();
+            const partSelect = document.getElementById('pagePartSelect');
+            const partId = partSelect?.value || null;
 
             if (!content) {
                 alert('⚠️ الرجاء إدخال محتوى الصفحة');
                 return;
             }
 
+            // التحقق من اختيار الجزء إذا كان الكتاب يحتوي على أجزاء
+            if (partSelect && partSelect.required && !partId) {
+                alert('⚠️ الرجاء اختيار الجزء - هذا الكتاب مقسم إلى أجزاء');
+                return;
+            }
+
             try {
                 if (currentEditingPageId) {
+                    // عند التعديل، نحتفظ برقم الصفحة الحالي
                     await api.updatePage(currentEditingPageId, content);
                     alert('✅ تم تحديث الصفحة بنجاح');
                 } else {
-                    await api.addPage(currentSelectedBookId, pageNumber, content);
+                    // عند الإضافة، نحسب رقم الصفحة تلقائياً
+                    let pages;
+                    if (partId) {
+                        // إذا كان هناك جزء، نحسب عدد صفحات الجزء
+                        pages = await api.getPartPages(partId);
+                    } else {
+                        // إذا لم يكن هناك جزء، نحسب عدد صفحات الكتاب
+                        pages = await api.getBookPages(currentSelectedBookId);
+                    }
+                    const pageNumber = pages.length + 1; // الرقم التالي
+                    await api.addPage(currentSelectedBookId, pageNumber, content, partId);
                     alert('✅ تم إضافة الصفحة بنجاح');
                 }
 
@@ -1154,15 +1771,84 @@
             }
         }
 
+        // معاينة صفحة
+        function previewPage(pageId, pageNumber, content) {
+            document.getElementById('previewPageNumber').textContent = pageNumber;
+            document.getElementById('previewContent').innerHTML = content;
+            document.getElementById('pagePreviewModal').classList.add('active');
+        }
+
+        // إغلاق نافذة المعاينة
+        function closePreviewModal(event) {
+            if (!event || event.target === event.currentTarget) {
+                document.getElementById('pagePreviewModal').classList.remove('active');
+            }
+        }
+
         // تعديل صفحة
-        function editPage(pageId, pageNumber, content) {
+        function editPage(pageId, content) {
             currentEditingPageId = pageId;
-            document.getElementById('pageNumber').value = pageNumber;
             document.getElementById('pageContent').value = content;
             document.querySelector('#pageForm button[type="submit"]').innerHTML = '<i class="fas fa-save"></i> تحديث الصفحة';
             
             // التمرير للنموذج
             document.getElementById('pageForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // تحريك صفحة لأعلى
+        async function movePageUp(index) {
+            try {
+                const pages = await api.getBookPages(currentSelectedBookId);
+                if (index === 0) return;
+
+                // تبديل أرقام الصفحات باستخدام رقم مؤقت لتجنب التعارض
+                const currentPage = pages[index];
+                const previousPage = pages[index - 1];
+                const tempNumber = -999999; // رقم مؤقت سلبي
+
+                // الخطوة 1: تعيين رقم مؤقت للصفحة الحالية
+                await api.updatePageNumber(currentPage.id, tempNumber);
+                
+                // الخطوة 2: تعيين رقم الصفحة الحالية للصفحة السابقة
+                await api.updatePageNumber(previousPage.id, currentPage.page_number);
+                
+                // الخطوة 3: تعيين رقم الصفحة السابقة للصفحة الحالية
+                await api.updatePageNumber(currentPage.id, previousPage.page_number);
+
+                await loadBookPages();
+                alert('✅ تم تحريك الصفحة بنجاح');
+            } catch (error) {
+                console.error('خطأ في تحريك الصفحة:', error);
+                alert('❌ حدث خطأ: ' + error.message);
+            }
+        }
+
+        // تحريك صفحة لأسفل
+        async function movePageDown(index) {
+            try {
+                const pages = await api.getBookPages(currentSelectedBookId);
+                if (index === pages.length - 1) return;
+
+                // تبديل أرقام الصفحات باستخدام رقم مؤقت لتجنب التعارض
+                const currentPage = pages[index];
+                const nextPage = pages[index + 1];
+                const tempNumber = -999999; // رقم مؤقت سلبي
+
+                // الخطوة 1: تعيين رقم مؤقت للصفحة الحالية
+                await api.updatePageNumber(currentPage.id, tempNumber);
+                
+                // الخطوة 2: تعيين رقم الصفحة الحالية للصفحة التالية
+                await api.updatePageNumber(nextPage.id, currentPage.page_number);
+                
+                // الخطوة 3: تعيين رقم الصفحة التالية للصفحة الحالية
+                await api.updatePageNumber(currentPage.id, nextPage.page_number);
+
+                await loadBookPages();
+                alert('✅ تم تحريك الصفحة بنجاح');
+            } catch (error) {
+                console.error('خطأ في تحريك الصفحة:', error);
+                alert('❌ حدث خطأ: ' + error.message);
+            }
         }
 
         // حذف صفحة
@@ -1352,48 +2038,6 @@
             await loadBookPages();
         }
 
-        // تحديث دالة حفظ الصفحة لدعم الجزء
-        async function savePage(event) {
-            event.preventDefault();
-
-            if (!currentSelectedBookId) {
-                alert('⚠️ الرجاء اختيار كتاب أولاً');
-                return;
-            }
-
-            const pageNumber = parseInt(document.getElementById('pageNumber').value);
-            const content = document.getElementById('pageContent').value.trim();
-            const partSelect = document.getElementById('pagePartSelect');
-            const partId = partSelect?.value || null;
-
-            if (!content) {
-                alert('⚠️ الرجاء إدخال محتوى الصفحة');
-                return;
-            }
-
-            // التحقق من اختيار الجزء إذا كان الكتاب يحتوي على أجزاء
-            if (partSelect && partSelect.required && !partId) {
-                alert('⚠️ الرجاء اختيار الجزء - هذا الكتاب مقسم إلى أجزاء');
-                return;
-            }
-
-            try {
-                if (currentEditingPageId) {
-                    await api.updatePage(currentEditingPageId, content);
-                    alert('✅ تم تحديث الصفحة بنجاح');
-                } else {
-                    await api.addPage(currentSelectedBookId, pageNumber, content, partId);
-                    alert('✅ تم إضافة الصفحة بنجاح');
-                }
-
-                clearPageForm();
-                await loadBookPages();
-                await loadStats();
-            } catch (error) {
-                console.error('خطأ في حفظ الصفحة:', error);
-                alert('❌ حدث خطأ: ' + error.message);
-            }
-        }
     </script>
 </body>
 </html>

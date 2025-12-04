@@ -469,6 +469,10 @@
                 justify-content: center;
             }
 
+            .read-btn:hover {
+            transform: translateY(-4px);
+            }
+
             .part-arrow {
                 display: none;
             }
@@ -618,7 +622,7 @@
             }
 
             // عرض عدد الأجزاء
-            document.getElementById('partsCount').innerHTML = '<i class="fas fa-layer-group"></i> ' + bookParts.length + ' جزء';
+            document.getElementById('partsCount').innerHTML = '<i class="fas fa-layer-group"></i> ' + bookParts.length + ' أجزاء';
 
             // عرض الأجزاء
             displayParts();

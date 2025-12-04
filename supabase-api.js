@@ -259,17 +259,110 @@ class SupabaseAPI {
     // البحث في الكتب
     async searchBooks(searchTerm) {
         try {
-            const { data, error } = await this.supabase
+            // البحث في عناوين الكتب
+            const { data: booksByTitle, error: titleError } = await this.supabase
                 .from(SUPABASE_CONFIG.tables.books)
                 .select('*')
                 .eq('published', true)
                 .ilike('title', `%${searchTerm}%`)
                 .order('created_at', { ascending: false });
 
-            if (error) throw error;
-            return data || [];
+            if (titleError) throw titleError;
+
+            // البحث في محتوى الصفحات
+            const { data: pagesByContent, error: contentError } = await this.supabase
+                .from(SUPABASE_CONFIG.tables.pages)
+                .select('book_id')
+                .ilike('content', `%${searchTerm}%`);
+
+            if (contentError) throw contentError;
+
+            // جمع IDs الكتب من نتائج البحث في المحتوى
+            const bookIdsFromContent = [...new Set(pagesByContent.map(page => page.book_id))];
+
+            // جلب الكتب التي تحتوي على المحتوى
+            let booksByContent = [];
+            if (bookIdsFromContent.length > 0) {
+                const { data: booksData, error: booksError } = await this.supabase
+                    .from(SUPABASE_CONFIG.tables.books)
+                    .select('*')
+                    .eq('published', true)
+                    .in('id', bookIdsFromContent)
+                    .order('created_at', { ascending: false });
+
+                if (booksError) throw booksError;
+                booksByContent = booksData || [];
+            }
+
+            // دمج النتائج وإزالة التكرار
+            const allBooks = [...booksByTitle];
+            const bookIds = new Set(booksByTitle.map(book => book.id));
+
+            booksByContent.forEach(book => {
+                if (!bookIds.has(book.id)) {
+                    allBooks.push(book);
+                }
+            });
+
+            return allBooks;
         } catch (error) {
             console.error('خطأ في البحث:', error);
+            return [];
+        }
+    }
+
+    // البحث التفصيلي في المحتوى مع معلومات الصفحات والأجزاء
+    async searchInContent(searchTerm) {
+        try {
+            // البحث في محتوى الصفحات مع جلب معلومات الكتاب والجزء
+            const { data: pages, error } = await this.supabase
+                .from(SUPABASE_CONFIG.tables.pages)
+                .select(`
+                    id,
+                    content,
+                    page_number,
+                    book_id,
+                    part_id,
+                    books!inner(id, title, published),
+                    parts(id, part_number)
+                `)
+                .eq('books.published', true)
+                .ilike('content', `%${searchTerm}%`)
+                .limit(50);
+
+            if (error) throw error;
+
+            // معالجة النتائج لاستخراج السياق
+            const results = pages.map(page => {
+                const content = page.content;
+                const searchLower = searchTerm.toLowerCase();
+                const contentLower = content.toLowerCase();
+                const index = contentLower.indexOf(searchLower);
+                
+                // استخراج السياق (50 حرف قبل وبعد)
+                const start = Math.max(0, index - 50);
+                const end = Math.min(content.length, index + searchTerm.length + 50);
+                let context = content.substring(start, end);
+                
+                // إضافة ... في البداية والنهاية إذا لزم الأمر
+                if (start > 0) context = '...' + context;
+                if (end < content.length) context = context + '...';
+
+                return {
+                    pageId: page.id,
+                    bookId: page.book_id,
+                    bookTitle: page.books.title,
+                    partId: page.part_id,
+                    partNumber: page.parts ? page.parts.part_number : null,
+                    pageNumber: page.page_number,
+                    context: context,
+                    searchTerm: searchTerm
+                };
+            });
+
+            return results;
+        } catch (error) {
+            console.error('خطأ في البحث التفصيلي:', error);
             return [];
         }
     }
@@ -430,6 +523,24 @@ class SupabaseAPI {
         }
     }
 
+    // تحديث رقم الصفحة
+    async updatePageNumber(pageId, pageNumber) {
+        try {
+            const { data, error } = await this.supabase
+                .from(SUPABASE_CONFIG.tables.pages)
+                .update({ page_number: pageNumber })
+                .eq('id', pageId)
+                .select()
+                .single();
+
+            if (error) throw error;
+            return data;
+        } catch (error) {
+            console.error('خطأ في تحديث رقم الصفحة:', error);
+            throw error;
+        }
+    }
+
     // حذف صفحة
     async deletePage(pageId) {
         try {
@@ -470,7 +581,7 @@ class SupabaseAPI {
     async addContactMessage(messageData) {
         try {
             const { data, error } = await this.supabase
-                .from(SUPABASE_CONFIG.tables.contactMessages)
+                .from(SUPABASE_CONFIG.tables.contact_messages)
                 .insert([{
                     name: messageData.name,
                     email: messageData.email,
@@ -493,7 +604,7 @@ class SupabaseAPI {
     async deleteContactMessage(messageId) {
         try {
             const { error } = await this.supabase
-                .from(SUPABASE_CONFIG.tables.contactMessages)
+                .from(SUPABASE_CONFIG.tables.contact_messages)
                 .delete()
                 .eq('id', messageId);
 
@@ -536,6 +647,121 @@ class SupabaseAPI {
         } catch (error) {
             console.error('خطأ في تحديث حالة الرسالة:', error);
             throw error;
+        }
+    }
+
+    // ===================================
+    // دوال الزوار (Visitors)
+    // ===================================
+
+    // إضافة زائر جديد
+    async addVisitor(visitorData) {
+        try {
+            const { data, error } = await this.supabase
+                .from(SUPABASE_CONFIG.tables.visitors)
+                .insert([{
+                    visitor_id: visitorData.visitor_id,
+                    is_returning: visitorData.is_returning,
+                    country: visitorData.country || 'Unknown',
+                    device_type: visitorData.device_type || 'Unknown',
+                    browser: visitorData.browser || 'Unknown',
+                    os: visitorData.os || 'Unknown',
+                    screen_resolution: visitorData.screen_resolution || 'Unknown',
+                    language: visitorData.language || 'Unknown'
+                }])
+                .select()
+                .single();
+
+            if (error) throw error;
+            return data;
+        } catch (error) {
+            console.error('خطأ في إضافة الزائر:', error);
+            throw error;
+        }
+    }
+
+    // جلب إحصائيات الزوار
+    async getVisitorStats() {
+        try {
+            const { data, error } = await this.supabase
+                .from(SUPABASE_CONFIG.tables.visitors)
+                .select('*')
+                .order('created_at', { ascending: false });
+
+            if (error) throw error;
+            return data || [];
+        } catch (error) {
+            console.error('خطأ في جلب إحصائيات الزوار:', error);
+            return [];
+        }
+    }
+
+    // جلب عدد الزوار حسب النوع
+    async getVisitorCounts() {
+        try {
+            const { data, error } = await this.supabase
+                .from(SUPABASE_CONFIG.tables.visitors)
+                .select('is_returning');
+
+            if (error) throw error;
+            
+            const newVisitors = data.filter(v => !v.is_returning).length;
+            const returningVisitors = data.filter(v => v.is_returning).length;
+            
+            return {
+                total: data.length,
+                new: newVisitors,
+                returning: returningVisitors
+            };
+        } catch (error) {
+            console.error('خطأ في حساب الزوار:', error);
+            return { total: 0, new: 0, returning: 0 };
+        }
+    }
+
+    // جلب الزوار حسب الدولة
+    async getVisitorsByCountry() {
+        try {
+            const { data, error } = await this.supabase
+                .from(SUPABASE_CONFIG.tables.visitors)
+                .select('country');
+
+            if (error) throw error;
+            
+            const countryCounts = {};
+            data.forEach(v => {
+                countryCounts[v.country] = (countryCounts[v.country] || 0) + 1;
+            });
+            
+            return Object.entries(countryCounts)
+                .map(([country, count]) => ({ country, count }))
+                .sort((a, b) => b.count - a.count);
+        } catch (error) {
+            console.error('خطأ في جلب الزوار حسب الدولة:', error);
+            return [];
+        }
+    }
+
+    // جلب الزوار حسب نوع الجهاز
+    async getVisitorsByDevice() {
+        try {
+            const { data, error } = await this.supabase
+                .from(SUPABASE_CONFIG.tables.visitors)
+                .select('device_type');
+
+            if (error) throw error;
+            
+            const deviceCounts = {};
+            data.forEach(v => {
+                deviceCounts[v.device_type] = (deviceCounts[v.device_type] || 0) + 1;
+            });
+            
+            return Object.entries(deviceCounts)
+                .map(([device, count]) => ({ device, count }))
+                .sort((a, b) => b.count - a.count);
+        } catch (error) {
+            console.error('خطأ في جلب الزوار حسب الجهاز:', error);
+            return [];
         }
     }
 

@@ -16,7 +16,8 @@ const SUPABASE_CONFIG = {
         books: 'books',
         parts: 'parts',
         pages: 'pages',
-        contact_messages: 'contact_messages'
+        contact_messages: 'contact_messages',
+        visitors: 'visitors'
     }
 };
 

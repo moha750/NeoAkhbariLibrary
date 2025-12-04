@@ -295,7 +295,8 @@
         }
 
         .search-results.active {
-            display: block;
+            display: flex;
+            flex-direction: column;
             position: fixed;
             bottom: 20px;
             left: 50%;
@@ -339,11 +340,11 @@
 
         .search-info {
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
             align-items: center;
-            flex-wrap: wrap;
             gap: 15px;
             position: relative;
+            width: 100%;
         }
 
         .search-close-btn {
@@ -381,6 +382,8 @@
             display: flex;
             gap: 8px;
             align-items: center;
+            justify-content: center;
+            width: 100%;
         }
 
         .search-nav-btn {
@@ -1268,10 +1271,24 @@
             return urlParams.get('part');
         }
 
+        // الحصول على رقم الصفحة من URL
+        function getPageNumber() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('page');
+        }
+
+        // الحصول على كلمة البحث من URL
+        function getSearchQuery() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('search');
+        }
+
         // تحميل الكتاب
         async function loadBook() {
             const bookId = getBookId();
             const partId = getPartId();
+            const pageNumber = getPageNumber();
+            const searchQuery = getSearchQuery();
             
             if (!bookId) {
                 showError();
@@ -1298,8 +1315,24 @@
                 // تحديث عدد المشاهدات
                 await api.incrementBookViews(bookId);
 
+                // الانتقال إلى الصفحة المحددة إذا كانت موجودة في URL
+                if (pageNumber) {
+                    const pageIndex = currentBookPages.findIndex(page => page.page_number == pageNumber);
+                    if (pageIndex !== -1) {
+                        currentPageIndex = pageIndex;
+                    }
+                }
+
                 // عرض الكتاب
                 displayBook();
+
+                // تنفيذ البحث التلقائي إذا كانت هناك كلمة بحث في URL
+                if (searchQuery) {
+                    setTimeout(() => {
+                        document.getElementById('searchInput').value = searchQuery;
+                        searchInBook(true); // true = بحث تلقائي بدون تنبيهات
+                    }, 500);
+                }
             } catch (error) {
                 console.error('خطأ في تحميل الكتاب:', error);
                 showError();
@@ -1768,16 +1801,20 @@
         });
 
         // البحث في محتوى الكتاب
-        function searchInBook() {
+        function searchInBook(autoSearch = false) {
             const searchTerm = document.getElementById('searchInput').value.trim();
             
             if (!searchTerm) {
-                alert('⚠️ الرجاء إدخال كلمة للبحث');
+                if (!autoSearch) {
+                    alert('⚠️ الرجاء إدخال كلمة للبحث');
+                }
                 return;
             }
 
             if (!currentBook || currentBookPages.length === 0) {
-                alert('⚠️ لا يوجد محتوى للبحث فيه');
+                if (!autoSearch) {
+                    alert('⚠️ لا يوجد محتوى للبحث فيه');
+                }
                 return;
             }
 
