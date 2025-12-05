@@ -232,6 +232,17 @@
             border-color: #667eea;
         }
 
+        .form-group input[type="file"] {
+            padding: 10px;
+            cursor: pointer;
+            background: #f8f9fa;
+        }
+
+        .form-group input[type="file"]:hover {
+            background: #e9ecef;
+            border-color: #667eea;
+        }
+
         .form-group textarea {
             min-height: 100px;
             resize: vertical;
@@ -782,6 +793,9 @@
                 <button class="tab-btn" onclick="switchTab('analytics')">
                     <i class="fas fa-chart-bar"></i> الإحصائيات
                 </button>
+                <button class="tab-btn" onclick="switchTab('team')">
+                    <i class="fas fa-users"></i> فريق العمل
+                </button>
                 <button class="tab-btn" onclick="switchTab('messages')">
                     <i class="fas fa-envelope"></i> الرسائل
                 </button>
@@ -842,8 +856,11 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label><i class="fas fa-image"></i> رابط صورة الغلاف (اختياري)</label>
-                            <input type="url" id="bookCover" placeholder="https://example.com/cover.jpg">
+                            <label><i class="fas fa-image"></i> صورة الغلاف <span style="color: red;">*</span></label>
+                            <input type="file" id="bookCover" accept="image/*" required>
+                            <small style="color: #666; display: block; margin-top: 5px;">
+                                <i class="fas fa-info-circle"></i> يُفضل استخدام صور بحجم 800x1200 بكسل
+                            </small>
                         </div>
                         <div class="form-actions">
                             <button type="submit" class="btn btn-primary">
@@ -1080,6 +1097,61 @@
                 </div>
             </div>
 
+            <!-- Team Tab -->
+            <div id="team-tab" class="tab-content">
+                <div class="form-section">
+                    <h2 style="color: #667eea; margin-bottom: 20px;">
+                        <i class="fas fa-users"></i> إدارة فريق العمل
+                    </h2>
+
+                    <!-- نموذج إضافة عضو -->
+                    <div style="background: white; padding: 25px; border-radius: 10px; margin-bottom: 30px; border: 2px solid #e0e0e0;">
+                        <h3 style="margin-bottom: 20px; color: #333;">
+                            <i class="fas fa-user-plus"></i> إضافة عضو جديد
+                        </h3>
+                        <form id="inviteForm" onsubmit="sendInvitation(event)">
+                            <div class="form-group">
+                                <label><i class="fas fa-envelope"></i> البريد الإلكتروني</label>
+                                <input type="email" id="inviteEmail" placeholder="example@domain.com" required>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-shield-alt"></i> الدور</label>
+                                <select id="inviteRole" required>
+                                    <option value="">اختر الدور</option>
+                                    <option value="admin">إداري - وصول كامل لجميع التبويبات</option>
+                                    <option value="editor">محرر - وصول لتبويب الصفحات فقط</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane"></i> إرسال الدعوة
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- قائمة الأعضاء -->
+                    <h3 style="margin: 20px 0; color: #333;">
+                        <i class="fas fa-list"></i> الأعضاء الحاليون
+                    </h3>
+                    <div id="teamMembersList" class="items-list">
+                        <div class="loading">
+                            <i class="fas fa-spinner"></i>
+                            <p>جاري التحميل...</p>
+                        </div>
+                    </div>
+
+                    <!-- قائمة الدعوات -->
+                    <h3 style="margin: 30px 0 20px 0; color: #333;">
+                        <i class="fas fa-envelope"></i> الدعوات المرسلة
+                    </h3>
+                    <div id="invitationsList" class="items-list">
+                        <div class="loading">
+                            <i class="fas fa-spinner"></i>
+                            <p>جاري التحميل...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Messages Tab -->
             <div id="messages-tab" class="tab-content">
                 <h3 style="margin-bottom: 20px; color: #333;">
@@ -1098,6 +1170,7 @@
     <!-- Supabase Files -->
     <script src="supabase-config.js"></script>
     <script src="supabase-api.js"></script>
+    <script src="auth-guard.js"></script>
 
     <script>
         let currentEditingCategoryId = null;
@@ -1106,8 +1179,21 @@
         // تهيئة التطبيق
         window.addEventListener('load', async function() {
             try {
+                // 1. تهيئة API أولاً
                 await api.init();
                 console.log('✅ تم الاتصال بـ Supabase');
+                
+                // 2. التحقق من الصلاحيات
+                const isAuthorized = await initAuthGuard();
+                if (!isAuthorized) {
+                    console.log('❌ غير مصرح - سيتم التحويل');
+                    return; // إيقاف التحميل
+                }
+                
+                // 2.5. تفعيل مراقبة حالة المصادقة
+                setupAuthStateListener();
+                
+                // 3. تحميل البيانات فقط بعد التحقق من الصلاحيات
                 await loadStats();
                 await loadCategories();
                 await loadCategoriesSelect();
@@ -1116,7 +1202,11 @@
                 await loadBooksForPages();
                 await loadBooksForPublish();
                 await loadAnalytics();
+                await loadTeamMembers();
+                await loadInvitations();
                 await loadMessages();
+                
+                console.log('✅ تم تحميل جميع البيانات بنجاح');
             } catch (error) {
                 console.error('❌ خطأ في التهيئة:', error);
                 alert('❌ فشل الاتصال بقاعدة البيانات');
@@ -1300,17 +1390,29 @@
                     return;
                 }
 
+                // جلب معلومات الأقسام لعرض اسم القسم
+                const categories = await api.getCategories();
+                const categoryMap = {};
+                categories.forEach(cat => {
+                    categoryMap[cat.id] = cat.name;
+                });
+
                 container.innerHTML = books.map(book => `
                     <div class="item-card">
                         <div class="item-info">
                             <h3><i class="fas fa-book"></i> ${book.title}</h3>
                             <p>
-                                ${book.published ? '<span class="badge badge-success">منشور</span>' : '<span class="badge badge-warning">غير منشور</span>'}
+                                <span class="badge" style="background: #667eea; color: white;">
+                                    <i class="fas fa-folder"></i> ${categoryMap[book.category_id] || 'غير محدد'}
+                                </span>
                                 <span style="margin: 0 10px;">|</span>
-                                <i class="fas fa-eye"></i> ${book.views || 0} مشاهدة
+                                ${book.published ? '<span class="badge badge-success">منشور</span>' : '<span class="badge badge-warning">غير منشور</span>'}
                             </p>
                         </div>
                         <div class="item-actions">
+                            <button class="btn btn-info btn-small" onclick="changeBookCategory('${book.id}', '${book.category_id}')">
+                                <i class="fas fa-exchange-alt"></i> تغيير القسم
+                            </button>
                             <button class="btn btn-danger btn-small" onclick="deleteBook('${book.id}')">
                                 <i class="fas fa-trash"></i> حذف
                             </button>
@@ -1327,23 +1429,51 @@
 
             const title = document.getElementById('bookTitle').value.trim();
             const category_id = document.getElementById('bookCategory').value;
-            const cover_image = document.getElementById('bookCover').value.trim();
+            const coverInput = document.getElementById('bookCover');
+            const coverFile = coverInput.files[0];
 
             if (!title || !category_id) {
                 alert('⚠️ الرجاء إدخال عنوان الكتاب واختيار القسم');
                 return;
             }
 
+            if (!coverFile) {
+                alert('⚠️ الرجاء اختيار صورة الغلاف');
+                return;
+            }
+
+            // التحقق من نوع الملف
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
+            if (!allowedTypes.includes(coverFile.type)) {
+                alert('⚠️ يُرجى اختيار صورة بصيغة صحيحة (JPG, PNG, WEBP, GIF)');
+                return;
+            }
+
+            // التحقق من حجم الملف (أقل من 5MB)
+            const maxSize = 5 * 1024 * 1024; // 5MB
+            if (coverFile.size > maxSize) {
+                alert('⚠️ حجم الصورة كبير جداً. الرجاء اختيار صورة أقل من 5 ميجابايت');
+                return;
+            }
+
             try {
+                // إنشاء الكتاب أولاً بدون صورة
                 const bookData = {
                     title,
                     category_id,
-                    cover_image: cover_image || null,
-                    published: false, // الكتب غير منشورة افتراضياً
+                    cover_image: null, // سيتم تحديثه بعد رفع الصورة
+                    published: false,
                     views: 0
                 };
 
-                await api.addBook(bookData);
+                const newBook = await api.addBook(bookData);
+                
+                // رفع صورة الغلاف
+                const coverUrl = await api.uploadBookCover(coverFile, newBook.id);
+                
+                // تحديث الكتاب برابط الصورة
+                await api.updateBook(newBook.id, { cover_image: coverUrl });
+
                 alert('✅ تم إضافة الكتاب بنجاح. يمكنك نشره من تبويب النشر.');
 
                 clearBookForm();
@@ -1352,6 +1482,54 @@
                 await loadStats();
             } catch (error) {
                 console.error('خطأ في حفظ الكتاب:', error);
+                alert('❌ حدث خطأ: ' + error.message);
+            }
+        }
+
+        async function changeBookCategory(bookId, currentCategoryId) {
+            try {
+                // جلب قائمة الأقسام
+                const categories = await api.getCategories();
+                
+                if (categories.length === 0) {
+                    alert('⚠️ لا توجد أقسام متاحة. الرجاء إضافة قسم أولاً.');
+                    return;
+                }
+
+                // إنشاء قائمة الخيارات
+                let optionsHTML = categories.map(cat => 
+                    `<option value="${cat.id}" ${cat.id === currentCategoryId ? 'selected' : ''}>${cat.name}</option>`
+                ).join('');
+
+                // عرض نافذة اختيار القسم
+                const newCategoryId = prompt(
+                    'اختر القسم الجديد:\n\n' + 
+                    categories.map((cat, index) => `${index + 1}. ${cat.name}`).join('\n') + 
+                    '\n\nأدخل رقم القسم:',
+                    '1'
+                );
+
+                if (!newCategoryId) return; // إلغاء
+
+                const selectedIndex = parseInt(newCategoryId) - 1;
+                
+                if (selectedIndex < 0 || selectedIndex >= categories.length) {
+                    alert('⚠️ رقم القسم غير صحيح');
+                    return;
+                }
+
+                const selectedCategory = categories[selectedIndex];
+
+                // تأكيد التغيير
+                if (!confirm(`هل تريد نقل الكتاب إلى قسم "${selectedCategory.name}"؟`)) return;
+
+                // تحديث القسم
+                await api.updateBook(bookId, { category_id: selectedCategory.id });
+                alert('✅ تم تغيير قسم الكتاب بنجاح');
+                await loadBooks();
+                await loadBooksForPublish();
+            } catch (error) {
+                console.error('خطأ في تغيير القسم:', error);
                 alert('❌ حدث خطأ: ' + error.message);
             }
         }
@@ -1557,6 +1735,243 @@
                 await loadStats();
             } catch (error) {
                 console.error('خطأ في حذف الرسالة:', error);
+                alert('❌ حدث خطأ: ' + error.message);
+            }
+        }
+
+        // ===================================
+        // فريق العمل (Team Management)
+        // ===================================
+
+        // إرسال دعوة
+        async function sendInvitation(event) {
+            event.preventDefault();
+
+            const email = document.getElementById('inviteEmail').value.trim();
+            const role = document.getElementById('inviteRole').value;
+
+            if (!email || !role) {
+                alert('⚠️ الرجاء إدخال جميع البيانات');
+                return;
+            }
+
+            try {
+                const invitation = await api.createInvitation(email, role);
+                
+                // إنشاء رابط الدعوة
+                const inviteLink = `${window.location.origin}/signup.html?token=${invitation.token}`;
+                
+                // عرض الرابط للإداري
+                const message = `✅ تم إنشاء الدعوة بنجاح!\n\nالرابط:\n${inviteLink}\n\nقم بإرسال هذا الرابط للشخص عبر البريد الإلكتروني.\n\nصلاحية الدعوة: 7 أيام`;
+                
+                // نسخ الرابط تلقائياً
+                try {
+                    await navigator.clipboard.writeText(inviteLink);
+                    alert(message + '\n\n✅ تم نسخ الرابط تلقائياً!');
+                } catch (err) {
+                    alert(message);
+                }
+                
+                document.getElementById('inviteForm').reset();
+                await loadInvitations();
+            } catch (error) {
+                console.error('خطأ في إرسال الدعوة:', error);
+                alert('❌ حدث خطأ: ' + error.message);
+            }
+        }
+
+        // تحميل قائمة الأعضاء
+        async function loadTeamMembers() {
+            try {
+                const users = await api.getAllUsers();
+                const container = document.getElementById('teamMembersList');
+
+                if (users.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-users"></i>
+                            <h3>لا يوجد أعضاء</h3>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const currentUserId = authGuard.getCurrentUser()?.id;
+
+                container.innerHTML = users.map(user => `
+                    <div class="item-card">
+                        <div class="item-info">
+                            <h3>
+                                <i class="fas fa-user"></i> ${user.full_name}
+                                ${user.id === currentUserId ? '<span style="color: #667eea; font-size: 0.8em; margin-right: 10px;">(أنت)</span>' : ''}
+                            </h3>
+                            <p>
+                                <i class="fas fa-envelope"></i> ${user.email}
+                                <span style="margin: 0 10px;">|</span>
+                                <span class="badge" style="background: ${user.role === 'admin' ? '#667eea' : '#4caf50'}; color: white;">
+                                    <i class="fas fa-shield-alt"></i> ${user.role === 'admin' ? 'إداري' : 'محرر'}
+                                </span>
+                                <span style="margin: 0 10px;">|</span>
+                                <small style="color: #999;">
+                                    <i class="fas fa-calendar"></i> ${new Date(user.created_at).toLocaleDateString('ar-EG')}
+                                </small>
+                            </p>
+                        </div>
+                        <div class="item-actions">
+                            ${user.id !== currentUserId ? `
+                                <button class="btn btn-danger btn-small" onclick="deleteTeamMember('${user.id}', '${user.full_name}')">
+                                    <i class="fas fa-trash"></i> حذف
+                                </button>
+                            ` : ''}
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('خطأ في تحميل الأعضاء:', error);
+                const container = document.getElementById('teamMembersList');
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h3>حدث خطأ في تحميل الأعضاء</h3>
+                    </div>
+                `;
+            }
+        }
+
+        // تحميل قائمة الدعوات
+        async function loadInvitations() {
+            try {
+                const invitations = await api.getInvitations();
+                const container = document.getElementById('invitationsList');
+
+                if (invitations.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-envelope"></i>
+                            <h3>لا توجد دعوات</h3>
+                            <p>قم بإضافة أعضاء جدد من النموذج أعلاه</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = invitations.map(inv => {
+                    const statusText = {
+                        'pending': 'قيد الانتظار',
+                        'accepted': 'مقبولة',
+                        'expired': 'منتهية'
+                    };
+
+                    const statusColor = {
+                        'pending': '#ff9800',
+                        'accepted': '#4caf50',
+                        'expired': '#f44336'
+                    };
+
+                    const isExpired = new Date(inv.expires_at) < new Date();
+                    const actualStatus = isExpired ? 'expired' : inv.status;
+
+                    return `
+                        <div class="item-card">
+                            <div class="item-info">
+                                <h3><i class="fas fa-envelope"></i> ${inv.email}</h3>
+                                <p>
+                                    <span class="badge" style="background: ${statusColor[actualStatus]}; color: white;">
+                                        ${statusText[actualStatus]}
+                                    </span>
+                                    <span style="margin: 0 10px;">|</span>
+                                    <span style="color: #667eea;">
+                                        <i class="fas fa-shield-alt"></i> ${inv.role === 'admin' ? 'إداري' : 'محرر'}
+                                    </span>
+                                    <span style="margin: 0 10px;">|</span>
+                                    <small style="color: #999;">
+                                        <i class="fas fa-calendar"></i> ${new Date(inv.created_at).toLocaleDateString('ar-EG')}
+                                    </small>
+                                    ${!isExpired && inv.status === 'pending' ? `
+                                        <span style="margin: 0 10px;">|</span>
+                                        <small style="color: #ff9800;">
+                                            <i class="fas fa-clock"></i> تنتهي: ${new Date(inv.expires_at).toLocaleDateString('ar-EG')}
+                                        </small>
+                                    ` : ''}
+                                </p>
+                            </div>
+                            <div class="item-actions">
+                                ${inv.status === 'pending' && !isExpired ? `
+                                    <button class="btn btn-info btn-small" onclick="copyInviteLink('${inv.token}')">
+                                        <i class="fas fa-copy"></i> نسخ الرابط
+                                    </button>
+                                    <button class="btn btn-warning btn-small" onclick="resendInvite('${inv.id}')">
+                                        <i class="fas fa-redo"></i> تجديد
+                                    </button>
+                                ` : ''}
+                                <button class="btn btn-danger btn-small" onclick="deleteInvite('${inv.id}')">
+                                    <i class="fas fa-trash"></i> حذف
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error('خطأ في تحميل الدعوات:', error);
+                const container = document.getElementById('invitationsList');
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h3>حدث خطأ في تحميل الدعوات</h3>
+                    </div>
+                `;
+            }
+        }
+
+        // نسخ رابط الدعوة
+        async function copyInviteLink(token) {
+            const link = `${window.location.origin}/signup.html?token=${token}`;
+            try {
+                await navigator.clipboard.writeText(link);
+                alert('✅ تم نسخ الرابط!\n\n' + link);
+            } catch (err) {
+                prompt('انسخ هذا الرابط:', link);
+            }
+        }
+
+        // إعادة إرسال دعوة (تجديد)
+        async function resendInvite(invitationId) {
+            if (!confirm('هل تريد تجديد هذه الدعوة؟\nسيتم تمديد صلاحيتها لـ 7 أيام إضافية.')) return;
+
+            try {
+                await api.resendInvitation(invitationId);
+                alert('✅ تم تجديد الدعوة بنجاح');
+                await loadInvitations();
+            } catch (error) {
+                console.error('خطأ في إعادة الإرسال:', error);
+                alert('❌ حدث خطأ: ' + error.message);
+            }
+        }
+
+        // حذف دعوة
+        async function deleteInvite(invitationId) {
+            if (!confirm('هل تريد حذف هذه الدعوة؟')) return;
+
+            try {
+                await api.deleteInvitation(invitationId);
+                alert('✅ تم حذف الدعوة');
+                await loadInvitations();
+            } catch (error) {
+                console.error('خطأ في حذف الدعوة:', error);
+                alert('❌ حدث خطأ: ' + error.message);
+            }
+        }
+
+        // حذف عضو
+        async function deleteTeamMember(userId, userName) {
+            if (!confirm(`⚠️ هل أنت متأكد من حذف ${userName} من فريق العمل؟\n\nسيتم حذف جميع بياناته ولن يتمكن من الوصول للوحة التحكم.`)) return;
+
+            try {
+                await api.deleteUser(userId);
+                alert('✅ تم حذف العضو بنجاح');
+                await loadTeamMembers();
+            } catch (error) {
+                console.error('خطأ في حذف العضو:', error);
                 alert('❌ حدث خطأ: ' + error.message);
             }
         }

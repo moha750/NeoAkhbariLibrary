@@ -1,0 +1,514 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>إنشاء حساب - لوحة التحكم</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .signup-container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+            max-width: 500px;
+            width: 100%;
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .signup-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .signup-header i {
+            font-size: 3em;
+            margin-bottom: 15px;
+            display: block;
+        }
+
+        .signup-header h1 {
+            font-size: 1.8em;
+            margin-bottom: 10px;
+        }
+
+        .signup-header p {
+            opacity: 0.9;
+            font-size: 0.95em;
+        }
+
+        .signup-body {
+            padding: 40px 30px;
+        }
+
+        .invitation-info {
+            background: #f0f4ff;
+            border-right: 4px solid #667eea;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+        }
+
+        .invitation-info p {
+            margin: 5px 0;
+            color: #333;
+        }
+
+        .invitation-info strong {
+            color: #667eea;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        .form-group label i {
+            margin-left: 5px;
+            color: #667eea;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 14px 45px 14px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .toggle-password {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #999;
+            cursor: pointer;
+            font-size: 1.1em;
+            padding: 5px;
+        }
+
+        .toggle-password:hover {
+            color: #667eea;
+        }
+
+        .password-strength {
+            margin-top: 8px;
+            font-size: 0.85em;
+        }
+
+        .strength-bar {
+            height: 4px;
+            background: #e0e0e0;
+            border-radius: 2px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+
+        .strength-fill {
+            height: 100%;
+            width: 0%;
+            transition: all 0.3s;
+        }
+
+        .strength-weak { background: #f44336; width: 33%; }
+        .strength-medium { background: #ff9800; width: 66%; }
+        .strength-strong { background: #4caf50; width: 100%; }
+
+        .btn-signup {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+
+        .btn-signup:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .btn-signup:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .error-message, .success-message {
+            padding: 12px 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: none;
+            font-size: 0.9em;
+        }
+
+        .error-message {
+            background: #fee;
+            color: #c33;
+            border-right: 4px solid #c33;
+        }
+
+        .success-message {
+            background: #efe;
+            color: #3c3;
+            border-right: 4px solid #3c3;
+        }
+
+        .error-message.show, .success-message.show {
+            display: block;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .loading.show {
+            display: block;
+        }
+
+        .loading i {
+            font-size: 2em;
+            color: #667eea;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @media (max-width: 480px) {
+            .signup-container {
+                border-radius: 15px;
+            }
+
+            .signup-header, .signup-body {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="signup-container">
+        <div class="signup-header">
+            <i class="fas fa-user-plus"></i>
+            <h1>إنشاء حساب جديد</h1>
+            <p>مرحباً بك في فريق العمل</p>
+        </div>
+
+        <div class="signup-body">
+            <div id="errorMessage" class="error-message"></div>
+            <div id="successMessage" class="success-message"></div>
+            <div id="loadingIndicator" class="loading">
+                <i class="fas fa-spinner"></i>
+                <p>جاري إنشاء الحساب...</p>
+            </div>
+
+            <div id="invitationInfo" class="invitation-info" style="display: none;">
+                <p><strong>البريد الإلكتروني:</strong> <span id="invEmail"></span></p>
+                <p><strong>الدور:</strong> <span id="invRole"></span></p>
+            </div>
+
+            <form id="signupForm" onsubmit="handleSignup(event)">
+                <div class="form-group">
+                    <label for="fullName">
+                        <i class="fas fa-user"></i>
+                        الاسم الكامل
+                    </label>
+                    <input 
+                        type="text" 
+                        id="fullName" 
+                        placeholder="مثال: أحمد محمد" 
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="password">
+                        <i class="fas fa-lock"></i>
+                        كلمة المرور
+                    </label>
+                    <div class="input-wrapper">
+                        <input 
+                            type="password" 
+                            id="password" 
+                            placeholder="••••••••" 
+                            required
+                            minlength="8"
+                            oninput="checkPasswordStrength()"
+                        >
+                        <button 
+                            type="button" 
+                            class="toggle-password" 
+                            onclick="togglePassword('password')"
+                        >
+                            <i class="fas fa-eye" id="toggleIcon1"></i>
+                        </button>
+                    </div>
+                    <div class="password-strength">
+                        <div class="strength-bar">
+                            <div class="strength-fill" id="strengthFill"></div>
+                        </div>
+                        <small id="strengthText">يجب أن تكون 8 أحرف على الأقل</small>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword">
+                        <i class="fas fa-lock"></i>
+                        تأكيد كلمة المرور
+                    </label>
+                    <div class="input-wrapper">
+                        <input 
+                            type="password" 
+                            id="confirmPassword" 
+                            placeholder="••••••••" 
+                            required
+                        >
+                        <button 
+                            type="button" 
+                            class="toggle-password" 
+                            onclick="togglePassword('confirmPassword')"
+                        >
+                            <i class="fas fa-eye" id="toggleIcon2"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <button type="submit" class="btn-signup" id="signupBtn">
+                    <i class="fas fa-check"></i>
+                    إنشاء الحساب
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="supabase-config.js"></script>
+    <script src="supabase-api.js"></script>
+
+    <script>
+        let invitationToken = null;
+        let invitationData = null;
+
+        // تهيئة التطبيق
+        async function initApp() {
+            try {
+                await api.init();
+                
+                // الحصول على token من URL
+                const urlParams = new URLSearchParams(window.location.search);
+                invitationToken = urlParams.get('token');
+
+                if (!invitationToken) {
+                    showError('رابط الدعوة غير صالح');
+                    return;
+                }
+
+                // التحقق من الدعوة
+                const result = await api.verifyInvitation(invitationToken);
+                
+                if (!result.valid) {
+                    showError(result.message || 'الدعوة غير صالحة أو منتهية الصلاحية');
+                    document.getElementById('signupForm').style.display = 'none';
+                    return;
+                }
+
+                invitationData = result.invitation;
+                
+                // عرض معلومات الدعوة
+                document.getElementById('invEmail').textContent = invitationData.email;
+                document.getElementById('invRole').textContent = 
+                    invitationData.role === 'admin' ? 'إداري' : 'محرر';
+                document.getElementById('invitationInfo').style.display = 'block';
+
+            } catch (error) {
+                console.error('خطأ في التهيئة:', error);
+                showError('فشل التحقق من الدعوة');
+            }
+        }
+
+        // إنشاء الحساب
+        async function handleSignup(event) {
+            event.preventDefault();
+
+            const fullName = document.getElementById('fullName').value.trim();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            // التحقق من البيانات
+            if (!fullName) {
+                showError('الرجاء إدخال الاسم الكامل');
+                return;
+            }
+
+            if (password.length < 8) {
+                showError('كلمة المرور يجب أن تكون 8 أحرف على الأقل');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                showError('كلمتا المرور غير متطابقتين');
+                return;
+            }
+
+            showLoading(true);
+            hideMessages();
+
+            try {
+                await api.signUpWithInvitation(invitationToken, password, fullName);
+                
+                showSuccess('تم إنشاء الحساب بنجاح! جاري تسجيل الدخول...');
+                
+                setTimeout(() => {
+                    window.location.href = 'dashboard.html';
+                }, 2000);
+
+            } catch (error) {
+                console.error('خطأ في إنشاء الحساب:', error);
+                showError(error.message || 'فشل إنشاء الحساب');
+                showLoading(false);
+            }
+        }
+
+        // فحص قوة كلمة المرور
+        function checkPasswordStrength() {
+            const password = document.getElementById('password').value;
+            const fill = document.getElementById('strengthFill');
+            const text = document.getElementById('strengthText');
+
+            if (password.length === 0) {
+                fill.className = 'strength-fill';
+                text.textContent = 'يجب أن تكون 8 أحرف على الأقل';
+                return;
+            }
+
+            let strength = 0;
+            if (password.length >= 8) strength++;
+            if (/[a-z]/.test(password) && /[A-Z]/.test(password)) strength++;
+            if (/\d/.test(password)) strength++;
+            if (/[^a-zA-Z\d]/.test(password)) strength++;
+
+            fill.className = 'strength-fill';
+            
+            if (strength <= 1) {
+                fill.classList.add('strength-weak');
+                text.textContent = 'ضعيفة';
+                text.style.color = '#f44336';
+            } else if (strength <= 3) {
+                fill.classList.add('strength-medium');
+                text.textContent = 'متوسطة';
+                text.style.color = '#ff9800';
+            } else {
+                fill.classList.add('strength-strong');
+                text.textContent = 'قوية';
+                text.style.color = '#4caf50';
+            }
+        }
+
+        // إظهار/إخفاء كلمة المرور
+        function togglePassword(fieldId) {
+            const field = document.getElementById(fieldId);
+            const icon = document.getElementById(fieldId === 'password' ? 'toggleIcon1' : 'toggleIcon2');
+            
+            if (field.type === 'password') {
+                field.type = 'text';
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                field.type = 'password';
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+
+        function showError(message) {
+            const errorDiv = document.getElementById('errorMessage');
+            errorDiv.textContent = message;
+            errorDiv.classList.add('show');
+        }
+
+        function showSuccess(message) {
+            const successDiv = document.getElementById('successMessage');
+            successDiv.textContent = message;
+            successDiv.classList.add('show');
+        }
+
+        function hideMessages() {
+            document.getElementById('errorMessage').classList.remove('show');
+            document.getElementById('successMessage').classList.remove('show');
+        }
+
+        function showLoading(show) {
+            const loadingDiv = document.getElementById('loadingIndicator');
+            const form = document.getElementById('signupForm');
+            
+            if (show) {
+                loadingDiv.classList.add('show');
+                form.style.display = 'none';
+            } else {
+                loadingDiv.classList.remove('show');
+                form.style.display = 'block';
+            }
+        }
+
+        window.addEventListener('load', initApp);
+    </script>
+</body>
+</html>
