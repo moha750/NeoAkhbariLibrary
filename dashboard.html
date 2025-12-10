@@ -310,6 +310,7 @@
             scroll-behavior: smooth;
             flex: 1;
             padding: 10px 10px;
+            justify-content: space-between;
         }
 
         .tab-buttons::-webkit-scrollbar {
@@ -586,40 +587,1021 @@
         /* Items List */
         .items-list {
             display: grid;
-            gap: 15px;
+            gap: 25px;
         }
 
         .item-card {
-            background: linear-gradient(135deg, rgba(236, 176, 7, 0.1) 0%, rgba(245, 200, 66, 0.15) 100%);
-            padding: 20px;
-            border-radius: 15px;
-            border-left: 4px solid #ECB007;
+            background: white;
+            padding: 0;
+            border-radius: 20px;
+            border: 2px solid #f0f0f0;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            transition: all 0.3s;
-            box-shadow: 0 4px 15px rgba(236, 176, 7, 0.1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            position: relative;
+            transition: all 0.7s;
+
+        }
+
+        .item-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 6px;
+            height: 100%;
+            background: linear-gradient(180deg, #ECB007 0%, #f5c842 100%);
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         .item-card:hover {
-            background: linear-gradient(135deg, rgba(236, 176, 7, 0.15) 0%, rgba(245, 200, 66, 0.2) 100%);
-            box-shadow: 0 8px 25px rgba(236, 176, 7, 0.2);
-            transform: translateX(-5px);
+            border-color: #ECB007;
+            box-shadow: 0 12px 40px rgba(236, 176, 7, 0.25);
+            transform: translateY(-5px);
+            background: linear-gradient(135deg, rgba(236, 176, 7, 0.08) 0%, rgba(245, 200, 66, 0.12) 100%);
+        }
+
+        .item-info {
+            padding: 25px;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .item-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8em;
+            color: white;
+            box-shadow: 0 8px 20px rgba(236, 176, 7, 0.3);
+            transition: all 0.3s;
+        }
+
+        .item-card:hover .item-icon {
+            transform: rotate(10deg) scale(1.1);
+            box-shadow: 0 12px 30px rgba(236, 176, 7, 0.4);
+        }
+
+        .item-details {
+            flex: 1;
         }
 
         .item-info h3 {
-            color: #333;
-            margin-bottom: 5px;
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 1.3em;
+            font-weight: 700;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .item-badge {
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(236, 176, 7, 0.3);
         }
 
         .item-info p {
-            color: #666;
-            font-size: 0.9em;
+            color: #7f8c8d;
+            font-size: 0.95em;
+            line-height: 1.6;
+            margin: 0;
         }
 
         .item-actions {
             display: flex;
+            gap: 12px;
+            padding: 25px;
+            background: linear-gradient(135deg, rgba(236, 176, 7, 0.03) 0%, rgba(245, 200, 66, 0.05) 100%);
+            border-right: 1px solid #f0f0f0;
+        }
+
+        /* Book Card Specific Styles */
+        .book-card {
+            background: white;
+            padding: 0;
+            border-radius: 20px;
+            border: 2px solid #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.7s;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .book-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 6px;
+            height: 100%;
+            background: linear-gradient(180deg, #ECB007 0%, #f5c842 100%);
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .book-card:hover {
+            border-color: #ECB007;
+            box-shadow: 0 12px 40px rgba(236, 176, 7, 0.25);
+            transform: translateY(-5px);
+            background: linear-gradient(135deg, rgba(236, 176, 7, 0.08) 0%, rgba(245, 200, 66, 0.12) 100%);
+        }
+
+        .book-card .item-info {
+            padding: 25px;
+            flex-direction: row;
+            align-items: flex-start;
+            gap: 20px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .book-card .item-details {
+            flex: 1;
+        }
+
+        .book-card .item-details h3 {
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .book-card .item-details p {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            line-height: 1.8;
+        }
+
+        .book-card .book-meta {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            font-size: 0.9em;
+            white-space: nowrap;
+        }
+
+        .book-card .item-actions {
+            display: flex;
+            padding: 20px 25px;
+            background: linear-gradient(135deg, rgba(236, 176, 7, 0.03) 0%, rgba(245, 200, 66, 0.05) 100%);
+            border-right: none;
+            border-top: 1px solid #ECB007;
+            justify-content: center;
+        }
+
+        /* Part Card Specific Styles */
+        .part-card {
+            background: white;
+            padding: 0;
+            border-radius: 20px;
+            border: 2px solid #f0f0f0;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            transition: all 0.7s;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .part-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 6px;
+            height: 100%;
+            background: linear-gradient(180deg, #ECB007 0%, #f5c842 100%);
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .part-card:hover {
+            border-color: #ECB007;
+            box-shadow: 0 12px 40px rgba(236, 176, 7, 0.25);
+            transform: translateY(-5px);
+            background: linear-gradient(135deg, rgba(236, 176, 7, 0.08) 0%, rgba(245, 200, 66, 0.12) 100%);
+        }
+
+        .part-card .item-info {
+            padding: 25px;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .part-card .item-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8em;
+            color: white;
+            box-shadow: 0 8px 20px rgba(236, 176, 7, 0.3);
+            transition: all 0.3s;
+        }
+
+        .part-card:hover .item-icon {
+            transform: rotate(10deg) scale(1.1);
+            box-shadow: 0 12px 30px rgba(236, 176, 7, 0.4);
+        }
+
+        .part-card .item-details h3 {
+            color: #2c3e50;
+            margin: 0;
+            font-size: 1.3em;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
             gap: 10px;
+        }
+
+        .part-card .item-actions {
+            padding: 25px;
+            background: linear-gradient(135deg, rgba(236, 176, 7, 0.03) 0%, rgba(245, 200, 66, 0.05) 100%);
+            border-right: none;
+            border-left: 1px solid #f0f0f0;
+            display: flex;
+            gap: 12px;
+        }
+
+        /* Page Card Specific Styles */
+        .page-card {
+            background: white;
+            padding: 0;
+            border-radius: 20px;
+            border: 2px solid #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.7s;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .page-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 6px;
+            height: 100%;
+            background: linear-gradient(180deg, #ECB007 0%, #f5c842 100%);
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .page-card:hover {
+            border-color: #ECB007;
+            box-shadow: 0 12px 40px rgba(236, 176, 7, 0.25);
+            transform: translateY(-5px);
+            background: linear-gradient(135deg, rgba(236, 176, 7, 0.08) 0%, rgba(245, 200, 66, 0.12) 100%);
+        }
+
+        .page-card .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 25px;
+            background: linear-gradient(135deg, rgba(236, 176, 7, 0.05) 0%, rgba(245, 200, 66, 0.08) 100%);
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .page-card .page-title {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .page-card .page-title .page-preview {
+            display: block;
+            color: #7f8c8d;
+            font-size: 0.85em;
+            line-height: 1.5;
+            margin-top: 5px;
+        }
+
+        .page-card .page-title h3 {
+            color: #2c3e50;
+            margin: 0;
+            font-size: 1.3em;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .page-card .page-title h3 i {
+            color: #ECB007;
+        }
+
+        .page-card .item-info {
+            display: none;
+        }
+
+        .page-card .item-actions {
+            padding: 20px 25px;
+            background: linear-gradient(135deg, rgba(236, 176, 7, 0.03) 0%, rgba(245, 200, 66, 0.05) 100%);
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .page-order-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            padding: 8px 12px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .page-order-number {
+            font-weight: 700;
+            color: #ECB007;
+            font-size: 1em;
+            padding: 0 8px;
+            min-width: 35px;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(236, 176, 7, 0.1) 0%, rgba(245, 200, 66, 0.15) 100%);
+            border-radius: 6px;
+            line-height: 28px;
+        }
+
+        .btn-icon {
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
+            color: white;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(236, 176, 7, 0.3);
+            font-size: 0.85em;
+        }
+
+        .btn-icon:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(236, 176, 7, 0.4);
+        }
+
+        .btn-icon:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            background: #ccc;
+            box-shadow: none;
+        }
+
+        /* Publish Card Specific Styles */
+        .publish-card {
+            background: white;
+            padding: 0;
+            border-radius: 20px;
+            border: 2px solid #f0f0f0;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            transition: all 0.7s;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .publish-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 6px;
+            height: 100%;
+            background: linear-gradient(180deg, #ECB007 0%, #f5c842 100%);
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .publish-card:hover {
+            border-color: #ECB007;
+            box-shadow: 0 12px 40px rgba(236, 176, 7, 0.25);
+            transform: translateY(-5px);
+            background: linear-gradient(135deg, rgba(236, 176, 7, 0.08) 0%, rgba(245, 200, 66, 0.12) 100%);
+        }
+
+        .publish-card .item-info {
+            padding: 25px;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .publish-card .item-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8em;
+            color: white;
+            box-shadow: 0 8px 20px rgba(236, 176, 7, 0.3);
+            transition: all 0.3s;
+        }
+
+        .publish-card:hover .item-icon {
+            transform: rotate(10deg) scale(1.1);
+            box-shadow: 0 12px 30px rgba(236, 176, 7, 0.4);
+        }
+
+        .publish-card .item-details {
+            flex: 1;
+        }
+
+        .publish-card .item-details h3 {
+            color: #2c3e50;
+            margin: 0 0 8px 0;
+            font-size: 1.3em;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .publish-card .publish-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+
+        .publish-card .publish-status.published {
+            background: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+        }
+
+        .publish-card .publish-status.unpublished {
+            background: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+        }
+
+        .publish-card .item-actions {
+            padding: 25px;
+            background: linear-gradient(135deg, rgba(236, 176, 7, 0.03) 0%, rgba(245, 200, 66, 0.05) 100%);
+            border-right: none;
+            border-left: 1px solid #f0f0f0;
+            display: flex;
+            gap: 12px;
+        }
+
+        /* User Card Specific Styles - Modern Design */
+        .user-card {
+            background: white;
+            padding: 0;
+            border-radius: 24px;
+            border: none;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .user-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 95px;
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 50%, #ffd700 100%);
+            z-index: 0;
+        }
+
+        .user-card:hover {
+            box-shadow: 0 16px 50px rgba(236, 176, 7, 0.3);
+            transform: translateY(-8px);
+        }
+
+        .user-card .user-header {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px 20px 0px;
+        }
+
+        .user-card .user-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid white;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            transition: all 0.4s;
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 50%, #ffd700 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5em;
+            color: white;
+            font-weight: 700;
+            position: relative;
+        }
+
+        .user-card:hover .user-avatar {
+            transform: scale(1.08);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
+        }
+
+        .user-card .user-status-badge {
+            position: absolute;
+            bottom: 0px;
+            right: 0px;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .user-card .user-status-badge.active {
+            background: #28a745;
+        }
+
+        .user-card .user-status-badge.inactive {
+            background: #ffc107;
+        }
+
+        .user-card .user-name {
+            margin-top: 15px;
+            font-size: 1.4em;
+            font-weight: 700;
+            color: #ECB007;
+            text-align: center;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-card .user-role {
+            margin-top: 8px;
+            padding: 6px 16px;
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 50%, #ffd700 100%);
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-card .user-role.admin {
+            color: white;
+        }
+
+        .user-card .user-role.editor {
+            color: white;
+        }
+
+        .user-card .user-info {
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: white;
+        }
+
+        .user-card .info-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            transition: all 0.3s;
+        }
+
+        .user-card .info-item:hover {
+            background: #e9ecef;
+            transform: translateX(-3px);
+        }
+
+        .user-card .info-item i {
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
+            border-radius: 10px;
+            color: white;
+            font-size: 0.9em;
+            box-shadow: 0 2px 8px rgba(236, 176, 7, 0.3);
+        }
+
+        .user-card .info-item span {
+            flex: 1;
+            color: #495057;
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+
+        .user-card .user-actions {
+            padding: 20px;
+            display: flex;
+            gap: 10px;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+            text-align: center;
+        }
+
+        .user-card .user-actions button {
+            display: flex;
+            flex: 1;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            justify-content: center;
+        }
+
+        .user-card .user-actions button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Invitation Card Specific Styles - Modern Design */
+        .invitation-card {
+            background: white;
+            padding: 0;
+            border-radius: 24px;
+            border: none;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .invitation-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 95px;
+            background: linear-gradient(135deg, #17a2b8 0%, #20c9e0 50%, #5ddef4 100%);
+            z-index: 0;
+        }
+
+        .invitation-card.pending::before {
+            background: linear-gradient(135deg, #ffc107 0%, #ffcd38 50%, #ffd966 100%);
+        }
+
+        .invitation-card.accepted::before {
+            background: linear-gradient(135deg, #28a745 0%, #34ce57 50%, #5ced73 100%);
+        }
+
+        .invitation-card.expired::before {
+            background: linear-gradient(135deg, #dc3545 0%, #e74c3c 50%, #ff6b6b 100%);
+        }
+
+        .invitation-card:hover {
+            box-shadow: 0 16px 50px rgba(23, 162, 184, 0.3);
+            transform: translateY(-8px);
+        }
+
+        .invitation-card .invitation-header {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px 20px 0px;
+        }
+
+        .invitation-card .invitation-icon {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 5px solid white;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            transition: all 0.4s;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5em;
+            color: #17a2b8;
+            font-weight: 700;
+            position: relative;
+        }
+
+        .invitation-card.pending .invitation-icon {
+            color: #ffc107;
+        }
+
+        .invitation-card.accepted .invitation-icon {
+            color: #28a745;
+        }
+
+        .invitation-card.expired .invitation-icon {
+            color: #dc3545;
+        }
+
+        .invitation-card:hover .invitation-icon {
+            transform: scale(1.08);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
+        }
+
+        .invitation-card .invitation-email {
+            margin-top: 15px;
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #28a745 ;
+            text-align: center;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .invitation-card .invitation-status {
+            margin-top: 8px;
+            padding: 6px 16px;
+            background: linear-gradient(135deg, #17a2b8 0%, #20c9e0 50%, #5ddef4 100%);
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            color: white;
+        }
+
+        .invitation-card.pending .invitation-status {
+            background: linear-gradient(135deg, #ffc107 0%, #ffcd38 50%, #ffd966 100%);
+        }
+
+        .invitation-card.accepted .invitation-status {
+            background: linear-gradient(135deg, #28a745 0%, #34ce57 50%, #5ced73 100%);
+        }
+
+        .invitation-card.expired .invitation-status {
+            background: linear-gradient(135deg, #dc3545 0%, #e74c3c 50%, #ff6b6b 100%);
+        }
+
+        .invitation-card .invitation-info {
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: white;
+        }
+
+        .invitation-card .info-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            transition: all 0.3s;
+        }
+
+        .invitation-card .info-item:hover {
+            background: #e9ecef;
+            transform: translateX(-3px);
+        }
+
+        .invitation-card .info-item i {
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #17a2b8 0%, #20c9e0 100%);
+            border-radius: 10px;
+            color: white;
+            font-size: 0.9em;
+            box-shadow: 0 2px 8px rgba(23, 162, 184, 0.3);
+        }
+
+        .invitation-card.pending .info-item i {
+            background: linear-gradient(135deg, #ffc107 0%, #ffcd38 100%);
+        }
+
+        .invitation-card.accepted .info-item i {
+            background: linear-gradient(135deg, #28a745 0%, #34ce57 100%);
+        }
+
+        .invitation-card.expired .info-item i {
+            background: linear-gradient(135deg, #dc3545 0%, #e74c3c 100%);
+        }
+
+        .invitation-card .info-item span {
+            flex: 1;
+            color: #495057;
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+
+        .invitation-card .invitation-actions {
+            padding: 20px;
+            display: flex;
+            gap: 10px;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+            text-align: center;
+        }
+
+        .invitation-card .invitation-actions button {
+            display: flex;
+            flex: 1;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            justify-content: center;
+        }
+
+        .invitation-card .invitation-actions button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Deleted Account Card Specific Styles - Modern Design */
+        .deleted-account-card {
+            background: white;
+            padding: 0;
+            border-radius: 24px;
+            border: none;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .deleted-account-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 95px;
+            background: linear-gradient(135deg, #dc3545 0%, #e74c3c 50%, #ff6b6b 100%);
+            z-index: 0;
+        }
+
+        .deleted-account-card:hover {
+            box-shadow: 0 16px 50px rgba(220, 53, 69, 0.3);
+            transform: translateY(-8px);
+        }
+
+        .deleted-account-card .deleted-header {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px 20px 0px;
+        }
+
+        .deleted-account-card .deleted-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 5px solid white;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            transition: all 0.4s;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5em;
+            color: #dc3545;
+            font-weight: 700;
+            position: relative;
+        }
+
+        .deleted-account-card:hover .deleted-avatar {
+            transform: scale(1.08);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
+        }
+
+        .deleted-account-card .deleted-name {
+            margin-top: 15px;
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #dc3545;
+            text-align: center;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .deleted-account-card .deleted-badge {
+            margin-top: 8px;
+            padding: 6px 16px;
+            background: linear-gradient(135deg, #dc3545 0%, #e74c3c 50%, #ff6b6b 100%);
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            color: white;
+        }
+
+        .deleted-account-card .deleted-info {
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: white;
+        }
+
+        .deleted-account-card .info-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px;
+            background: #fff5f5;
+            border-radius: 12px;
+            transition: all 0.3s;
+        }
+
+        .deleted-account-card .info-item:hover {
+            background: #ffe5e5;
+            transform: translateX(-3px);
+        }
+
+        .deleted-account-card .info-item i {
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #dc3545 0%, #e74c3c 100%);
+            border-radius: 10px;
+            color: white;
+            font-size: 0.9em;
+            box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+        }
+
+        .deleted-account-card .info-item span {
+            flex: 1;
+            color: #495057;
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+
+        .deleted-account-card .deleted-actions {
+            padding: 20px;
+            display: flex;
+            gap: 10px;
+            background: #fff5f5;
+            border-top: 1px solid #ffe5e5;
+            text-align: center;
+        }
+
+        .deleted-account-card .deleted-actions button {
+            display: flex;
+            flex: 1;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            justify-content: center;
+        }
+
+        .deleted-account-card .deleted-actions button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
         }
 
         .btn-small {
@@ -714,14 +1696,34 @@
         /* Empty State */
         .empty-state {
             text-align: center;
-            padding: 60px 20px;
-            color: #999;
+            padding: 80px 40px;
+            background: linear-gradient(135deg, rgba(236, 176, 7, 0.03) 0%, rgba(245, 200, 66, 0.05) 100%);
+            border-radius: 20px;
+            border: 2px dashed #e0e0e0;
         }
 
         .empty-state i {
-            font-size: 4em;
-            margin-bottom: 20px;
-            opacity: 0.5;
+            font-size: 5em;
+            margin-bottom: 25px;
+            color: #ECB007;
+            opacity: 0.6;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .empty-state h3 {
+            color: #2c3e50;
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: #7f8c8d;
+            font-size: 1.1em;
         }
 
         /* Loading */
@@ -908,6 +1910,157 @@
                 text-align: center;
             }
 
+            .book-card .item-info {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .book-card .item-details p {
+                justify-content: center;
+            }
+
+            .book-card .item-actions {
+                justify-content: center;
+                gap: 10px;
+            }
+
+            .part-card {
+                flex-direction: column;
+            }
+
+            .part-card .item-info {
+                border-bottom: 1px solid #f0f0f0;
+            }
+
+            .part-card .item-actions {
+                border-left: none;
+                border-top: 1px solid #f0f0f0;
+                justify-content: center;
+            }
+
+            .page-card .page-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: stretch;
+            }
+
+            .page-card .page-title {
+                align-items: center;
+            }
+
+            .page-card .page-title .page-preview {
+                text-align: center;
+            }
+
+            .page-order-controls {
+                justify-content: center;
+            }
+
+            .btn-icon {
+                width: 36px;
+                height: 36px;
+            }
+
+            .publish-card {
+                flex-direction: column;
+            }
+
+            .publish-card .item-info {
+                border-bottom: 1px solid #f0f0f0;
+                flex-direction: column;
+            }
+
+            .publish-card .item-actions {
+                border-left: none;
+                border-top: 1px solid #f0f0f0;
+                justify-content: center;
+            }
+
+            .user-card .user-avatar {
+                width: 90px;
+                height: 90px;
+                font-size: 2.2em;
+            }
+
+            .user-card .user-name {
+                font-size: 1.2em;
+            }
+
+            .user-card .user-info {
+                padding: 20px;
+            }
+
+            .user-card .info-item {
+                padding: 8px;
+            }
+
+            .user-card .info-item i {
+                width: 32px;
+                height: 32px;
+                font-size: 0.85em;
+            }
+
+            .user-card .user-actions {
+                gap: 8px;
+            }
+
+            .invitation-card .invitation-icon {
+                width: 90px;
+                height: 90px;
+                font-size: 2.2em;
+            }
+
+            .invitation-card .invitation-email {
+                font-size: 1.2em;
+            }
+
+            .invitation-card .invitation-info {
+                padding: 20px;
+            }
+
+            .invitation-card .info-item {
+                padding: 8px;
+            }
+
+            .invitation-card .info-item i {
+                width: 32px;
+                height: 32px;
+                font-size: 0.85em;
+            }
+
+            .invitation-card .invitation-actions {
+                gap: 8px;
+            }
+
+            .deleted-account-card .deleted-avatar {
+                width: 90px;
+                height: 90px;
+                font-size: 2.2em;
+            }
+
+            .deleted-account-card .deleted-name {
+                font-size: 1.2em;
+            }
+
+            .deleted-account-card .deleted-info {
+                padding: 20px;
+            }
+
+            .deleted-account-card .info-item {
+                padding: 8px;
+            }
+
+            .deleted-account-card .info-item i {
+                width: 32px;
+                height: 32px;
+                font-size: 0.85em;
+            }
+
+            .deleted-account-card .deleted-actions {
+                gap: 8px;
+            }
+
             .form-actions {
                 flex-direction: column;
             }
@@ -949,13 +2102,19 @@
                 justify-content: center;
             }
 
+            .item-info {
+                padding: 25px 25px 5px 25px;
+            }
+
             .item-actions {
                 flex-wrap: wrap;
                 justify-content: center;
+                background: none;
+                border: none;
+                padding: 5px 25px 25px 25px;
             }
 
             .btn-small {
-                flex: 1;
                 min-width: 100px;
             }
 
@@ -1365,28 +2524,28 @@
                         <i class="fas fa-chevron-right"></i>
                     </button>
                     <div class="tab-buttons" id="tabButtons">
-                        <button class="tab-btn active" onclick="switchTab('categories')">
+                        <button class="tab-btn active admin-only" onclick="switchTab('categories')">
                             <i class="fas fa-folder"></i> الأقسام
                         </button>
-                        <button class="tab-btn" onclick="switchTab('books')">
+                        <button class="tab-btn admin-only" onclick="switchTab('books')">
                             <i class="fas fa-book"></i> الكتب
                         </button>
-                        <button class="tab-btn" onclick="switchTab('parts')">
+                        <button class="tab-btn admin-only" onclick="switchTab('parts')">
                             <i class="fas fa-bookmark"></i> الأجزاء
                         </button>
                         <button class="tab-btn" onclick="switchTab('pages')">
                             <i class="fas fa-file-alt"></i> الصفحات
                         </button>
-                        <button class="tab-btn" onclick="switchTab('publish')">
+                        <button class="tab-btn admin-only" onclick="switchTab('publish')">
                             <i class="fas fa-globe"></i> النشر
                         </button>
-                        <button class="tab-btn" onclick="switchTab('analytics')">
+                        <button class="tab-btn admin-only" onclick="switchTab('analytics')">
                             <i class="fas fa-chart-bar"></i> الإحصائيات
                         </button>
-                        <button class="tab-btn" onclick="switchTab('messages')">
+                        <button class="tab-btn admin-only" onclick="switchTab('messages')">
                             <i class="fas fa-envelope"></i> الرسائل
                         </button>
-                        <button class="tab-btn" onclick="switchTab('team')">
+                        <button class="tab-btn admin-only" onclick="switchTab('team')">
                             <i class="fas fa-users"></i> فريق العمل
                         </button>
                         <button class="tab-btn" onclick="switchTab('profile')">
@@ -1400,7 +2559,7 @@
             </div>
 
             <!-- Categories Tab -->
-            <div id="categories-tab" class="tab-content active">
+            <div id="categories-tab" class="tab-content active admin-only">
                 <div class="form-section">
                     <h2 style="color: #ECB007; margin-bottom: 20px;">
                         <i class="fas fa-plus-circle"></i> إضافة قسم جديد
@@ -1425,9 +2584,17 @@
                     </form>
                 </div>
 
-                <h3 style="margin: 20px 0; color: #333;">
-                    <i class="fas fa-list"></i> قائمة الأقسام
-                </h3>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin: 30px 0 20px 0; padding: 20px; background: linear-gradient(135deg, rgba(236, 176, 7, 0.08) 0%, rgba(245, 200, 66, 0.12) 100%); border-radius: 15px; border-right: 5px solid #ECB007;">
+                    <h3 style="margin: 0; color: #2c3e50; font-size: 1.4em; display: flex; align-items: center; gap: 12px;">
+                        <span style="width: 45px; height: 45px; background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 4px 15px rgba(236, 176, 7, 0.3);">
+                            <i class="fas fa-list"></i>
+                        </span>
+                        قائمة الأقسام
+                    </h3>
+                    <span style="background: white; padding: 8px 16px; border-radius: 25px; font-weight: 600; color: #ECB007; box-shadow: 0 2px 10px rgba(0,0,0,0.08); font-size: 0.9em;">
+                        <i class="fas fa-folder"></i> <span id="categoriesCount">0</span> قسم
+                    </span>
+                </div>
                 <div id="categoriesList" class="items-list">
                     <div class="loading">
                         <i class="fas fa-spinner"></i>
@@ -1437,7 +2604,7 @@
             </div>
 
             <!-- Books Tab -->
-            <div id="books-tab" class="tab-content">
+            <div id="books-tab" class="tab-content admin-only">
                 <div class="form-section">
                     <h2 style="color: #ECB007; margin-bottom: 20px;">
                         <i class="fas fa-plus-circle"></i> إضافة كتاب جديد
@@ -1490,9 +2657,17 @@
                     </form>
                 </div>
 
-                <h3 style="margin: 20px 0; color: #333;">
-                    <i class="fas fa-list"></i> قائمة الكتب
-                </h3>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin: 30px 0 20px 0; padding: 20px; background: linear-gradient(135deg, rgba(236, 176, 7, 0.08) 0%, rgba(245, 200, 66, 0.12) 100%); border-radius: 15px; border-right: 5px solid #ECB007;">
+                    <h3 style="margin: 0; color: #2c3e50; font-size: 1.4em; display: flex; align-items: center; gap: 12px;">
+                        <span style="width: 45px; height: 45px; background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 4px 15px rgba(236, 176, 7, 0.3);">
+                            <i class="fas fa-book"></i>
+                        </span>
+                        قائمة الكتب
+                    </h3>
+                    <span style="background: white; padding: 8px 16px; border-radius: 25px; font-weight: 600; color: #ECB007; box-shadow: 0 2px 10px rgba(0,0,0,0.08); font-size: 0.9em;">
+                        <i class="fas fa-book-open"></i> <span id="booksCount">0</span> كتاب
+                    </span>
+                </div>
                 <div id="booksList" class="items-list">
                     <div class="loading">
                         <i class="fas fa-spinner"></i>
@@ -1502,7 +2677,7 @@
             </div>
 
             <!-- Parts Management Tab -->
-            <div id="parts-tab" class="tab-content">
+            <div id="parts-tab" class="tab-content admin-only">
                 <div class="form-section">
                     <h2 style="color: #ECB007; margin-bottom: 20px;">
                         <i class="fas fa-bookmark"></i> إدارة أجزاء الكتاب
@@ -1534,9 +2709,17 @@
                             </div>
                         </form>
 
-                        <h3 style="margin: 30px 0 20px; color: #333;">
-                            <i class="fas fa-list"></i> أجزاء الكتاب
-                        </h3>
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin: 30px 0 20px 0; padding: 20px; background: linear-gradient(135deg, rgba(236, 176, 7, 0.08) 0%, rgba(245, 200, 66, 0.12) 100%); border-radius: 15px; border-right: 5px solid #ECB007;">
+                            <h3 style="margin: 0; color: #2c3e50; font-size: 1.4em; display: flex; align-items: center; gap: 12px;">
+                                <span style="width: 45px; height: 45px; background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 4px 15px rgba(236, 176, 7, 0.3);">
+                                    <i class="fas fa-bookmark"></i>
+                                </span>
+                                أجزاء الكتاب
+                            </h3>
+                            <span style="background: white; padding: 8px 16px; border-radius: 25px; font-weight: 600; color: #ECB007; box-shadow: 0 2px 10px rgba(0,0,0,0.08); font-size: 0.9em;">
+                                <i class="fas fa-layer-group"></i> <span id="partsCount">0</span> جزء
+                            </span>
+                        </div>
                         <div id="partsList" class="items-list">
                             <div class="empty-state">
                                 <i class="fas fa-bookmark"></i>
@@ -1594,9 +2777,17 @@
                             </div>
                         </form>
 
-                        <h3 style="margin: 30px 0 20px; color: #333;">
-                            <i class="fas fa-list"></i> صفحات الكتاب
-                        </h3>
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin: 30px 0 20px 0; padding: 20px; background: linear-gradient(135deg, rgba(236, 176, 7, 0.08) 0%, rgba(245, 200, 66, 0.12) 100%); border-radius: 15px; border-right: 5px solid #ECB007;">
+                            <h3 style="margin: 0; color: #2c3e50; font-size: 1.4em; display: flex; align-items: center; gap: 12px;">
+                                <span style="width: 45px; height: 45px; background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 4px 15px rgba(236, 176, 7, 0.3);">
+                                    <i class="fas fa-file-alt"></i>
+                                </span>
+                                صفحات الكتاب
+                            </h3>
+                            <span style="background: white; padding: 8px 16px; border-radius: 25px; font-weight: 600; color: #ECB007; box-shadow: 0 2px 10px rgba(0,0,0,0.08); font-size: 0.9em;">
+                                <i class="fas fa-file-alt"></i> <span id="pagesCount">0</span> صفحة
+                            </span>
+                        </div>
                         <div id="pagesList" class="items-list">
                             <div class="empty-state">
                                 <i class="fas fa-file-alt"></i>
@@ -1629,7 +2820,7 @@
             </div>
 
             <!-- Publish Tab -->
-            <div id="publish-tab" class="tab-content">
+            <div id="publish-tab" class="tab-content admin-only">
                 <div class="form-section">
                     <h2 style="color: #ECB007; margin-bottom: 20px;">
                         <i class="fas fa-globe"></i> نشر الكتب
@@ -1638,9 +2829,17 @@
                         <i class="fas fa-info-circle"></i> يمكنك نشر أو إلغاء نشر الكتب من هنا. الكتب المنشورة فقط تظهر للزوار.
                     </p>
 
-                    <h3 style="margin: 20px 0; color: #333;">
-                        <i class="fas fa-list"></i> جميع الكتب
-                    </h3>
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin: 30px 0 20px 0; padding: 20px; background: linear-gradient(135deg, rgba(236, 176, 7, 0.08) 0%, rgba(245, 200, 66, 0.12) 100%); border-radius: 15px; border-right: 5px solid #ECB007;">
+                        <h3 style="margin: 0; color: #2c3e50; font-size: 1.4em; display: flex; align-items: center; gap: 12px;">
+                            <span style="width: 45px; height: 45px; background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 4px 15px rgba(236, 176, 7, 0.3);">
+                                <i class="fas fa-globe"></i>
+                            </span>
+                            جميع الكتب
+                        </h3>
+                        <span style="background: white; padding: 8px 16px; border-radius: 25px; font-weight: 600; color: #ECB007; box-shadow: 0 2px 10px rgba(0,0,0,0.08); font-size: 0.9em;">
+                            <i class="fas fa-book"></i> <span id="publishBooksCount">0</span> كتاب
+                        </span>
+                    </div>
                     <div id="publishBooksList" class="items-list">
                         <div class="loading">
                             <i class="fas fa-spinner"></i>
@@ -1651,7 +2850,7 @@
             </div>
 
             <!-- Analytics Tab -->
-            <div id="analytics-tab" class="tab-content">
+            <div id="analytics-tab" class="tab-content admin-only">
                 <div class="form-section">
                     <h2 style="color: #ECB007; margin-bottom: 20px;">
                         <i class="fas fa-chart-bar"></i> إحصائيات الزوار
@@ -1715,7 +2914,7 @@
             </div>
 
             <!-- Messages Tab -->
-            <div id="messages-tab" class="tab-content">
+            <div id="messages-tab" class="tab-content admin-only">
                 <h3 style="margin-bottom: 20px; color: #333;">
                     <i class="fas fa-envelope"></i> رسائل التواصل
                 </h3>
@@ -1728,7 +2927,7 @@
             </div>
 
             <!-- Team Tab -->
-            <div id="team-tab" class="tab-content">
+            <div id="team-tab" class="tab-content admin-only">
                 <div class="form-section">
                     <h2 style="color: #ECB007; margin-bottom: 20px;">
                         <i class="fas fa-user-plus"></i> دعوة عضو جديد
@@ -1755,9 +2954,17 @@
                     </form>
                 </div>
 
-                <h3 style="margin: 30px 0 20px; color: #333;">
-                    <i class="fas fa-users"></i> أعضاء الفريق
-                </h3>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin: 30px 0 20px 0; padding: 20px; background: linear-gradient(135deg, rgba(236, 176, 7, 0.08) 0%, rgba(245, 200, 66, 0.12) 100%); border-radius: 15px; border-right: 5px solid #ECB007;">
+                    <h3 style="margin: 0; color: #2c3e50; font-size: 1.4em; display: flex; align-items: center; gap: 12px;">
+                        <span style="width: 45px; height: 45px; background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 4px 15px rgba(236, 176, 7, 0.3);">
+                            <i class="fas fa-users"></i>
+                        </span>
+                        فريق العمل
+                    </h3>
+                    <span style="background: white; padding: 8px 16px; border-radius: 25px; font-weight: 600; color: #ECB007; box-shadow: 0 2px 10px rgba(0,0,0,0.08); font-size: 0.9em;">
+                        <i class="fas fa-user"></i> <span id="teamMembersCount">0</span> عضو
+                    </span>
+                </div>
                 <div id="teamMembersList" class="items-list">
                     <div class="loading">
                         <i class="fas fa-spinner"></i>
@@ -1765,9 +2972,17 @@
                     </div>
                 </div>
 
-                <h3 style="margin: 30px 0 20px; color: #333;">
-                    <i class="fas fa-envelope-open-text"></i> الدعوات المرسلة
-                </h3>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin: 30px 0 20px 0; padding: 20px; background: linear-gradient(135deg, rgba(236, 176, 7, 0.08) 0%, rgba(245, 200, 66, 0.12) 100%); border-radius: 15px; border-right: 5px solid #ECB007;">
+                    <h3 style="margin: 0; color: #2c3e50; font-size: 1.4em; display: flex; align-items: center; gap: 12px;">
+                        <span style="width: 45px; height: 45px; background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 4px 15px rgba(236, 176, 7, 0.3);">
+                            <i class="fas fa-envelope-open-text"></i>
+                        </span>
+                        الدعوات المرسلة
+                    </h3>
+                    <span style="background: white; padding: 8px 16px; border-radius: 25px; font-weight: 600; color: #ECB007; box-shadow: 0 2px 10px rgba(0,0,0,0.08); font-size: 0.9em;">
+                        <i class="fas fa-envelope"></i> <span id="invitationsCount">0</span> دعوة
+                    </span>
+                </div>
                 <div id="invitationsList" class="items-list">
                     <div class="loading">
                         <i class="fas fa-spinner"></i>
@@ -1775,9 +2990,17 @@
                     </div>
                 </div>
 
-                <h3 style="margin: 30px 0 20px; color: #333;">
-                    <i class="fas fa-trash-restore"></i> الحسابات المحذوفة
-                </h3>
+                <div style="display: flex; align-items: center; justify-content: space-between; margin: 30px 0 20px 0; padding: 20px; background: linear-gradient(135deg, rgba(220, 53, 69, 0.08) 0%, rgba(255, 82, 82, 0.12) 100%); border-radius: 15px; border-right: 5px solid #dc3545;">
+                    <h3 style="margin: 0; color: #2c3e50; font-size: 1.4em; display: flex; align-items: center; gap: 12px;">
+                        <span style="width: 45px; height: 45px; background: linear-gradient(135deg, #dc3545 0%, #ff5252 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);">
+                            <i class="fas fa-trash-restore"></i>
+                        </span>
+                        الحسابات المحذوفة
+                    </h3>
+                    <span style="background: white; padding: 8px 16px; border-radius: 25px; font-weight: 600; color: #dc3545; box-shadow: 0 2px 10px rgba(0,0,0,0.08); font-size: 0.9em;">
+                        <i class="fas fa-user-times"></i> <span id="deletedAccountsCount">0</span> حساب
+                    </span>
+                </div>
                 <div id="deletedAccountsList" class="items-list">
                     <div class="loading">
                         <i class="fas fa-spinner"></i>
@@ -1936,6 +3159,90 @@
             });
         }
 
+        // تطبيق صلاحيات المحررين
+        function applyEditorPermissions() {
+            // التحقق من دور المستخدم الحالي
+            if (!authGuard.isAdmin()) {
+                console.log('🔒 تطبيق صلاحيات المحرر...');
+                
+                // إخفاء جميع العناصر المخصصة للإداريين فقط بشكل فوري
+                const adminElements = document.querySelectorAll('.admin-only');
+                adminElements.forEach(element => {
+                    element.style.display = 'none';
+                    element.style.visibility = 'hidden';
+                });
+
+                // إظهار تبويب الصفحات كأول تبويب نشط للمحررين
+                const pagesTab = document.getElementById('pages-tab');
+                const pagesBtn = document.querySelector('.tab-btn[onclick*="pages"]');
+                const profileTab = document.getElementById('profile-tab');
+                const profileBtn = document.querySelector('.tab-btn[onclick*="profile"]');
+                
+                if (pagesTab && pagesBtn) {
+                    // إخفاء جميع التبويبات
+                    document.querySelectorAll('.tab-content').forEach(tab => {
+                        tab.classList.remove('active');
+                    });
+                    document.querySelectorAll('.tab-btn').forEach(btn => {
+                        btn.classList.remove('active');
+                    });
+
+                    // تفعيل تبويب الصفحات فقط (النشط)
+                    pagesTab.classList.add('active');
+                    pagesBtn.classList.add('active');
+                    
+                    // التأكد من إظهار زر الملف الشخصي (لكن ليس محتواه)
+                    if (profileBtn) {
+                        profileBtn.style.display = 'inline-flex';
+                        profileBtn.style.visibility = 'visible';
+                    }
+                }
+
+                // إخفاء الإحصائيات المخصصة للإداريين
+                const statsGrid = document.getElementById('statsGrid');
+                if (statsGrid) {
+                    statsGrid.style.display = 'none';
+                    statsGrid.style.visibility = 'hidden';
+                }
+
+                // إخفاء .tab-buttons-wrapper بالكامل للمحررين
+                const tabButtonsWrapper = document.querySelector('.tab-buttons-wrapper');
+                if (tabButtonsWrapper) {
+                    tabButtonsWrapper.style.display = 'none';
+                }
+                
+                // إنشاء تبويبات بسيطة للمحرر
+                const tabsContainer = document.querySelector('.tabs-container');
+                if (tabsContainer) {
+                    // إنشاء div بسيط للتبويبات
+                    const simpleTabsDiv = document.createElement('div');
+                    simpleTabsDiv.style.cssText = 'display: flex; gap: 10px; justify-content: center;';
+                    
+                    // زر الصفحات
+                    const pagesSimpleBtn = document.createElement('button');
+                    pagesSimpleBtn.className = 'tab-btn active';
+                    pagesSimpleBtn.innerHTML = '<i class="fas fa-file-alt"></i> الصفحات';
+                    pagesSimpleBtn.onclick = () => switchTab('pages');
+                    
+                    // زر الملف الشخصي
+                    const profileSimpleBtn = document.createElement('button');
+                    profileSimpleBtn.className = 'tab-btn';
+                    profileSimpleBtn.innerHTML = '<i class="fas fa-user-circle"></i> الملف الشخصي';
+                    profileSimpleBtn.onclick = () => switchTab('profile');
+                    
+                    simpleTabsDiv.appendChild(pagesSimpleBtn);
+                    simpleTabsDiv.appendChild(profileSimpleBtn);
+                    
+                    // إضافة التبويبات البسيطة
+                    tabsContainer.insertBefore(simpleTabsDiv, tabsContainer.firstChild);
+                }
+
+                console.log('✅ تم تطبيق صلاحيات المحرر بنجاح');
+            } else {
+                console.log('👑 صلاحيات الإداري نشطة');
+            }
+        }
+
         // تهيئة التطبيق
         window.addEventListener('load', async function() {
             try {
@@ -1949,10 +3256,13 @@
                     return; // سيتم التحويل تلقائياً لصفحة تسجيل الدخول
                 }
                 
-                // 3. تحميل بيانات المستخدم والتحية
+                // 3. تطبيق صلاحيات المحررين فوراً قبل تحميل البيانات
+                applyEditorPermissions();
+                
+                // 4. تحميل بيانات المستخدم والتحية
                 await loadUserGreeting();
                 
-                // 4. تحميل البيانات
+                // 5. تحميل البيانات
                 await loadStats();
                 await loadCategories();
                 await loadCategoriesSelect();
@@ -1963,7 +3273,7 @@
                 await loadAnalytics();
                 await loadMessages();
                 
-                // 5. تهيئة أزرار إظهار/إخفاء كلمة المرور
+                // 6. تهيئة أزرار إظهار/إخفاء كلمة المرور
                 setupPasswordToggles();
                 
                 console.log('✅ تم تحميل جميع البيانات بنجاح');
@@ -2312,6 +3622,12 @@
             try {
                 const categories = await api.getCategories();
                 const container = document.getElementById('categoriesList');
+                
+                // تحديث عداد الأقسام
+                const countElement = document.getElementById('categoriesCount');
+                if (countElement) {
+                    countElement.textContent = categories.length;
+                }
 
                 if (categories.length === 0) {
                     container.innerHTML = `
@@ -2324,18 +3640,26 @@
                     return;
                 }
 
-                container.innerHTML = categories.map(category => `
+                container.innerHTML = categories.map((category, index) => `
                     <div class="item-card">
                         <div class="item-info">
-                            <h3><i class="fas fa-folder"></i> ${category.name}</h3>
-                            <p>${category.description || 'لا يوجد وصف'}</p>
+                            <div class="item-icon">
+                                <i class="fas fa-folder"></i>
+                            </div>
+                            <div class="item-details">
+                                <h3>
+                                    ${category.name}
+                                    <span class="item-badge">#${index + 1}</span>
+                                </h3>
+                                <p><i class="fas fa-align-right" style="color: #ECB007; margin-left: 5px;"></i> ${category.description || 'لا يوجد وصف لهذا القسم'}</p>
+                            </div>
                         </div>
                         <div class="item-actions">
-                            <button class="btn btn-warning btn-small" onclick="editCategory('${category.id}')">
+                            <button class="btn btn-warning btn-small" onclick="editCategory('${category.id}')" title="تعديل القسم">
                                 <i class="fas fa-edit"></i> تعديل
                             </button>
-                            <button class="btn btn-danger btn-small" onclick="deleteCategory('${category.id}')">
-                                <i class="fas fa-trash"></i> حذف
+                            <button class="btn btn-danger btn-small" onclick="deleteCategory('${category.id}')" title="حذف القسم">
+                                <i class="fas fa-trash-alt"></i> حذف
                             </button>
                         </div>
                     </div>
@@ -2464,6 +3788,12 @@
             try {
                 const books = await api.getAllBooks();
                 const container = document.getElementById('booksList');
+                
+                // تحديث عداد الكتب
+                const countElement = document.getElementById('booksCount');
+                if (countElement) {
+                    countElement.textContent = books.length;
+                }
 
                 if (books.length === 0) {
                     container.innerHTML = `
@@ -2483,24 +3813,35 @@
                     categoryMap[cat.id] = cat.name;
                 });
 
-                container.innerHTML = books.map(book => `
-                    <div class="item-card">
+                container.innerHTML = books.map((book, index) => `
+                    <div class="book-card">
                         <div class="item-info">
-                            <h3><i class="fas fa-book"></i> ${book.title}</h3>
-                            <p>
-                                <span class="badge" style="background: #667eea; color: white;">
-                                    <i class="fas fa-folder"></i> ${categoryMap[book.category_id] || 'غير محدد'}
-                                </span>
-                                <span style="margin: 0 10px;">|</span>
-                                ${book.published ? '<span class="badge badge-success">منشور</span>' : '<span class="badge badge-warning">غير منشور</span>'}
-                            </p>
+                            <div class="item-icon">
+                                <i class="fas fa-book"></i>
+                            </div>
+                            <div class="item-details">
+                                <h3>
+                                    ${book.title}
+                                    <span class="item-badge">#${index + 1}</span>
+                                </h3>
+                                <p>
+                                    <span class="book-meta" style="background: linear-gradient(135deg, rgba(236, 176, 7, 0.1) 0%, rgba(245, 200, 66, 0.12) 100%); color: #ECB007 ;">
+                                        <i class="fas fa-folder"></i>
+                                        ${categoryMap[book.category_id] || 'غير محدد'}
+                                    </span>
+                                    ${book.published ? 
+                                        '<span class="book-meta" style="background: rgba(40, 167, 69, 0.1); color: #28a745;"><i class="fas fa-check-circle"></i> منشور</span>' : 
+                                        '<span class="book-meta" style="background: rgba(220, 53, 69, 0.1); color: #dc3545;"><i class="fas fa-clock"></i> غير منشور</span>'}
+                                    ${book.views ? `<span class="book-meta" style="background: rgba(127, 140, 141, 0.1); color: #7f8c8d;"><i class="fas fa-eye"></i> ${book.views} مشاهدة</span>` : ''}
+                                </p>
+                            </div>
                         </div>
                         <div class="item-actions">
-                            <button class="btn btn-info btn-small" onclick="changeBookCategory('${book.id}', '${book.category_id}')">
+                            <button class="btn btn-info btn-small" onclick="changeBookCategory('${book.id}', '${book.category_id}')" title="تغيير قسم الكتاب">
                                 <i class="fas fa-exchange-alt"></i> تغيير القسم
                             </button>
-                            <button class="btn btn-danger btn-small" onclick="deleteBook('${book.id}')">
-                                <i class="fas fa-trash"></i> حذف
+                            <button class="btn btn-danger btn-small" onclick="deleteBook('${book.id}')" title="حذف الكتاب">
+                                <i class="fas fa-trash-alt"></i> حذف
                             </button>
                         </div>
                     </div>
@@ -2833,6 +4174,12 @@
             try {
                 const books = await api.getAllBooks();
                 const container = document.getElementById('publishBooksList');
+                
+                // تحديث عداد الكتب
+                const countElement = document.getElementById('publishBooksCount');
+                if (countElement) {
+                    countElement.textContent = books.length;
+                }
 
                 if (books.length === 0) {
                     container.innerHTML = `
@@ -2845,23 +4192,31 @@
                     return;
                 }
 
-                container.innerHTML = books.map(book => `
-                    <div class="item-card">
+                container.innerHTML = books.map((book, index) => `
+                    <div class="publish-card">
                         <div class="item-info">
-                            <h3><i class="fas fa-book"></i> ${book.title}</h3>
-                            <p style="color: #666;">
-                                ${book.published ? 
-                                    '<span class="badge badge-success"><i class="fas fa-check-circle"></i> منشور</span>' : 
-                                    '<span class="badge badge-warning"><i class="fas fa-clock"></i> غير منشور</span>'
-                                }
-                            </p>
+                            <div class="item-icon">
+                                <i class="fas fa-book"></i>
+                            </div>
+                            <div class="item-details">
+                                <h3>
+                                    ${book.title}
+                                    <span class="item-badge">#${index + 1}</span>
+                                </h3>
+                                <span class="publish-status ${book.published ? 'published' : 'unpublished'}">
+                                    ${book.published ? 
+                                        '<i class="fas fa-check-circle"></i> منشور' : 
+                                        '<i class="fas fa-times-circle"></i> غير منشور'
+                                    }
+                                </span>
+                            </div>
                         </div>
                         <div class="item-actions">
                             ${book.published ? 
-                                `<button class="btn btn-warning btn-small" onclick="togglePublish('${book.id}', false)">
-                                    إلغاء النشر
+                                `<button class="btn btn-warning btn-small" onclick="togglePublish('${book.id}', false)" title="إلغاء نشر الكتاب">
+                                    <i class="fas fa-eye-slash"></i> إلغاء النشر
                                 </button>` :
-                                `<button class="btn btn-success btn-small" onclick="togglePublish('${book.id}', true)">
+                                `<button class="btn btn-success btn-small" onclick="togglePublish('${book.id}', true)" title="نشر الكتاب">
                                     <i class="fas fa-globe"></i> نشر الكتاب
                                 </button>`
                             }
@@ -2935,6 +4290,12 @@
             try {
                 const pages = await api.getBookPages(bookId);
                 const container = document.getElementById('pagesList');
+                
+                // تحديث عداد الصفحات
+                const countElement = document.getElementById('pagesCount');
+                if (countElement) {
+                    countElement.textContent = pages.length;
+                }
 
                 if (pages.length === 0) {
                     container.innerHTML = `
@@ -2948,31 +4309,36 @@
                 }
 
                 container.innerHTML = pages.map((page, index) => `
-                    <div class="item-card" data-page-id="${page.id}">
-                        <div class="page-order-controls">
-                            <button class="btn-icon" onclick="movePageUp(${index})" ${index === 0 ? 'disabled' : ''} title="تحريك لأعلى">
-                                <i class="fas fa-chevron-up"></i>
-                            </button>
-                            <span class="page-order-number">${index + 1}</span>
-                            <button class="btn-icon" onclick="movePageDown(${index})" ${index === pages.length - 1 ? 'disabled' : ''} title="تحريك لأسفل">
-                                <i class="fas fa-chevron-down"></i>
-                            </button>
-                        </div>
-                        <div class="item-info">
-                            <h3><i class="fas fa-file-alt"></i> صفحة ${index + 1}</h3>
-                            <p style="color: #666; margin-top: 5px;">
-                                ${page.content.substring(0, 100)}${page.content.length > 100 ? '...' : ''}
-                            </p>
+                    <div class="page-card" data-page-id="${page.id}">
+                        <div class="page-header">
+                            <div class="page-title">
+                                <h3>
+                                    <i class="fas fa-file-alt"></i> صفحة ${index + 1}
+                                    <span class="item-badge">#${index + 1}</span>
+                                </h3>
+                                <span class="page-preview">
+                                    ${page.content.substring(0, 120)}${page.content.length > 120 ? '...' : ''}
+                                </span>
+                            </div>
+                            <div class="page-order-controls">
+                                <button class="btn-icon" onclick="movePageUp(${index})" ${index === 0 ? 'disabled' : ''} title="تحريك لأعلى">
+                                    <i class="fas fa-chevron-up"></i>
+                                </button>
+                                <span class="page-order-number">${index + 1}</span>
+                                <button class="btn-icon" onclick="movePageDown(${index})" ${index === pages.length - 1 ? 'disabled' : ''} title="تحريك لأسفل">
+                                    <i class="fas fa-chevron-down"></i>
+                                </button>
+                            </div>
                         </div>
                         <div class="item-actions">
-                            <button class="btn btn-info btn-small" onclick="previewPage('${page.id}', ${index + 1}, \`${page.content.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`)">
-                                معاينة
+                            <button class="btn btn-info btn-small" onclick="previewPage('${page.id}', ${index + 1}, \`${page.content.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`)" title="معاينة الصفحة">
+                                <i class="fas fa-eye"></i> معاينة
                             </button>
-                            <button class="btn btn-warning btn-small" onclick="editPage('${page.id}', \`${page.content.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`)">
+                            <button class="btn btn-warning btn-small" onclick="editPage('${page.id}', \`${page.content.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`)" title="تعديل الصفحة">
                                 <i class="fas fa-edit"></i> تعديل
                             </button>
-                            <button class="btn btn-danger btn-small" onclick="deletePage('${page.id}')">
-                                <i class="fas fa-trash"></i> حذف
+                            <button class="btn btn-danger btn-small" onclick="deletePage('${page.id}')" title="حذف الصفحة">
+                                <i class="fas fa-trash-alt"></i> حذف
                             </button>
                         </div>
                     </div>
@@ -3195,6 +4561,12 @@
             try {
                 const parts = await api.getBookParts(bookId);
                 const container = document.getElementById('partsList');
+                
+                // تحديث عداد الأجزاء
+                const countElement = document.getElementById('partsCount');
+                if (countElement) {
+                    countElement.textContent = parts.length;
+                }
 
                 if (parts.length === 0) {
                     container.innerHTML = `
@@ -3207,17 +4579,25 @@
                     return;
                 }
 
-                container.innerHTML = parts.map(part => `
-                    <div class="item-card">
+                container.innerHTML = parts.map((part, index) => `
+                    <div class="part-card">
                         <div class="item-info">
-                            <h3><i class="fas fa-bookmark"></i> الجزء ${part.part_number}</h3>
+                            <div class="item-icon">
+                                <i class="fas fa-bookmark"></i>
+                            </div>
+                            <div class="item-details">
+                                <h3>
+                                    الجزء ${part.part_number}
+                                    <span class="item-badge">#${index + 1}</span>
+                                </h3>
+                            </div>
                         </div>
                         <div class="item-actions">
-                            <button class="btn btn-warning btn-small" onclick="editPart('${part.id}', ${part.part_number})">
+                            <button class="btn btn-warning btn-small" onclick="editPart('${part.id}', ${part.part_number})" title="تعديل الجزء">
                                 <i class="fas fa-edit"></i> تعديل
                             </button>
-                            <button class="btn btn-danger btn-small" onclick="deletePart('${part.id}')">
-                                <i class="fas fa-trash"></i> حذف
+                            <button class="btn btn-danger btn-small" onclick="deletePart('${part.id}')" title="حذف الجزء">
+                                <i class="fas fa-trash-alt"></i> حذف
                             </button>
                         </div>
                     </div>
@@ -3374,6 +4754,12 @@
             try {
                 const users = await api.getAllUsers();
                 const container = document.getElementById('teamMembersList');
+                
+                // تحديث عداد الأعضاء
+                const countElement = document.getElementById('teamMembersCount');
+                if (countElement) {
+                    countElement.textContent = users.length;
+                }
 
                 if (users.length === 0) {
                     container.innerHTML = `
@@ -3386,36 +4772,107 @@
                     return;
                 }
 
-                container.innerHTML = users.map(user => {
-                    const roleClass = user.user_roles?.name === 'admin' ? 'badge-success' : 'badge-info';
-                    const statusClass = user.is_active ? 'badge-success' : 'badge-warning';
+                // فصل الأعضاء حسب الدور
+                const admins = users.filter(user => user.user_roles?.name === 'admin');
+                const editors = users.filter(user => user.user_roles?.name === 'editor');
+
+                const renderUser = (user) => {
+                    const roleClass = user.user_roles?.name === 'admin' ? 'admin' : 'editor';
+                    const statusClass = user.is_active ? 'active' : 'inactive';
                     const lastLogin = user.last_login ? new Date(user.last_login).toLocaleDateString('ar-EG') : 'لم يسجل دخول بعد';
                     
+                    // الحصول على الحرف الأول من الاسم للأفاتار
+                    const avatarLetter = (user.full_name || user.email).charAt(0).toUpperCase();
+                    
+                    // رابط الصورة أو الحرف الأول
+                    const avatarContent = user.avatar_url 
+                        ? `<img src="${user.avatar_url}" alt="${user.full_name || user.email}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">` 
+                        : avatarLetter;
+                    
                     return `
-                        <div class="item-card">
-                            <div class="item-info">
-                                <h3>${user.full_name || user.email}</h3>
-                                <p>
-                                    <i class="fas fa-envelope"></i> ${user.email}<br>
-                                    <i class="fas fa-user-tag"></i> <span class="badge ${roleClass}">${user.user_roles?.display_name || 'غير محدد'}</span>
-                                    <span class="badge ${statusClass}">${user.is_active ? 'نشط' : 'غير نشط'}</span><br>
-                                    <i class="fas fa-clock"></i> آخر دخول: ${lastLogin}
-                                </p>
+                        <div class="user-card">
+                            <div class="user-header">
+                                <div class="user-avatar">
+                                    ${avatarContent}
+                                    <div class="user-status-badge ${statusClass}"></div>
+                                </div>
+                                <div class="user-name">${user.full_name || user.email}</div>
+                                <div class="user-role ${roleClass}">
+                                    <i class="fas fa-${roleClass === 'admin' ? 'shield-alt' : 'pen'}"></i>
+                                    ${user.user_roles?.display_name || 'غير محدد'}
+                                </div>
                             </div>
-                            <div class="item-actions">
-                                ${authGuard.isAdmin() && user.id !== authGuard.getCurrentUser()?.id ? `
-                                    <button class="btn btn-small btn-warning" onclick="toggleUserStatus('${user.id}', ${!user.is_active})">
-                                        <i class="fas fa-${user.is_active ? 'ban' : 'check'}"></i>
-                                        ${user.is_active ? 'تعطيل' : 'تفعيل'}
-                                    </button>
-                                    <button class="btn btn-small btn-danger" onclick="deleteTeamMember('${user.id}')">
-                                        <i class="fas fa-trash"></i> حذف
-                                    </button>
-                                ` : ''}
+                            <div class="user-info">
+                                <div class="info-item">
+                                    <i class="fas fa-envelope"></i>
+                                    <span>${user.email}</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-${user.is_active ? 'check-circle' : 'pause-circle'}"></i>
+                                    <span style="color: ${user.is_active ? '#28a745' : '#ffc107'}; font-weight: 600;">
+                                        ${user.is_active ? 'حساب نشط' : 'حساب غير نشط'}
+                                    </span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-clock"></i>
+                                    <span>آخر دخول: ${lastLogin}</span>
+                                </div>
+                            ${authGuard.isAdmin() && user.id !== authGuard.getCurrentUser()?.id ? `
+                                <div class="user-actions">
+                                    ${user.user_roles?.name === 'admin' ? `
+                                        <div style=" text-align: center; color: #6c757d; font-size: 0.9em;">
+                                            <i class="fas fa-shield-alt"></i>
+                                            ولا يمكنك حذفه أو تعطيله حساب إداري محمي
+                                        </div>
+                                    ` : `
+                                        <button class="btn btn-warning" onclick="toggleUserStatus('${user.id}', ${!user.is_active}, '${user.user_roles?.name}')" title="${user.is_active ? 'تعطيل الحساب' : 'تفعيل الحساب'}">
+                                            <i class="fas fa-${user.is_active ? 'ban' : 'check'}"></i>
+                                            ${user.is_active ? 'تعطيل' : 'تفعيل'}
+                                        </button>
+                                        <button class="btn btn-danger" onclick="deleteTeamMember('${user.id}', '${user.user_roles?.name}')" title="حذف العضو">
+                                            <i class="fas fa-trash-alt"></i>
+                                            حذف
+                                        </button>
+                                    `}
+                                </div>
+                            ` : ''}
+                        </div>
+                    `;
+                };
+
+                let html = '';
+
+                // عرض الإداريين
+                if (admins.length > 0) {
+                    html += `
+                        <div style="margin-bottom: 30px;">
+                            <h4 style="color: #28a745; margin-bottom: 15px; padding: 10px 15px; background: rgba(40, 167, 69, 0.1); border-radius: 10px; border-right: 4px solid #28a745; display: flex; align-items: center; gap: 10px;">
+                                <i class="fas fa-user-shield"></i>
+                                الإداريون (${admins.length})
+                            </h4>
+                            <div style="display: grid; gap: 25px;">
+                                ${admins.map(renderUser).join('')}
                             </div>
                         </div>
                     `;
-                }).join('');
+                }
+
+                // عرض المحررين
+                if (editors.length > 0) {
+                    html += `
+                        <div>
+                            <h4 style="color: #17a2b8; margin-bottom: 15px; padding: 10px 15px; background: rgba(23, 162, 184, 0.1); border-radius: 10px; border-right: 4px solid #17a2b8; display: flex; align-items: center; gap: 10px;">
+                                <i class="fas fa-user-edit"></i>
+                                المحررون (${editors.length})
+                            </h4>
+                            <div style="display: grid; gap: 25px;">
+                                ${editors.map(renderUser).join('')}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                container.innerHTML = html;
             } catch (error) {
                 console.error('خطأ في تحميل أعضاء الفريق:', error);
                 document.getElementById('teamMembersList').innerHTML = `
@@ -3433,6 +4890,12 @@
             try {
                 const invitations = await api.getAllInvitations();
                 const container = document.getElementById('invitationsList');
+                
+                // تحديث عداد الدعوات
+                const countElement = document.getElementById('invitationsCount');
+                if (countElement) {
+                    countElement.textContent = invitations.length;
+                }
 
                 if (invitations.length === 0) {
                     container.innerHTML = `
@@ -3446,39 +4909,57 @@
                 }
 
                 container.innerHTML = invitations.map(inv => {
-                    const statusBadge = {
-                        'pending': '<span class="badge badge-warning">قيد الانتظار</span>',
-                        'accepted': '<span class="badge badge-success">مقبولة</span>',
-                        'expired': '<span class="badge" style="background: #fee; color: #c33;">منتهية</span>'
-                    }[inv.status] || inv.status;
+                    const statusInfo = {
+                        'pending': { text: 'قيد الانتظار', icon: 'clock', class: 'pending' },
+                        'accepted': { text: 'مقبولة', icon: 'check-circle', class: 'accepted' },
+                        'expired': { text: 'منتهية', icon: 'times-circle', class: 'expired' }
+                    }[inv.status] || { text: inv.status, icon: 'question-circle', class: 'pending' };
 
                     const expiresAt = new Date(inv.expires_at).toLocaleDateString('ar-EG');
                     const invitedBy = inv.invited_by_user?.full_name || inv.invited_by_user?.email || 'غير معروف';
                     
                     return `
-                        <div class="item-card">
-                            <div class="item-info">
-                                <h3>${inv.email}</h3>
-                                <p>
-                                    <i class="fas fa-user-tag"></i> ${inv.user_roles?.display_name || 'غير محدد'}<br>
-                                    <i class="fas fa-user"></i> دعوة من: ${invitedBy}<br>
-                                    <i class="fas fa-calendar"></i> تنتهي في: ${expiresAt}<br>
-                                    ${statusBadge}
-                                </p>
+                        <div class="invitation-card ${statusInfo.class}">
+                            <div class="invitation-header">
+                                <div class="invitation-icon">
+                                    <i class="fas fa-${statusInfo.icon}"></i>
+                                </div>
+                                <div class="invitation-email">${inv.email}</div>
+                                <div class="invitation-status">
+                                    <i class="fas fa-${statusInfo.icon}"></i>
+                                    ${statusInfo.text}
+                                </div>
                             </div>
-                            <div class="item-actions">
-                                ${inv.status === 'pending' ? `
-                                    <button class="btn btn-small btn-info" onclick="copyInvitationLink('${inv.token}')">
-                                        <i class="fas fa-copy"></i> نسخ الرابط
-                                    </button>
-                                    <button class="btn btn-small btn-success" onclick="resendInvitation('${inv.id}')">
-                                        <i class="fas fa-paper-plane"></i> إعادة إرسال
-                                    </button>
-                                    <button class="btn btn-small btn-danger" onclick="deleteInvitation('${inv.id}')">
-                                        <i class="fas fa-trash"></i> حذف
-                                    </button>
-                                ` : ''}
+                            <div class="invitation-info">
+                                <div class="info-item">
+                                    <i class="fas fa-user-tag"></i>
+                                    <span>${inv.user_roles?.display_name || 'غير محدد'}</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-user"></i>
+                                    <span>دعوة من: ${invitedBy}</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-calendar"></i>
+                                    <span>تنتهي في: ${expiresAt}</span>
+                                </div>
                             </div>
+                            ${inv.status === 'pending' ? `
+                                <div class="invitation-actions">
+                                    <button class="btn btn-info" onclick="copyInvitationLink('${inv.token}')" title="نسخ رابط الدعوة">
+                                        <i class="fas fa-copy"></i>
+                                        نسخ
+                                    </button>
+                                    <button class="btn btn-success" onclick="resendInvitation('${inv.id}')" title="إعادة إرسال الدعوة">
+                                        <i class="fas fa-paper-plane"></i>
+                                        إرسال
+                                    </button>
+                                    <button class="btn btn-danger" onclick="deleteInvitation('${inv.id}')" title="حذف الدعوة">
+                                        <i class="fas fa-trash-alt"></i>
+                                        حذف
+                                    </button>
+                                </div>
+                            ` : ''}
                         </div>
                     `;
                 }).join('');
@@ -3605,7 +5086,13 @@
         }
 
         // تبديل حالة المستخدم (تفعيل/تعطيل)
-        async function toggleUserStatus(userId, newStatus) {
+        async function toggleUserStatus(userId, newStatus, userRole) {
+            // منع تعطيل الإداريين
+            if (userRole === 'admin') {
+                alert('⚠️ لا يمكن تعطيل حساب إداري');
+                return;
+            }
+
             const action = newStatus ? 'تفعيل' : 'تعطيل';
             const confirmed = await showConfirm(`هل أنت متأكد من ${action} هذا المستخدم؟`, `تأكيد ${action} المستخدم`);
             if (!confirmed) return;
@@ -3621,7 +5108,13 @@
         }
 
         // حذف عضو من الفريق
-        async function deleteTeamMember(userId) {
+        async function deleteTeamMember(userId, userRole) {
+            // منع حذف الإداريين
+            if (userRole === 'admin') {
+                alert('⚠️ لا يمكن حذف حساب إداري');
+                return;
+            }
+
             const confirmed = await showConfirm('هل أنت متأكد من حذف هذا العضو؟<br><br><strong>سيتم:</strong><br>• حذف الحساب<br>• حذف دعوته من الدعوات المرسلة<br>• نقل بياناته إلى الحسابات المحذوفة', 'تأكيد حذف العضو');
             if (!confirmed) return;
 
@@ -3661,6 +5154,12 @@
             try {
                 const accounts = await api.getDeletedAccounts();
                 const container = document.getElementById('deletedAccountsList');
+                
+                // تحديث عداد الحسابات المحذوفة
+                const countElement = document.getElementById('deletedAccountsCount');
+                if (countElement) {
+                    countElement.textContent = accounts.length;
+                }
 
                 if (accounts.length === 0) {
                     container.innerHTML = `
@@ -3677,22 +5176,49 @@
                     const deletedAt = new Date(account.deleted_at).toLocaleString('ar-EG');
                     const deletedBy = account.deleted_by_user?.full_name || account.deleted_by_user?.email || 'غير معروف';
                     
+                    // الحصول على الحرف الأول من الاسم
+                    const avatarLetter = (account.full_name || account.email).charAt(0).toUpperCase();
+                    
                     return `
-                        <div class="item-card" style="background: #fff5f5; border-left: 4px solid #f44336;">
-                            <div class="item-info">
-                                <h3>${account.full_name || account.email}</h3>
-                                <p>
-                                    <i class="fas fa-envelope"></i> ${account.email}<br>
-                                    <i class="fas fa-user-tag"></i> <span class="badge badge-secondary">${account.role_display_name || 'غير محدد'}</span><br>
-                                    <i class="fas fa-user-shield"></i> حذف بواسطة: ${deletedBy}<br>
-                                    <i class="fas fa-calendar-times"></i> تاريخ الحذف: ${deletedAt}
-                                    ${account.deletion_reason ? `<br><i class="fas fa-comment"></i> السبب: ${account.deletion_reason}` : ''}
-                                    ${account.full_name ? `<br><i class="fas fa-envelope-open"></i> ${account.full_name}` : ''}
-                                </p>
+                        <div class="deleted-account-card">
+                            <div class="deleted-header">
+                                <div class="deleted-avatar">
+                                    <i class="fas fa-user-slash"></i>
+                                </div>
+                                <div class="deleted-name">${account.full_name || account.email}</div>
+                                <div class="deleted-badge">
+                                    <i class="fas fa-trash-alt"></i>
+                                    حساب محذوف
+                                </div>
                             </div>
-                            <div class="item-actions">
-                                <button class="btn btn-small btn-danger" onclick="permanentlyDeleteAccount('${account.id}', '${account.full_name || account.email}')">
-                                    <i class="fas fa-trash-alt"></i> حذف نهائي
+                            <div class="deleted-info">
+                                <div class="info-item">
+                                    <i class="fas fa-envelope"></i>
+                                    <span>${account.email}</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-user-tag"></i>
+                                    <span>${account.role_display_name || 'غير محدد'}</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-user-shield"></i>
+                                    <span>حذف بواسطة: ${deletedBy}</span>
+                                </div>
+                                <div class="info-item">
+                                    <i class="fas fa-calendar-times"></i>
+                                    <span>تاريخ الحذف: ${deletedAt}</span>
+                                </div>
+                                ${account.deletion_reason ? `
+                                    <div class="info-item">
+                                        <i class="fas fa-comment"></i>
+                                        <span>السبب: ${account.deletion_reason}</span>
+                                    </div>
+                                ` : ''}
+                            </div>
+                            <div class="deleted-actions">
+                                <button class="btn btn-danger" onclick="permanentlyDeleteAccount('${account.id}', '${account.full_name || account.email}')" title="حذف نهائي من قاعدة البيانات">
+                                    <i class="fas fa-trash-alt"></i>
+                                    حذف نهائي
                                 </button>
                             </div>
                         </div>
@@ -3869,7 +5395,31 @@
                 return;
             }
 
+            // التحقق من أن كلمة المرور الجديدة مختلفة عن الحالية
+            if (currentPassword === newPassword) {
+                alert('❌ كلمة المرور الجديدة يجب أن تكون مختلفة عن الحالية');
+                return;
+            }
+
             try {
+                // الحصول على البريد الإلكتروني للمستخدم الحالي
+                const { data: { user } } = await api.supabase.auth.getUser();
+                
+                if (!user || !user.email) {
+                    throw new Error('لم يتم العثور على معلومات المستخدم');
+                }
+
+                // التحقق من كلمة المرور الحالية عن طريق محاولة تسجيل الدخول
+                const { error: signInError } = await api.supabase.auth.signInWithPassword({
+                    email: user.email,
+                    password: currentPassword
+                });
+
+                if (signInError) {
+                    alert('❌ كلمة المرور الحالية غير صحيحة');
+                    return;
+                }
+
                 // تحديث كلمة المرور
                 const { error } = await api.supabase.auth.updateUser({
                     password: newPassword
