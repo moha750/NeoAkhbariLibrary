@@ -1314,8 +1314,11 @@ class SupabaseAPI {
             
             invitation = invData;
 
-            // إنشاء رابط الدعوة
-            invitationLink = `${window.location.origin}/signup.html?token=${invitation.token}`;
+            // إنشاء رابط الدعوة مع المسار الكامل
+            const origin = window.location.origin;
+            const pathname = window.location.pathname;
+            const basePath = pathname.substring(0, pathname.lastIndexOf('/'));
+            invitationLink = `${origin}${basePath}/signup.html?token=${invitation.token}`;
             
             console.log('📧 محاولة إرسال البريد الإلكتروني...');
             console.log('📧 ملاحظة: إرسال البريد يتطلب Edge Function منشورة');
