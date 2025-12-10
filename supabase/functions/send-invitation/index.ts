@@ -1,5 +1,5 @@
-// Supabase Edge Function لإرسال دعوات البريد الإلكتروني
-// Send Invitation Email via Supabase
+// Edge Function لإرسال دعوات البريد الإلكتروني
+// Send Invitation Email Function
 
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts"
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2'
@@ -9,13 +9,6 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 }
 
-interface InvitationRequest {
-  email: string
-  role: string
-  inviteLink: string
-  inviterName: string
-}
-
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -23,172 +16,136 @@ serve(async (req) => {
   }
 
   try {
-    // التحقق من الـ Authorization header
-    const authHeader = req.headers.get('Authorization')
-    if (!authHeader) {
-      throw new Error('Missing authorization header')
-    }
-
-    // إنشاء Supabase client
+    // إنشاء عميل Supabase
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
       {
         global: {
-          headers: { Authorization: authHeader },
+          headers: { Authorization: req.headers.get('Authorization')! },
         },
       }
     )
 
-    // التحقق من المستخدم
-    const {
-      data: { user },
-      error: userError,
-    } = await supabaseClient.auth.getUser()
+    // الحصول على معرف الدعوة والرابط من الطلب
+    const { invitationId, siteUrl } = await req.json()
 
-    if (userError || !user) {
-      throw new Error('Unauthorized')
+    if (!invitationId) {
+      throw new Error('معرف الدعوة مطلوب')
     }
 
-    // قراءة البيانات من الطلب
-    const { email, role, inviteLink, inviterName }: InvitationRequest = await req.json()
+    // جلب بيانات الدعوة
+    const { data: invitation, error: invError } = await supabaseClient
+      .from('invitations')
+      .select(`
+        *,
+        user_roles (
+          display_name
+        ),
+        invited_by_user:users!invitations_invited_by_fkey (
+          email,
+          full_name
+        )
+      `)
+      .eq('id', invitationId)
+      .single()
 
-    // تحديد نص الدور بالعربية
-    const roleText = role === 'admin' ? 'إداري' : 'محرر'
+    if (invError) throw invError
+    if (!invitation) throw new Error('الدعوة غير موجودة')
 
-    // إنشاء محتوى البريد الإلكتروني بتنسيق HTML
-    const emailHtml = `
-<!DOCTYPE html>
-<html dir="rtl" lang="ar">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>دعوة للانضمام</title>
-</head>
-<body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f4f4;">
-    <table role="presentation" style="width: 100%; border-collapse: collapse;">
-        <tr>
-            <td align="center" style="padding: 40px 0;">
-                <table role="presentation" style="width: 600px; border-collapse: collapse; background: white; border-radius: 10px; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
-                    <!-- Header -->
-                    <tr>
-                        <td style="padding: 40px 40px 20px; text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px 10px 0 0;">
-                            <h1 style="margin: 0; color: white; font-size: 28px;">
-                                <span style="font-size: 40px;">📧</span><br>
-                                دعوة للانضمام
-                            </h1>
-                        </td>
-                    </tr>
-                    
-                    <!-- Content -->
-                    <tr>
-                        <td style="padding: 40px;">
-                            <h2 style="color: #333; margin: 0 0 20px 0; font-size: 22px;">مرحباً!</h2>
-                            
-                            <p style="color: #666; line-height: 1.8; font-size: 16px; margin: 0 0 20px 0;">
-                                تم دعوتك من قبل <strong style="color: #667eea;">${inviterName}</strong> للانضمام إلى فريق العمل في لوحة التحكم.
-                            </p>
-                            
-                            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-right: 4px solid #667eea; margin: 20px 0;">
-                                <p style="margin: 0; color: #333; font-size: 16px;">
-                                    <strong>الدور المخصص لك:</strong> 
-                                    <span style="color: #667eea; font-weight: bold;">${roleText}</span>
-                                </p>
-                            </div>
-                            
-                            <p style="color: #666; line-height: 1.8; font-size: 16px; margin: 20px 0;">
-                                للقبول والانضمام، اضغط على الزر أدناه:
-                            </p>
-                            
-                            <!-- Button -->
-                            <table role="presentation" style="margin: 30px 0;">
-                                <tr>
-                                    <td style="text-align: center;">
-                                        <a href="${inviteLink}" 
-                                           style="display: inline-block; padding: 15px 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; box-shadow: 0 4px 6px rgba(102, 126, 234, 0.3);">
-                                            قبول الدعوة والانضمام
-                                        </a>
-                                    </td>
-                                </tr>
-                            </table>
-                            
-                            <p style="color: #999; font-size: 14px; line-height: 1.6; margin: 20px 0 0 0;">
-                                أو انسخ الرابط التالي والصقه في المتصفح:<br>
-                                <a href="${inviteLink}" style="color: #667eea; word-break: break-all;">${inviteLink}</a>
-                            </p>
-                            
-                            <div style="background: #fff3cd; padding: 15px; border-radius: 8px; border-right: 4px solid #ffc107; margin: 30px 0 0 0;">
-                                <p style="margin: 0; color: #856404; font-size: 14px;">
-                                    ⚠️ <strong>ملاحظة:</strong> هذه الدعوة صالحة لمدة 7 أيام فقط.
-                                </p>
-                            </div>
-                        </td>
-                    </tr>
-                    
-                    <!-- Footer -->
-                    <tr>
-                        <td style="padding: 30px 40px; background: #f8f9fa; border-radius: 0 0 10px 10px; text-align: center;">
-                            <p style="margin: 0; color: #999; font-size: 14px;">
-                                إذا لم تكن تتوقع هذه الدعوة، يمكنك تجاهل هذه الرسالة.
-                            </p>
-                            <p style="margin: 10px 0 0 0; color: #999; font-size: 12px;">
-                                © 2024 المكتبة الرقمية - جميع الحقوق محفوظة
-                            </p>
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-    </table>
-</body>
-</html>
-    `
+    // إنشاء رابط الدعوة
+    // استخدام siteUrl من الطلب، أو SITE_URL من البيئة، أو localhost كآخر خيار
+    const baseUrl = siteUrl || Deno.env.get('SITE_URL') || 'http://localhost:5500'
+    const invitationLink = `${baseUrl}/signup.html?token=${invitation.token}`
+    
+    console.log('📧 إرسال دعوة إلى:', invitation.email)
+    console.log('🌐 Base URL:', baseUrl)
+    console.log('🔗 رابط الدعوة:', invitationLink)
 
-    // إرسال البريد الإلكتروني باستخدام Supabase Admin API
+    // إرسال بريد إلكتروني مخصص (بدون إنشاء مستخدم)
+    // ملاحظة: inviteUserByEmail ينشئ المستخدم تلقائياً، لذلك نستخدم طريقة أخرى
+    
+    // استخدام Supabase Admin لإرسال بريد مخصص
     const supabaseAdmin = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? '',
     )
 
-    // استخدام Supabase Auth لإرسال بريد مخصص
-    // ملاحظة: يجب تفعيل SMTP في Supabase Dashboard
-    const { error: emailError } = await supabaseAdmin.auth.admin.inviteUserByEmail(email, {
-      data: {
-        invitation_link: inviteLink,
-        role: role,
-        inviter_name: inviterName,
-      },
-      redirectTo: inviteLink,
-    })
+    // إنشاء محتوى البريد
+    const emailSubject = 'دعوة للانضمام إلى المكتبة الرقمية'
+    const emailBody = `
+      <div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <h2>مرحباً!</h2>
+        <p>تمت دعوتك للانضمام إلى فريق المكتبة الرقمية بصفة <strong>${invitation.user_roles?.display_name || 'عضو'}</strong>.</p>
+        ${invitation.invited_by_user ? `<p><strong>دعوة من:</strong> ${invitation.invited_by_user.full_name || invitation.invited_by_user.email}</p>` : ''}
+        <p><strong>البريد الإلكتروني:</strong> ${invitation.email}</p>
+        <p>للانضمام، يرجى النقر على الرابط أدناه لإنشاء حسابك:</p>
+        <p><a href="${invitationLink}" style="display: inline-block; padding: 12px 24px; background: #4F46E5; color: white; text-decoration: none; border-radius: 6px;">إنشاء الحساب</a></p>
+        <p style="color: #666; font-size: 14px;">أو انسخ الرابط التالي: ${invitationLink}</p>
+        <p style="color: #999; font-size: 12px;">هذه الدعوة صالحة حتى ${new Date(invitation.expires_at).toLocaleDateString('ar-EG')}</p>
+      </div>
+    `
 
-    if (emailError) {
-      // إذا فشل إرسال البريد عبر Supabase Auth، نحاول طريقة بديلة
-      console.error('Error sending via Supabase Auth:', emailError)
-      
-      // يمكن استخدام خدمة بريد خارجية هنا كبديل
-      // مثل Resend أو SendGrid
-      
-      throw new Error('Failed to send invitation email')
+    // محاولة إرسال البريد عبر Supabase (يتطلب SMTP مُعد)
+    let emailSent = false
+    
+    try {
+      // استخدام Database Function لإرسال البريد
+      const { error: emailError } = await supabaseAdmin.rpc('send_email', {
+        recipient: invitation.email,
+        subject: emailSubject,
+        body: emailBody
+      })
+
+      if (emailError) {
+        console.warn('⚠️ لا يمكن إرسال البريد عبر Database Function:', emailError.message)
+        emailSent = false
+      } else {
+        console.log('✅ تم إرسال البريد بنجاح')
+        emailSent = true
+      }
+    } catch (error) {
+      console.warn('⚠️ Database Function غير متوفرة')
+      emailSent = false
     }
 
+    // إذا لم يُرسل البريد، إرجاع success: false
+    if (!emailSent) {
+      console.warn('⚠️ لم يتم إرسال البريد - استخدم الرابط اليدوي')
+      return new Response(
+        JSON.stringify({ 
+          success: false, 
+          error: 'إرسال البريد غير متاح حالياً. يمكنك نسخ الرابط وإرساله يدوياً.',
+          invitationLink
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 200,  // 200 لأن الدعوة تم إنشاؤها بنجاح
+        }
+      )
+    }
+
+    // البريد تم إرساله بنجاح
     return new Response(
-      JSON.stringify({
-        success: true,
+      JSON.stringify({ 
+        success: true, 
         message: 'تم إرسال الدعوة بنجاح',
+        invitationLink
       }),
-      {
+      { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200,
       }
     )
+
   } catch (error) {
-    console.error('Error:', error)
+    console.error('خطأ:', error)
     return new Response(
-      JSON.stringify({
-        success: false,
-        error: error.message,
+      JSON.stringify({ 
+        success: false, 
+        error: error.message 
       }),
-      {
+      { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 400,
       }

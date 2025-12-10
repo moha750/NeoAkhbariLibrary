@@ -18,36 +18,73 @@
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #FCFCF9;
             min-height: 100vh;
-            padding: 20px;
         }
 
         .container {
             max-width: 1400px;
             margin: 0 auto;
+            padding: 0 20px 0px;
+        }
+
+        /* Header Image */
+        .header-image {
+            max-width: 100%;
+            border-radius: 0px 0px 20px 20px; 
+            box-shadow: 0 4px 20px rgba(236, 176, 7, 0.2);
+            margin-bottom: 40px;
         }
 
         /* Header */
         .header {
             background: white;
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            padding: 30px 40px;
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(236, 176, 7, 0.15);
             margin-bottom: 30px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border: 1px solid rgba(236, 176, 7, 0.1);
         }
 
         .header h1 {
-            color: #667eea;
+            color: #ECB007;
             font-size: 2em;
+            text-shadow: 2px 2px 4px rgba(236, 176, 7, 0.1);
         }
 
-        .header-actions {
+        .header button:hover {
+            background: linear-gradient(135deg, #c82333 0%, #bd2130 100%);
+            border-color: #a71d2a;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(220, 53, 69, 0.5);
+        }
+
+        .user-avatar-header {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
             display: flex;
-            gap: 10px;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 10px rgba(236, 176, 7, 0.3);
+            overflow: hidden;
+            flex-shrink: 0;
+            transition: all 0.3s;
+        }
+
+        .user-avatar-header:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(236, 176, 7, 0.5);
+        }
+
+        .user-info-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
         }
 
         .btn {
@@ -65,13 +102,15 @@
         }
 
         .btn-primary {
-            background: #667eea;
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
             color: white;
+            box-shadow: 0 4px 15px rgba(236, 176, 7, 0.3);
         }
 
         .btn-primary:hover {
-            background: #764ba2;
+            background: linear-gradient(135deg, #f5c842 0%, #ECB007 100%);
             transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(236, 176, 7, 0.4);
         }
 
         .btn-secondary {
@@ -94,17 +133,18 @@
         .stat-card {
             background: white;
             padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(236, 176, 7, 0.15);
             display: flex;
             align-items: center;
             gap: 20px;
             transition: all 0.3s;
+            border: 1px solid rgba(236, 176, 7, 0.1);
         }
 
         .stat-card:hover {
             transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            box-shadow: 0 15px 50px rgba(236, 176, 7, 0.25);
         }
 
         .stat-icon {
@@ -119,7 +159,7 @@
         }
 
         .stat-icon.books {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
         }
 
         .stat-icon.categories {
@@ -150,18 +190,144 @@
         .tabs {
             background: white;
             padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(236, 176, 7, 0.15);
+            border: 1px solid rgba(236, 176, 7, 0.1);
+        }
+
+        .tabs-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .tab-buttons-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 15px;
+            position: relative;
+        }
+
+        /* مؤشرات التدرج للإشارة إلى وجود محتوى إضافي */
+        .tab-buttons-wrapper::before,
+        .tab-buttons-wrapper::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 15px;
+            width: 30px;
+            pointer-events: none;
+            z-index: 5;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .tab-buttons-wrapper::before {
+            left: 42px;
+            background: linear-gradient(to right, rgba(255,255,255), transparent);
+        }
+
+        .tab-buttons-wrapper::after {
+            right: 42px;
+            background: linear-gradient(to left, rgba(255,255,255), transparent);
+        }
+
+        .tab-buttons-wrapper.show-left-fade::before {
+            opacity: 1;
+        }
+
+        .tab-buttons-wrapper.show-right-fade::after {
+            opacity: 1;
+        }
+
+        .tab-nav-btn {
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
+            border: none;
+            color: white;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(236, 176, 7, 0.4);
+            font-size: 1.1em;
+            position: relative;
+            z-index: 10;
+        }
+
+        .tab-nav-btn:hover:not(:disabled) {
+            transform: scale(1.15);
+            box-shadow: 0 5px 15px rgba(236, 176, 7, 0.6);
+            background: linear-gradient(135deg, #f5c842 0%, #ECB007 100%);
+        }
+
+        .tab-nav-btn:active:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 2px 8px rgba(236, 176, 7, 0.4);
+        }
+
+        .tab-nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            transform: scale(1);
+            box-shadow: 0 1px 4px rgba(236, 176, 7, 0.2);
+        }
+
+        .tab-nav-btn i {
+            transition: transform 0.3s ease;
+        }
+
+        .tab-nav-btn:hover:not(:disabled) i {
+            transform: translateX(0) scale(1.2);
+        }
+
+        /* تأثير النبض عند النقر */
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(236, 176, 7, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(236, 176, 7, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(236, 176, 7, 0);
+            }
+        }
+
+        .tab-nav-btn.pulse {
+            animation: pulse 0.5s;
         }
 
         .tab-buttons {
             display: flex;
             gap: 10px;
-            border-bottom: 2px solid #e0e0e0;
-            padding-bottom: 15px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            flex: 1;
+            padding: 10px 10px;
+        }
+
+        .tab-buttons::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .tab-buttons::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .tab-buttons::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
+            border-radius: 10px;
+        }
+
+        .tab-buttons::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #f5c842 0%, #ECB007 100%);
         }
 
         .tab-btn {
@@ -176,15 +342,41 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            white-space: nowrap;
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tab-btn::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 3px;
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
+            transition: all 0.3s;
+            transform: translateX(-50%);
         }
 
         .tab-btn:hover {
             background: #f0f0f0;
+            transform: translateY(-2px);
+        }
+
+        .tab-btn:hover::before {
+            width: 80%;
         }
 
         .tab-btn.active {
-            background: #667eea;
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
             color: white;
+            box-shadow: 0 4px 12px rgba(236, 176, 7, 0.4);
+        }
+
+        .tab-btn i {
+            font-size: 1.1em;
         }
 
         .tab-content {
@@ -197,10 +389,11 @@
 
         /* Forms */
         .form-section {
-            background: #f8f9fa;
+            background: linear-gradient(135deg, rgba(236, 176, 7, 0.08) 0%, rgba(245, 200, 66, 0.12) 100%);
             padding: 25px;
-            border-radius: 10px;
+            border-radius: 15px;
             margin-bottom: 20px;
+            border: 1px solid rgba(236, 176, 7, 0.15);
         }
 
         .form-group {
@@ -229,18 +422,154 @@
         .form-group textarea:focus,
         .form-group select:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: #ECB007;
+            box-shadow: 0 0 0 4px rgba(236, 176, 7, 0.1);
         }
 
         .form-group input[type="file"] {
-            padding: 10px;
-            cursor: pointer;
-            background: #f8f9fa;
+            display: none;
         }
 
-        .form-group input[type="file"]:hover {
-            background: #e9ecef;
-            border-color: #667eea;
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            font-size: 1.1em;
+        }
+
+        .input-wrapper i.toggle-password {
+            cursor: pointer;
+            left: 15px;
+            right: auto;
+            transition: all 0.5s;
+        }
+
+        .input-wrapper i.toggle-password:hover {
+            color: #ECB007;
+        }
+
+        .input-wrapper input {
+            padding-right: 45px;
+            padding-left: 45px;
+        }
+
+        .file-upload-wrapper {
+            position: relative;
+            display: block;
+            width: 100%;
+        }
+
+        .file-upload-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            padding: 30px 20px;
+            background: linear-gradient(135deg, rgba(236, 176, 7, 0.05) 0%, rgba(245, 200, 66, 0.1) 100%);
+            border: 2px dashed #ECB007;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            min-height: 120px;
+            flex-direction: column;
+        }
+
+        .file-upload-label:hover {
+            background: linear-gradient(135deg, rgba(236, 176, 7, 0.1) 0%, rgba(245, 200, 66, 0.15) 100%);
+            border-color: #f5c842;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(236, 176, 7, 0.2);
+        }
+
+        .file-upload-icon {
+            font-size: 3em;
+            color: #ECB007;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload-label:hover .file-upload-icon {
+            transform: scale(1.1);
+            color: #f5c842;
+        }
+
+        .file-upload-text {
+            color: #666;
+            font-size: 1em;
+        }
+
+        .file-upload-text strong {
+            color: #ECB007;
+            display: block;
+            margin-bottom: 5px;
+            font-size: 1.1em;
+        }
+
+        .file-upload-hint {
+            font-size: 0.85em;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        .file-preview {
+            margin-top: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            border: 1px solid rgba(236, 176, 7, 0.2);
+            display: none;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .file-preview.active {
+            display: flex;
+        }
+
+        .file-preview-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 2px solid #ECB007;
+        }
+
+        .file-preview-info {
+            flex: 1;
+        }
+
+        .file-preview-name {
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 5px;
+            word-break: break-all;
+        }
+
+        .file-preview-size {
+            color: #999;
+            font-size: 0.9em;
+        }
+
+        .file-preview-remove {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9em;
+        }
+
+        .file-preview-remove:hover {
+            background: #c82333;
+            transform: scale(1.05);
         }
 
         .form-group textarea {
@@ -261,18 +590,20 @@
         }
 
         .item-card {
-            background: white;
+            background: linear-gradient(135deg, rgba(236, 176, 7, 0.1) 0%, rgba(245, 200, 66, 0.15) 100%);
             padding: 20px;
-            border-radius: 10px;
-            border-left: 4px solid #667eea;
+            border-radius: 15px;
+            border-left: 4px solid #ECB007;
             display: flex;
             justify-content: space-between;
             align-items: center;
             transition: all 0.3s;
+            box-shadow: 0 4px 15px rgba(236, 176, 7, 0.1);
         }
 
         .item-card:hover {
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            background: linear-gradient(135deg, rgba(236, 176, 7, 0.15) 0%, rgba(245, 200, 66, 0.2) 100%);
+            box-shadow: 0 8px 25px rgba(236, 176, 7, 0.2);
             transform: translateX(-5px);
         }
 
@@ -327,10 +658,10 @@
 
         .page-order-number {
             font-weight: bold;
-            color: #667eea;
+            color: #ECB007;
             font-size: 1.1em;
             padding: 5px 10px;
-            background: rgba(102, 126, 234, 0.1);
+            background: rgba(236, 176, 7, 0.1);
             border-radius: 5px;
             min-width: 40px;
             text-align: center;
@@ -338,8 +669,8 @@
 
         .btn-icon {
             background: white;
-            border: 2px solid #667eea;
-            color: #667eea;
+            border: 2px solid #ECB007;
+            color: #ECB007;
             width: 35px;
             height: 35px;
             border-radius: 50%;
@@ -352,7 +683,7 @@
         }
 
         .btn-icon:hover:not(:disabled) {
-            background: #667eea;
+            background: #ECB007;
             color: white;
             transform: scale(1.1);
         }
@@ -397,7 +728,7 @@
         .loading {
             text-align: center;
             padding: 40px;
-            color: #667eea;
+            color: #ECB007;
         }
 
         .loading i {
@@ -472,7 +803,7 @@
 
         .modal-header {
             padding: 20px 30px;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
             color: white;
             border-radius: 15px 15px 0 0;
             display: flex;
@@ -549,6 +880,24 @@
                 text-align: center;
             }
 
+            .user-info-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .user-avatar-header {
+                width: 50px;
+                height: 50px;
+            }
+
+            .user-avatar-header i {
+                font-size: 24px !important;
+            }
+
+            .header h1 {
+                font-size: 1.5em;
+            }
+
             .stats-grid {
                 grid-template-columns: 1fr;
             }
@@ -561,6 +910,30 @@
 
             .form-actions {
                 flex-direction: column;
+            }
+
+            /* تحسين التبويبات للموبايل */
+            .tab-nav-btn {
+                width: 38px;
+                height: 38px;
+                font-size: 1em;
+            }
+
+            .tab-btn {
+                padding: 10px 18px;
+                font-size: 0.9em;
+            }
+
+            .tab-btn i {
+                font-size: 1em;
+            }
+
+            .tab-buttons::-webkit-scrollbar {
+                height: 4px;
+            }
+
+            .tab-buttons-wrapper {
+                gap: 8px;
             }
 
             /* جعل أزرار الصفحات تحت المحتوى في الموبايل */
@@ -634,7 +1007,7 @@
 
         .chart-bar-fill {
             height: 100%;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
             border-radius: 5px;
             transition: width 0.5s ease;
             display: flex;
@@ -659,7 +1032,7 @@
         }
 
         .visitors-table th {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
             color: white;
             padding: 15px;
             text-align: right;
@@ -712,21 +1085,213 @@
             color: #4facfe;
             font-weight: 600;
         }
+
+        /* Custom Alert/Confirm Dialog */
+        .custom-dialog-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 10000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .custom-dialog-overlay.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .custom-dialog {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 50px rgba(236, 176, 7, 0.3);
+            max-width: 500px;
+            width: 90%;
+            animation: slideDown 0.3s ease;
+            overflow: hidden;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .custom-dialog-header {
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
+            color: white;
+            padding: 20px 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .custom-dialog-header.success {
+            background: linear-gradient(135deg, #28a745 0%, #34ce57 100%);
+        }
+
+        .custom-dialog-header.error {
+            background: linear-gradient(135deg, #dc3545 0%, #e74c3c 100%);
+        }
+
+        .custom-dialog-header.warning {
+            background: linear-gradient(135deg, #ffc107 0%, #ffb300 100%);
+        }
+
+        .custom-dialog-icon {
+            font-size: 2em;
+            animation: bounceIn 0.5s ease;
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .custom-dialog-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .custom-dialog-body {
+            padding: 30px 25px;
+            color: #333;
+            font-size: 1.05em;
+            line-height: 1.6;
+            text-align: center;
+        }
+
+        .custom-dialog-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            margin-top: 15px;
+            transition: all 0.3s;
+            direction: rtl;
+        }
+
+        .custom-dialog-input:focus {
+            outline: none;
+            border-color: #ECB007;
+            box-shadow: 0 0 0 4px rgba(236, 176, 7, 0.1);
+        }
+
+        .custom-dialog-footer {
+            padding: 20px 25px;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .dialog-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dialog-btn-primary {
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(236, 176, 7, 0.3);
+        }
+
+        .dialog-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(236, 176, 7, 0.4);
+        }
+
+        .dialog-btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .dialog-btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .dialog-btn-danger {
+            background: linear-gradient(135deg, #dc3545 0%, #e74c3c 100%);
+            color: white;
+        }
+
+        .dialog-btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
+        }
+
+        /* Category Selector Items */
+        .custom-dialog-body div[onclick^="selectCategory"] {
+            transition: all 0.3s;
+        }
+
+        .custom-dialog-body div[onclick^="selectCategory"]:hover {
+            box-shadow: 0 3px 10px rgba(236, 176, 7, 0.2);
+            border-color: #ECB007 !important;
+        }
+
+        /* Edit Dialog Textarea for Page Content */
+        #editPageContent {
+            min-height: 300px !important;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
+            color: white;
+            padding: 30px 20px;
+            margin-top: 60px;
+            box-shadow: 0 -5px 20px rgba(236, 176, 7, 0.2);
+            font-size: 1.1em;
+            font-weight: 500;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
     </style>
 </head>
 <body>
+    <!-- Header Image -->
+    <img src="tape.png" alt="شعار المكتبة الرقمية" class="header-image">
+
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <div>
-                <h1><i class="fas fa-tachometer-alt"></i> لوحة التحكم</h1>
-                <p style="color: #666; margin-top: 5px;">إدارة المكتبة الرقمية</p>
+            <div class="user-info-header">
+                <div id="userAvatarContainer" class="user-avatar-header">
+                    <i id="userAvatarIcon" class="fas fa-user" style="font-size: 30px; color: white;"></i>
+                    <img id="userAvatarImg" src="" alt="صورة المستخدم" style="display: none; width: 100%; height: 100%; object-fit: cover;">
+                </div>
+                <div>
+                    <h1 id="greetingText" style="margin-bottom: 5px;"></h1>
+                </div>
             </div>
-            <div class="header-actions">
-                <a href="index.html" class="btn btn-secondary">
-                    <i class="fas fa-home"></i> الصفحة الرئيسية
-                </a>
-            </div>
+            <button onclick="logout()" style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); border: 2px solid #bd2130; color: white; padding: 12px 24px; border-radius: 12px; cursor: pointer; font-size: 16px; font-weight: 600; transition: all 0.3s; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);">
+                <i class="fas fa-sign-out-alt"></i>
+                تسجيل الخروج
+            </button>
         </div>
 
         <!-- Stats -->
@@ -770,41 +1335,74 @@
                     <div class="number" id="totalMessages">0</div>
                 </div>
             </div>
+
+            <div class="stat-card">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>الزوار</h3>
+                    <div class="number" id="totalVisitors">0</div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);">
+                    <i class="fas fa-users"></i>
+                </div>
+                <div class="stat-info">
+                    <h3>فريق العمل</h3>
+                    <div class="number" id="totalTeamMembers">0</div>
+                </div>
+            </div>
         </div>
 
         <!-- Tabs -->
         <div class="tabs">
-            <div class="tab-buttons">
-                <button class="tab-btn active" onclick="switchTab('categories')">
-                    <i class="fas fa-folder"></i> الأقسام
-                </button>
-                <button class="tab-btn" onclick="switchTab('books')">
-                    <i class="fas fa-book"></i> الكتب
-                </button>
-                <button class="tab-btn" onclick="switchTab('parts')">
-                    <i class="fas fa-bookmark"></i> الأجزاء
-                </button>
-                <button class="tab-btn" onclick="switchTab('pages')">
-                    <i class="fas fa-file-alt"></i> الصفحات
-                </button>
-                <button class="tab-btn" onclick="switchTab('publish')">
-                    <i class="fas fa-globe"></i> النشر
-                </button>
-                <button class="tab-btn" onclick="switchTab('analytics')">
-                    <i class="fas fa-chart-bar"></i> الإحصائيات
-                </button>
-                <button class="tab-btn" onclick="switchTab('team')">
-                    <i class="fas fa-users"></i> فريق العمل
-                </button>
-                <button class="tab-btn" onclick="switchTab('messages')">
-                    <i class="fas fa-envelope"></i> الرسائل
-                </button>
+            <div class="tabs-container">
+                <div class="tab-buttons-wrapper">
+                    <button class="tab-nav-btn" id="tabPrevBtn" onclick="scrollTabs('prev')" title="السابق">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                    <div class="tab-buttons" id="tabButtons">
+                        <button class="tab-btn active" onclick="switchTab('categories')">
+                            <i class="fas fa-folder"></i> الأقسام
+                        </button>
+                        <button class="tab-btn" onclick="switchTab('books')">
+                            <i class="fas fa-book"></i> الكتب
+                        </button>
+                        <button class="tab-btn" onclick="switchTab('parts')">
+                            <i class="fas fa-bookmark"></i> الأجزاء
+                        </button>
+                        <button class="tab-btn" onclick="switchTab('pages')">
+                            <i class="fas fa-file-alt"></i> الصفحات
+                        </button>
+                        <button class="tab-btn" onclick="switchTab('publish')">
+                            <i class="fas fa-globe"></i> النشر
+                        </button>
+                        <button class="tab-btn" onclick="switchTab('analytics')">
+                            <i class="fas fa-chart-bar"></i> الإحصائيات
+                        </button>
+                        <button class="tab-btn" onclick="switchTab('messages')">
+                            <i class="fas fa-envelope"></i> الرسائل
+                        </button>
+                        <button class="tab-btn" onclick="switchTab('team')">
+                            <i class="fas fa-users"></i> فريق العمل
+                        </button>
+                        <button class="tab-btn" onclick="switchTab('profile')">
+                            <i class="fas fa-user-circle"></i> الملف الشخصي
+                        </button>
+                    </div>
+                    <button class="tab-nav-btn" id="tabNextBtn" onclick="scrollTabs('next')" title="التالي">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                </div>
             </div>
 
             <!-- Categories Tab -->
             <div id="categories-tab" class="tab-content active">
                 <div class="form-section">
-                    <h2 style="color: #667eea; margin-bottom: 20px;">
+                    <h2 style="color: #ECB007; margin-bottom: 20px;">
                         <i class="fas fa-plus-circle"></i> إضافة قسم جديد
                     </h2>
                     <form id="categoryForm" onsubmit="saveCategory(event)">
@@ -841,7 +1439,7 @@
             <!-- Books Tab -->
             <div id="books-tab" class="tab-content">
                 <div class="form-section">
-                    <h2 style="color: #667eea; margin-bottom: 20px;">
+                    <h2 style="color: #ECB007; margin-bottom: 20px;">
                         <i class="fas fa-plus-circle"></i> إضافة كتاب جديد
                     </h2>
                     <form id="bookForm" onsubmit="saveBook(event)">
@@ -857,10 +1455,29 @@
                         </div>
                         <div class="form-group">
                             <label><i class="fas fa-image"></i> صورة الغلاف <span style="color: red;">*</span></label>
-                            <input type="file" id="bookCover" accept="image/*" required>
-                            <small style="color: #666; display: block; margin-top: 5px;">
-                                <i class="fas fa-info-circle"></i> يُفضل استخدام صور بحجم 800x1200 بكسل
-                            </small>
+                            <div class="file-upload-wrapper">
+                                <input type="file" id="bookCover" accept="image/*" required onchange="handleFileSelect(event, 'bookCoverPreview')">
+                                <label for="bookCover" class="file-upload-label">
+                                    <i class="fas fa-cloud-upload-alt file-upload-icon"></i>
+                                    <div class="file-upload-text">
+                                        <strong>اضغط لاختيار صورة الغلاف</strong>
+                                        <span>أو اسحب الصورة وأفلتها هنا</span>
+                                    </div>
+                                    <div class="file-upload-hint">
+                                        <i class="fas fa-info-circle"></i> يُفضل استخدام صور بصيغة (JPG, PNG, GIF - حتى 5MB)
+                                    </div>
+                                </label>
+                                <div id="bookCoverPreview" class="file-preview">
+                                    <img src="" alt="معاينة" class="file-preview-image">
+                                    <div class="file-preview-info">
+                                        <div class="file-preview-name"></div>
+                                        <div class="file-preview-size"></div>
+                                    </div>
+                                    <button type="button" class="file-preview-remove" onclick="removeFile('bookCover', 'bookCoverPreview')">
+                                        <i class="fas fa-times"></i> إزالة
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                         <div class="form-actions">
                             <button type="submit" class="btn btn-primary">
@@ -887,7 +1504,7 @@
             <!-- Parts Management Tab -->
             <div id="parts-tab" class="tab-content">
                 <div class="form-section">
-                    <h2 style="color: #667eea; margin-bottom: 20px;">
+                    <h2 style="color: #ECB007; margin-bottom: 20px;">
                         <i class="fas fa-bookmark"></i> إدارة أجزاء الكتاب
                     </h2>
                     
@@ -899,7 +1516,7 @@
                     </div>
 
                     <div id="partEditorSection" style="display: none;">
-                        <h3 style="color: #667eea; margin: 30px 0 20px;">
+                        <h3 style="color: #ECB007; margin: 30px 0 20px;">
                             <i class="fas fa-plus-circle"></i> إضافة جزء جديد
                         </h3>
                         <form id="partForm" onsubmit="savePart(event)">
@@ -934,7 +1551,7 @@
             <!-- Pages Management Tab -->
             <div id="pages-tab" class="tab-content">
                 <div class="form-section">
-                    <h2 style="color: #667eea; margin-bottom: 20px;">
+                    <h2 style="color: #ECB007; margin-bottom: 20px;">
                         <i class="fas fa-book-open"></i> إدارة صفحات الكتاب
                     </h2>
                     
@@ -956,7 +1573,7 @@
                     </div>
 
                     <div id="pageEditorSection" style="display: none;">
-                        <h3 style="color: #667eea; margin: 30px 0 20px;">
+                        <h3 style="color: #ECB007; margin: 30px 0 20px;">
                             <i class="fas fa-plus-circle"></i> إضافة صفحة جديدة
                         </h3>
                         <form id="pageForm" onsubmit="savePage(event)">
@@ -995,7 +1612,7 @@
             <div id="pagePreviewModal" class="modal" onclick="closePreviewModal(event)">
                 <div class="modal-content" onclick="event.stopPropagation()">
                     <div class="modal-header">
-                        <h2><i class="fas fa-eye"></i> معاينة الصفحة <span id="previewPageNumber"></span></h2>
+                        <h2>معاينة الصفحة <span id="previewPageNumber"></span></h2>
                         <button class="modal-close" onclick="closePreviewModal()">
                             <i class="fas fa-times"></i>
                         </button>
@@ -1014,7 +1631,7 @@
             <!-- Publish Tab -->
             <div id="publish-tab" class="tab-content">
                 <div class="form-section">
-                    <h2 style="color: #667eea; margin-bottom: 20px;">
+                    <h2 style="color: #ECB007; margin-bottom: 20px;">
                         <i class="fas fa-globe"></i> نشر الكتب
                     </h2>
                     <p style="color: #666; margin-bottom: 30px;">
@@ -1036,14 +1653,14 @@
             <!-- Analytics Tab -->
             <div id="analytics-tab" class="tab-content">
                 <div class="form-section">
-                    <h2 style="color: #667eea; margin-bottom: 20px;">
+                    <h2 style="color: #ECB007; margin-bottom: 20px;">
                         <i class="fas fa-chart-bar"></i> إحصائيات الزوار
                     </h2>
 
                     <!-- إحصائيات عامة -->
                     <div class="stats-grid" style="margin-bottom: 30px;">
                         <div class="stat-card">
-                            <div class="stat-icon" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+                            <div class="stat-icon" style="background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);">
                                 <i class="fas fa-users"></i>
                             </div>
                             <div class="stat-info">
@@ -1097,61 +1714,6 @@
                 </div>
             </div>
 
-            <!-- Team Tab -->
-            <div id="team-tab" class="tab-content">
-                <div class="form-section">
-                    <h2 style="color: #667eea; margin-bottom: 20px;">
-                        <i class="fas fa-users"></i> إدارة فريق العمل
-                    </h2>
-
-                    <!-- نموذج إضافة عضو -->
-                    <div style="background: white; padding: 25px; border-radius: 10px; margin-bottom: 30px; border: 2px solid #e0e0e0;">
-                        <h3 style="margin-bottom: 20px; color: #333;">
-                            <i class="fas fa-user-plus"></i> إضافة عضو جديد
-                        </h3>
-                        <form id="inviteForm" onsubmit="sendInvitation(event)">
-                            <div class="form-group">
-                                <label><i class="fas fa-envelope"></i> البريد الإلكتروني</label>
-                                <input type="email" id="inviteEmail" placeholder="example@domain.com" required>
-                            </div>
-                            <div class="form-group">
-                                <label><i class="fas fa-shield-alt"></i> الدور</label>
-                                <select id="inviteRole" required>
-                                    <option value="">اختر الدور</option>
-                                    <option value="admin">إداري - وصول كامل لجميع التبويبات</option>
-                                    <option value="editor">محرر - وصول لتبويب الصفحات فقط</option>
-                                </select>
-                            </div>
-                            <button type="submit" class="btn btn-primary">
-                                <i class="fas fa-paper-plane"></i> إرسال الدعوة
-                            </button>
-                        </form>
-                    </div>
-
-                    <!-- قائمة الأعضاء -->
-                    <h3 style="margin: 20px 0; color: #333;">
-                        <i class="fas fa-list"></i> الأعضاء الحاليون
-                    </h3>
-                    <div id="teamMembersList" class="items-list">
-                        <div class="loading">
-                            <i class="fas fa-spinner"></i>
-                            <p>جاري التحميل...</p>
-                        </div>
-                    </div>
-
-                    <!-- قائمة الدعوات -->
-                    <h3 style="margin: 30px 0 20px 0; color: #333;">
-                        <i class="fas fa-envelope"></i> الدعوات المرسلة
-                    </h3>
-                    <div id="invitationsList" class="items-list">
-                        <div class="loading">
-                            <i class="fas fa-spinner"></i>
-                            <p>جاري التحميل...</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <!-- Messages Tab -->
             <div id="messages-tab" class="tab-content">
                 <h3 style="margin-bottom: 20px; color: #333;">
@@ -1164,17 +1726,215 @@
                     </div>
                 </div>
             </div>
+
+            <!-- Team Tab -->
+            <div id="team-tab" class="tab-content">
+                <div class="form-section">
+                    <h2 style="color: #ECB007; margin-bottom: 20px;">
+                        <i class="fas fa-user-plus"></i> دعوة عضو جديد
+                    </h2>
+                    <form id="invitationForm" onsubmit="sendInvitation(event)">
+                        <div class="form-group">
+                            <label><i class="fas fa-envelope"></i> البريد الإلكتروني</label>
+                            <input type="email" id="invitationEmail" placeholder="example@email.com" required>
+                        </div>
+                        <div class="form-group">
+                            <label><i class="fas fa-user-tag"></i> الدور</label>
+                            <select id="invitationRole" required>
+                                <option value="">اختر الدور...</option>
+                            </select>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-paper-plane"></i> إرسال الدعوة
+                            </button>
+                            <button type="button" class="btn btn-secondary" onclick="clearInvitationForm()">
+                                <i class="fas fa-times"></i> إلغاء
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <h3 style="margin: 30px 0 20px; color: #333;">
+                    <i class="fas fa-users"></i> أعضاء الفريق
+                </h3>
+                <div id="teamMembersList" class="items-list">
+                    <div class="loading">
+                        <i class="fas fa-spinner"></i>
+                        <p>جاري التحميل...</p>
+                    </div>
+                </div>
+
+                <h3 style="margin: 30px 0 20px; color: #333;">
+                    <i class="fas fa-envelope-open-text"></i> الدعوات المرسلة
+                </h3>
+                <div id="invitationsList" class="items-list">
+                    <div class="loading">
+                        <i class="fas fa-spinner"></i>
+                        <p>جاري التحميل...</p>
+                    </div>
+                </div>
+
+                <h3 style="margin: 30px 0 20px; color: #333;">
+                    <i class="fas fa-trash-restore"></i> الحسابات المحذوفة
+                </h3>
+                <div id="deletedAccountsList" class="items-list">
+                    <div class="loading">
+                        <i class="fas fa-spinner"></i>
+                        <p>جاري التحميل...</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Profile Tab -->
+            <div id="profile-tab" class="tab-content">
+                <div class="form-section">
+                    <h2 style="color: #ECB007; margin-bottom: 20px;">
+                        <i class="fas fa-user-circle"></i> معلومات الملف الشخصي
+                    </h2>
+                    
+                    <div style="text-align: center; margin-bottom: 30px;">
+                        <div id="profileAvatarContainer" style="width: 120px; height: 120px; margin: 0 auto 20px; border-radius: 50%; background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%); display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 20px rgba(236, 176, 7, 0.3); overflow: hidden; position: relative;">
+                            <i id="profileAvatarIcon" class="fas fa-user" style="font-size: 60px; color: white;"></i>
+                            <img id="profileAvatarImg" src="" alt="صورة المستخدم" style="display: none; width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                        <h3 id="profileUserName" style="color: #333; margin-bottom: 5px;">جاري التحميل...</h3>
+                        <p id="profileUserEmail" style="color: #666; font-size: 0.95em;"></p>
+                        <p id="profileUserRole" style="display: inline-block; margin-top: 10px; padding: 8px 20px; background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%); color: white; border-radius: 20px; font-size: 0.9em; font-weight: bold;"></p>
+                    </div>
+
+                    <form id="profileForm" onsubmit="updateProfile(event)">
+                        <div class="form-group">
+                            <label><i class="fas fa-user"></i> الاسم الكامل</label>
+                            <input type="text" id="profileFullName" placeholder="أدخل اسمك الكامل" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label><i class="fas fa-envelope"></i> البريد الإلكتروني</label>
+                            <input type="email" id="profileEmail" disabled style="background: #f5f5f5; cursor: not-allowed;">
+                            <small style="color: #666; display: block; margin-top: 5px;">
+                                <i class="fas fa-info-circle"></i> لا يمكن تغيير البريد الإلكتروني
+                            </small>
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-image"></i> صورة الملف الشخصي</label>
+                            <div class="file-upload-wrapper">
+                                <input type="file" id="profileAvatar" accept="image/*" onchange="handleFileSelect(event, 'profileAvatarPreview'); previewAvatar(event);">
+                                <label for="profileAvatar" class="file-upload-label">
+                                    <i class="fas fa-user-circle file-upload-icon"></i>
+                                    <div class="file-upload-text">
+                                        <strong>اضغط لاختيار صورة شخصية</strong>
+                                        <span>أو اسحب الصورة وأفلتها هنا</span>
+                                    </div>
+                                    <div class="file-upload-hint">
+                                        <i class="fas fa-info-circle"></i> الحد الأقصى: 2MB - الصيغ المدعومة: JPG, PNG, GIF
+                                    </div>
+                                </label>
+                                <div id="profileAvatarPreview" class="file-preview">
+                                    <img src="" alt="معاينة" class="file-preview-image">
+                                    <div class="file-preview-info">
+                                        <div class="file-preview-name"></div>
+                                        <div class="file-preview-size"></div>
+                                    </div>
+                                    <button type="button" class="file-preview-remove" onclick="removeFile('profileAvatar', 'profileAvatarPreview')">
+                                        <i class="fas fa-times"></i> إزالة
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save"></i> حفظ التغييرات
+                            </button>
+                            <button type="button" class="btn btn-secondary" onclick="loadUserProfile()">
+                                <i class="fas fa-undo"></i> إلغاء
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <div class="form-section" style="margin-top: 30px;">
+                    <h2 style="color: #ECB007; margin-bottom: 20px;">
+                        <i class="fas fa-key"></i> تغيير كلمة المرور
+                    </h2>
+                    
+                    <form id="passwordForm" onsubmit="changePassword(event)">
+                        <div class="form-group">
+                            <label><i class="fas fa-lock"></i> كلمة المرور الحالية</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-key"></i>
+                                <i class="fas fa-eye-slash toggle-password" id="toggleCurrentPassword"></i>
+                                <input type="password" id="currentPassword" placeholder="أدخل كلمة المرور الحالية" required>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-lock"></i> كلمة المرور الجديدة</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-key"></i>
+                                <i class="fas fa-eye-slash toggle-password" id="toggleNewPassword"></i>
+                                <input type="password" id="newPassword" placeholder="أدخل كلمة المرور الجديدة" required minlength="6">
+                            </div>
+                            <small style="color: #666; display: block; margin-top: 5px;">
+                                <i class="fas fa-info-circle"></i> يجب أن تكون 6 أحرف على الأقل
+                            </small>
+                        </div>
+
+                        <div class="form-group">
+                            <label><i class="fas fa-lock"></i> تأكيد كلمة المرور الجديدة</label>
+                            <div class="input-wrapper">
+                                <i class="fas fa-key"></i>
+                                <i class="fas fa-eye-slash toggle-password" id="toggleConfirmPassword"></i>
+                                <input type="password" id="confirmPassword" placeholder="أعد إدخال كلمة المرور الجديدة" required minlength="6">
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-key"></i> تغيير كلمة المرور
+                            </button>
+                            <button type="button" class="btn btn-secondary" onclick="clearPasswordForm()">
+                                <i class="fas fa-times"></i> إلغاء
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- Supabase Files -->
-    <script src="supabase-config.js"></script>
     <script src="supabase-api.js"></script>
     <script src="auth-guard.js"></script>
 
     <script>
         let currentEditingCategoryId = null;
         let currentEditingBookId = null;
+
+        // تبديل إظهار / إخفاء كلمة المرور
+        function setupPasswordToggles() {
+            const toggles = [
+                { toggle: 'toggleCurrentPassword', input: 'currentPassword' },
+                { toggle: 'toggleNewPassword', input: 'newPassword' },
+                { toggle: 'toggleConfirmPassword', input: 'confirmPassword' }
+            ];
+
+            toggles.forEach(({ toggle, input }) => {
+                const toggleEl = document.getElementById(toggle);
+                const inputEl = document.getElementById(input);
+                
+                if (toggleEl && inputEl) {
+                    toggleEl.addEventListener('click', () => {
+                        const isHidden = inputEl.type === 'password';
+                        inputEl.type = isHidden ? 'text' : 'password';
+                        toggleEl.classList.toggle('fa-eye-slash');
+                        toggleEl.classList.toggle('fa-eye');
+                    });
+                }
+            });
+        }
 
         // تهيئة التطبيق
         window.addEventListener('load', async function() {
@@ -1183,17 +1943,16 @@
                 await api.init();
                 console.log('✅ تم الاتصال بـ Supabase');
                 
-                // 2. التحقق من الصلاحيات
-                const isAuthorized = await initAuthGuard();
-                if (!isAuthorized) {
-                    console.log('❌ غير مصرح - سيتم التحويل');
-                    return; // إيقاف التحميل
+                // 2. حماية لوحة التحكم - التحقق من تسجيل الدخول
+                const isProtected = await protectDashboard();
+                if (!isProtected) {
+                    return; // سيتم التحويل تلقائياً لصفحة تسجيل الدخول
                 }
                 
-                // 2.5. تفعيل مراقبة حالة المصادقة
-                setupAuthStateListener();
+                // 3. تحميل بيانات المستخدم والتحية
+                await loadUserGreeting();
                 
-                // 3. تحميل البيانات فقط بعد التحقق من الصلاحيات
+                // 4. تحميل البيانات
                 await loadStats();
                 await loadCategories();
                 await loadCategoriesSelect();
@@ -1202,9 +1961,10 @@
                 await loadBooksForPages();
                 await loadBooksForPublish();
                 await loadAnalytics();
-                await loadTeamMembers();
-                await loadInvitations();
                 await loadMessages();
+                
+                // 5. تهيئة أزرار إظهار/إخفاء كلمة المرور
+                setupPasswordToggles();
                 
                 console.log('✅ تم تحميل جميع البيانات بنجاح');
             } catch (error) {
@@ -1212,6 +1972,61 @@
                 alert('❌ فشل الاتصال بقاعدة البيانات');
             }
         });
+
+        // تحميل بيانات المستخدم والتحية
+        async function loadUserGreeting() {
+            try {
+                const { data: { user } } = await api.supabase.auth.getUser();
+                
+                if (!user) return;
+
+                // الحصول على بيانات المستخدم من جدول users
+                const { data: userData, error } = await api.supabase
+                    .from('users')
+                    .select('full_name, avatar_url')
+                    .eq('id', user.id)
+                    .single();
+
+                if (error) {
+                    console.warn('تعذر تحميل بيانات المستخدم:', error);
+                    return;
+                }
+
+                // تحديد التحية حسب الوقت
+                const hour = new Date().getHours();
+                let greeting = '';
+                let icon = '';
+                
+                if (hour >= 5 && hour < 12) {
+                    greeting = 'صباح الخير';
+                } else if (hour >= 12 && hour < 17) {
+                    greeting = 'مساء الخير';
+                } else if (hour >= 17 && hour < 21) {
+                    greeting = 'مساء الخير';
+                } else {
+                    greeting = 'مساء الخير';
+                }
+
+                // عرض التحية مع الاسم
+                const userName = userData.full_name || user.email.split('@')[0];
+                document.getElementById('greetingText').innerHTML = `
+                    ${icon} ${greeting}، ${userName}
+                `;
+
+                // عرض الصورة الشخصية إذا كانت موجودة
+                if (userData.avatar_url) {
+                    document.getElementById('userAvatarImg').src = userData.avatar_url;
+                    document.getElementById('userAvatarImg').style.display = 'block';
+                    document.getElementById('userAvatarIcon').style.display = 'none';
+                } else {
+                    document.getElementById('userAvatarImg').style.display = 'none';
+                    document.getElementById('userAvatarIcon').style.display = 'block';
+                }
+
+            } catch (error) {
+                console.error('خطأ في تحميل بيانات المستخدم:', error);
+            }
+        }
 
         // تبديل التبويبات
         function switchTab(tabName) {
@@ -1226,7 +2041,210 @@
             // إظهار التبويب المحدد
             document.getElementById(tabName + '-tab').classList.add('active');
             event.target.closest('.tab-btn').classList.add('active');
+
+            // تحميل بيانات التبويب
+            if (tabName === 'team') {
+                loadRoles();
+                loadTeamMembers();
+                loadInvitations();
+                loadDeletedAccounts();
+            } else if (tabName === 'profile') {
+                loadUserProfile();
+            }
         }
+
+        // التنقل بين التبويبات - نسخة محسّنة
+        function scrollTabs(direction) {
+            const tabButtons = document.getElementById('tabButtons');
+            if (!tabButtons) return;
+            
+            // إضافة تأثير النبض للزر المضغوط
+            const btn = direction === 'next' ? 
+                document.getElementById('tabNextBtn') : 
+                document.getElementById('tabPrevBtn');
+            
+            if (btn && !btn.disabled) {
+                btn.classList.add('pulse');
+                setTimeout(() => btn.classList.remove('pulse'), 500);
+            }
+            
+            // حساب مقدار التمرير بناءً على عرض الحاوية
+            const containerWidth = tabButtons.clientWidth;
+            const scrollAmount = containerWidth * 0.8; // 80% من عرض الحاوية
+            
+            // التمرير السلس - معكوس للعربية (RTL)
+            if (direction === 'next') {
+                tabButtons.scrollBy({
+                    left: -scrollAmount, // معكوس للعربية
+                    behavior: 'smooth'
+                });
+            } else if (direction === 'prev') {
+                tabButtons.scrollBy({
+                    left: scrollAmount, // معكوس للعربية
+                    behavior: 'smooth'
+                });
+            }
+            
+            // تحديث حالة أزرار التنقل بعد التمرير
+            setTimeout(updateNavButtons, 300);
+        }
+
+        // تحديث حالة أزرار التنقل - نسخة محسّنة مع دعم RTL
+        function updateNavButtons() {
+            const tabButtons = document.getElementById('tabButtons');
+            const prevBtn = document.getElementById('tabPrevBtn');
+            const nextBtn = document.getElementById('tabNextBtn');
+            const wrapper = document.querySelector('.tab-buttons-wrapper');
+            
+            if (!tabButtons || !prevBtn || !nextBtn) return;
+            
+            const scrollLeft = Math.abs(tabButtons.scrollLeft); // استخدام القيمة المطلقة لدعم RTL
+            const scrollWidth = tabButtons.scrollWidth;
+            const clientWidth = tabButtons.clientWidth;
+            const maxScroll = scrollWidth - clientWidth;
+            
+            // إخفاء/إظهار الأزرار بناءً على الحاجة
+            if (scrollWidth <= clientWidth) {
+                // لا حاجة للأزرار إذا كان المحتوى يتسع
+                prevBtn.style.display = 'none';
+                nextBtn.style.display = 'none';
+                if (wrapper) {
+                    wrapper.classList.remove('show-left-fade', 'show-right-fade');
+                }
+            } else {
+                prevBtn.style.display = 'flex';
+                nextBtn.style.display = 'flex';
+                
+                // في RTL: السابق (يمين) يكون في البداية
+                // تعطيل/تفعيل زر السابق (اليمين)
+                if (scrollLeft <= 1) {
+                    prevBtn.disabled = true;
+                    prevBtn.style.opacity = '0.3';
+                    if (wrapper) wrapper.classList.remove('show-right-fade');
+                } else {
+                    prevBtn.disabled = false;
+                    prevBtn.style.opacity = '1';
+                    if (wrapper) wrapper.classList.add('show-right-fade');
+                }
+                
+                // تعطيل/تفعيل زر التالي (اليسار)
+                if (scrollLeft >= maxScroll - 1) {
+                    nextBtn.disabled = true;
+                    nextBtn.style.opacity = '0.3';
+                    if (wrapper) wrapper.classList.remove('show-left-fade');
+                } else {
+                    nextBtn.disabled = false;
+                    nextBtn.style.opacity = '1';
+                    if (wrapper) wrapper.classList.add('show-left-fade');
+                }
+            }
+        }
+
+        // دعم التمرير بالماوس (السحب)
+        function initTabsDragScroll() {
+            const tabButtons = document.getElementById('tabButtons');
+            if (!tabButtons) return;
+            
+            let isDown = false;
+            let startX;
+            let scrollLeftStart;
+            
+            tabButtons.addEventListener('mousedown', (e) => {
+                isDown = true;
+                tabButtons.style.cursor = 'grabbing';
+                startX = e.pageX - tabButtons.offsetLeft;
+                scrollLeftStart = tabButtons.scrollLeft;
+            });
+            
+            tabButtons.addEventListener('mouseleave', () => {
+                isDown = false;
+                tabButtons.style.cursor = 'grab';
+            });
+            
+            tabButtons.addEventListener('mouseup', () => {
+                isDown = false;
+                tabButtons.style.cursor = 'grab';
+            });
+            
+            tabButtons.addEventListener('mousemove', (e) => {
+                if (!isDown) return;
+                e.preventDefault();
+                const x = e.pageX - tabButtons.offsetLeft;
+                const walk = (x - startX) * 2;
+                tabButtons.scrollLeft = scrollLeftStart - walk;
+            });
+        }
+
+        // دعم التمرير بعجلة الماوس
+        function initTabsWheelScroll() {
+            const tabButtons = document.getElementById('tabButtons');
+            if (!tabButtons) return;
+            
+            tabButtons.addEventListener('wheel', (e) => {
+                if (e.deltaY !== 0) {
+                    e.preventDefault();
+                    tabButtons.scrollLeft += e.deltaY;
+                }
+            });
+        }
+
+        // دعم اللمس للأجهزة المحمولة
+        function initTabsTouchScroll() {
+            const tabButtons = document.getElementById('tabButtons');
+            if (!tabButtons) return;
+            
+            let touchStartX = 0;
+            let scrollLeftStart = 0;
+            
+            tabButtons.addEventListener('touchstart', (e) => {
+                touchStartX = e.touches[0].clientX;
+                scrollLeftStart = tabButtons.scrollLeft;
+            }, { passive: true });
+            
+            tabButtons.addEventListener('touchmove', (e) => {
+                const touchX = e.touches[0].clientX;
+                const diff = touchStartX - touchX;
+                tabButtons.scrollLeft = scrollLeftStart + diff;
+            }, { passive: true });
+        }
+
+        // مراقبة التمرير لتحديث أزرار التنقل
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabButtons = document.getElementById('tabButtons');
+            if (tabButtons) {
+                // إضافة مستمع التمرير
+                tabButtons.addEventListener('scroll', updateNavButtons);
+                
+                // تحديث الحالة الأولية
+                setTimeout(updateNavButtons, 100);
+                
+                // تحديث عند تغيير حجم النافذة
+                window.addEventListener('resize', () => {
+                    setTimeout(updateNavButtons, 100);
+                });
+                
+                // تفعيل السحب بالماوس
+                initTabsDragScroll();
+                
+                // تفعيل التمرير بعجلة الماوس
+                initTabsWheelScroll();
+                
+                // تفعيل اللمس للأجهزة المحمولة
+                initTabsTouchScroll();
+                
+                // إضافة مؤشر grab
+                tabButtons.style.cursor = 'grab';
+                
+                // دعم التنقل بلوحة المفاتيح (الأسهم) - معكوس للعربية
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'ArrowLeft') {
+                        scrollTabs('prev'); // اليسار = السابق في العربية
+                    } else if (e.key === 'ArrowRight') {
+                        scrollTabs('next'); // اليمين = التالي في العربية
+                    }
+                });
+            }
+        });
 
         // تحميل الإحصائيات
         async function loadStats() {
@@ -1243,10 +2261,44 @@
                     totalPages += pages.length;
                 }
 
-                document.getElementById('totalBooks').textContent = books.length;
-                document.getElementById('totalCategories').textContent = categories.length;
-                document.getElementById('totalPages').textContent = totalPages;
-                document.getElementById('totalMessages').textContent = messages.length;
+                // تحميل عدد الزوار
+                let totalVisitors = 0;
+                try {
+                    const { count, error: visitorsError } = await api.supabase
+                        .from('visitors')
+                        .select('*', { count: 'exact', head: true });
+                    
+                    if (!visitorsError && count !== null) {
+                        totalVisitors = count;
+                    }
+                } catch (err) {
+                    console.warn('تعذر تحميل عدد الزوار:', err);
+                }
+
+                // تحميل عدد فريق العمل
+                let totalTeam = 0;
+                try {
+                    const { count, error: teamError } = await api.supabase
+                        .from('users')
+                        .select('*', { count: 'exact', head: true })
+                        .eq('is_active', true);
+                    
+                    if (!teamError && count !== null) {
+                        totalTeam = count;
+                    }
+                } catch (err) {
+                    console.warn('تعذر تحميل عدد فريق العمل:', err);
+                }
+
+                // تنسيق الأرقام مع فواصل
+                const formatNumber = (num) => num.toLocaleString('ar-EG');
+                
+                document.getElementById('totalBooks').textContent = formatNumber(books.length);
+                document.getElementById('totalCategories').textContent = formatNumber(categories.length);
+                document.getElementById('totalPages').textContent = formatNumber(totalPages);
+                document.getElementById('totalMessages').textContent = formatNumber(messages.length);
+                document.getElementById('totalVisitors').textContent = formatNumber(totalVisitors);
+                document.getElementById('totalTeamMembers').textContent = formatNumber(totalTeam);
             } catch (error) {
                 console.error('خطأ في تحميل الإحصائيات:', error);
             }
@@ -1307,10 +2359,10 @@
             try {
                 if (currentEditingCategoryId) {
                     await api.updateCategory(currentEditingCategoryId, { name, description });
-                    alert('✅ تم تحديث القسم بنجاح');
+                    await showAlert('تم تحديث القسم بنجاح', 'success');
                 } else {
                     await api.addCategory(name, description);
-                    alert('✅ تم إضافة القسم بنجاح');
+                    await showAlert('تم إضافة القسم بنجاح', 'success');
                 }
 
                 clearCategoryForm();
@@ -1326,23 +2378,57 @@
         async function editCategory(id) {
             try {
                 const category = await api.getCategory(id);
-                if (category) {
-                    document.getElementById('categoryName').value = category.name;
-                    document.getElementById('categoryDescription').value = category.description || '';
-                    currentEditingCategoryId = id;
-                    document.querySelector('#categoryForm button[type="submit"]').innerHTML = '<i class="fas fa-save"></i> تحديث القسم';
-                }
+                if (!category) return;
+
+                // عرض نافذة التعديل
+                const result = await showEditDialog({
+                    title: 'تعديل القسم',
+                    fields: [
+                        {
+                            id: 'editCategoryName',
+                            label: 'اسم القسم',
+                            type: 'text',
+                            value: category.name,
+                            required: true,
+                            icon: 'fas fa-tag'
+                        },
+                        {
+                            id: 'editCategoryDescription',
+                            label: 'الوصف',
+                            type: 'textarea',
+                            value: category.description || '',
+                            required: false,
+                            icon: 'fas fa-align-right'
+                        }
+                    ]
+                });
+
+                if (!result) return; // ألغى المستخدم
+
+                // تحديث القسم
+                await api.updateCategory(id, {
+                    name: result.editCategoryName,
+                    description: result.editCategoryDescription
+                });
+
+                await showAlert('تم تحديث القسم بنجاح', 'success');
+                await loadCategories();
+                await loadCategoriesSelect();
+                await loadStats();
+
             } catch (error) {
-                console.error('خطأ في تحميل القسم:', error);
+                console.error('خطأ في تعديل القسم:', error);
+                await showAlert('حدث خطأ: ' + error.message, 'error');
             }
         }
 
         async function deleteCategory(id) {
-            if (!confirm('⚠️ هل أنت متأكد من حذف هذا القسم؟')) return;
+            const confirmed = await showConfirm('هل أنت متأكد من حذف هذا القسم؟', 'تأكيد حذف القسم');
+            if (!confirmed) return;
 
             try {
                 await api.deleteCategory(id);
-                alert('✅ تم حذف القسم بنجاح');
+                await showAlert('تم حذف القسم بنجاح', 'success');
                 await loadCategories();
                 await loadCategoriesSelect();
                 await loadStats();
@@ -1474,7 +2560,7 @@
                 // تحديث الكتاب برابط الصورة
                 await api.updateBook(newBook.id, { cover_image: coverUrl });
 
-                alert('✅ تم إضافة الكتاب بنجاح. يمكنك نشره من تبويب النشر.');
+                await showAlert('تم إضافة الكتاب بنجاح. يمكنك نشره من تبويب النشر.', 'success');
 
                 clearBookForm();
                 await loadBooks();
@@ -1496,36 +2582,34 @@
                     return;
                 }
 
-                // إنشاء قائمة الخيارات
-                let optionsHTML = categories.map(cat => 
-                    `<option value="${cat.id}" ${cat.id === currentCategoryId ? 'selected' : ''}>${cat.name}</option>`
+                // إنشاء قائمة الأقسام مع تحديد القسم الحالي
+                const categoriesList = categories.map((cat, index) => 
+                    `<div style="padding: 10px; margin: 5px 0; background: ${cat.id === currentCategoryId ? 'rgba(236, 176, 7, 0.1)' : '#f8f9fa'}; border-radius: 8px; cursor: pointer; border: 2px solid ${cat.id === currentCategoryId ? '#ECB007' : 'transparent'};" onclick="selectCategory('${cat.id}')">
+                        <strong>${index + 1}.</strong> ${cat.name} ${cat.id === currentCategoryId ? '<span style="color: #ECB007;">✓ (القسم الحالي)</span>' : ''}
+                    </div>`
                 ).join('');
 
                 // عرض نافذة اختيار القسم
-                const newCategoryId = prompt(
-                    'اختر القسم الجديد:\n\n' + 
-                    categories.map((cat, index) => `${index + 1}. ${cat.name}`).join('\n') + 
-                    '\n\nأدخل رقم القسم:',
-                    '1'
+                const selectedCategoryId = await showCategorySelector(
+                    `<div style="max-height: 300px; overflow-y: auto;">${categoriesList}</div>`,
+                    'اختر القسم الجديد للكتاب'
                 );
 
-                if (!newCategoryId) return; // إلغاء
+                if (!selectedCategoryId || selectedCategoryId === currentCategoryId) return;
 
-                const selectedIndex = parseInt(newCategoryId) - 1;
-                
-                if (selectedIndex < 0 || selectedIndex >= categories.length) {
-                    alert('⚠️ رقم القسم غير صحيح');
-                    return;
-                }
-
-                const selectedCategory = categories[selectedIndex];
+                const selectedCategory = categories.find(cat => cat.id === selectedCategoryId);
 
                 // تأكيد التغيير
-                if (!confirm(`هل تريد نقل الكتاب إلى قسم "${selectedCategory.name}"؟`)) return;
+                const confirmed = await showConfirm(
+                    `هل تريد نقل الكتاب إلى قسم "<strong>${selectedCategory.name}</strong>"؟`,
+                    'تأكيد تغيير القسم'
+                );
+                
+                if (!confirmed) return;
 
                 // تحديث القسم
                 await api.updateBook(bookId, { category_id: selectedCategory.id });
-                alert('✅ تم تغيير قسم الكتاب بنجاح');
+                await showAlert('تم تغيير قسم الكتاب بنجاح', 'success');
                 await loadBooks();
                 await loadBooksForPublish();
             } catch (error) {
@@ -1535,11 +2619,12 @@
         }
 
         async function deleteBook(id) {
-            if (!confirm('⚠️ هل أنت متأكد من حذف هذا الكتاب؟ سيتم حذف جميع صفحاته أيضاً.')) return;
+            const confirmed = await showConfirm('هل أنت متأكد من حذف هذا الكتاب؟<br><strong>سيتم حذف جميع صفحاته أيضاً!</strong>', 'تأكيد حذف الكتاب');
+            if (!confirmed) return;
 
             try {
                 await api.deleteBook(id);
-                alert('✅ تم حذف الكتاب بنجاح');
+                await showAlert('تم حذف الكتاب بنجاح', 'success');
                 await loadBooks();
                 await loadStats();
             } catch (error) {
@@ -1726,252 +2811,16 @@
         }
 
         async function deleteMessage(id) {
-            if (!confirm('⚠️ هل أنت متأكد من حذف هذه الرسالة؟')) return;
+            const confirmed = await showConfirm('هل أنت متأكد من حذف هذه الرسالة؟', 'تأكيد حذف الرسالة');
+            if (!confirmed) return;
 
             try {
                 await api.deleteContactMessage(id);
-                alert('✅ تم حذف الرسالة بنجاح');
+                await showAlert('تم حذف الرسالة بنجاح', 'success');
                 await loadMessages();
                 await loadStats();
             } catch (error) {
                 console.error('خطأ في حذف الرسالة:', error);
-                alert('❌ حدث خطأ: ' + error.message);
-            }
-        }
-
-        // ===================================
-        // فريق العمل (Team Management)
-        // ===================================
-
-        // إرسال دعوة
-        async function sendInvitation(event) {
-            event.preventDefault();
-
-            const email = document.getElementById('inviteEmail').value.trim();
-            const role = document.getElementById('inviteRole').value;
-
-            if (!email || !role) {
-                alert('⚠️ الرجاء إدخال جميع البيانات');
-                return;
-            }
-
-            try {
-                const invitation = await api.createInvitation(email, role);
-                
-                // إنشاء رابط الدعوة
-                const inviteLink = `${window.location.origin}/signup.html?token=${invitation.token}`;
-                
-                // عرض الرابط للإداري
-                const message = `✅ تم إنشاء الدعوة بنجاح!\n\nالرابط:\n${inviteLink}\n\nقم بإرسال هذا الرابط للشخص عبر البريد الإلكتروني.\n\nصلاحية الدعوة: 7 أيام`;
-                
-                // نسخ الرابط تلقائياً
-                try {
-                    await navigator.clipboard.writeText(inviteLink);
-                    alert(message + '\n\n✅ تم نسخ الرابط تلقائياً!');
-                } catch (err) {
-                    alert(message);
-                }
-                
-                document.getElementById('inviteForm').reset();
-                await loadInvitations();
-            } catch (error) {
-                console.error('خطأ في إرسال الدعوة:', error);
-                alert('❌ حدث خطأ: ' + error.message);
-            }
-        }
-
-        // تحميل قائمة الأعضاء
-        async function loadTeamMembers() {
-            try {
-                const users = await api.getAllUsers();
-                const container = document.getElementById('teamMembersList');
-
-                if (users.length === 0) {
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-users"></i>
-                            <h3>لا يوجد أعضاء</h3>
-                        </div>
-                    `;
-                    return;
-                }
-
-                const currentUserId = authGuard.getCurrentUser()?.id;
-
-                container.innerHTML = users.map(user => `
-                    <div class="item-card">
-                        <div class="item-info">
-                            <h3>
-                                <i class="fas fa-user"></i> ${user.full_name}
-                                ${user.id === currentUserId ? '<span style="color: #667eea; font-size: 0.8em; margin-right: 10px;">(أنت)</span>' : ''}
-                            </h3>
-                            <p>
-                                <i class="fas fa-envelope"></i> ${user.email}
-                                <span style="margin: 0 10px;">|</span>
-                                <span class="badge" style="background: ${user.role === 'admin' ? '#667eea' : '#4caf50'}; color: white;">
-                                    <i class="fas fa-shield-alt"></i> ${user.role === 'admin' ? 'إداري' : 'محرر'}
-                                </span>
-                                <span style="margin: 0 10px;">|</span>
-                                <small style="color: #999;">
-                                    <i class="fas fa-calendar"></i> ${new Date(user.created_at).toLocaleDateString('ar-EG')}
-                                </small>
-                            </p>
-                        </div>
-                        <div class="item-actions">
-                            ${user.id !== currentUserId ? `
-                                <button class="btn btn-danger btn-small" onclick="deleteTeamMember('${user.id}', '${user.full_name}')">
-                                    <i class="fas fa-trash"></i> حذف
-                                </button>
-                            ` : ''}
-                        </div>
-                    </div>
-                `).join('');
-            } catch (error) {
-                console.error('خطأ في تحميل الأعضاء:', error);
-                const container = document.getElementById('teamMembersList');
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <h3>حدث خطأ في تحميل الأعضاء</h3>
-                    </div>
-                `;
-            }
-        }
-
-        // تحميل قائمة الدعوات
-        async function loadInvitations() {
-            try {
-                const invitations = await api.getInvitations();
-                const container = document.getElementById('invitationsList');
-
-                if (invitations.length === 0) {
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-envelope"></i>
-                            <h3>لا توجد دعوات</h3>
-                            <p>قم بإضافة أعضاء جدد من النموذج أعلاه</p>
-                        </div>
-                    `;
-                    return;
-                }
-
-                container.innerHTML = invitations.map(inv => {
-                    const statusText = {
-                        'pending': 'قيد الانتظار',
-                        'accepted': 'مقبولة',
-                        'expired': 'منتهية'
-                    };
-
-                    const statusColor = {
-                        'pending': '#ff9800',
-                        'accepted': '#4caf50',
-                        'expired': '#f44336'
-                    };
-
-                    const isExpired = new Date(inv.expires_at) < new Date();
-                    const actualStatus = isExpired ? 'expired' : inv.status;
-
-                    return `
-                        <div class="item-card">
-                            <div class="item-info">
-                                <h3><i class="fas fa-envelope"></i> ${inv.email}</h3>
-                                <p>
-                                    <span class="badge" style="background: ${statusColor[actualStatus]}; color: white;">
-                                        ${statusText[actualStatus]}
-                                    </span>
-                                    <span style="margin: 0 10px;">|</span>
-                                    <span style="color: #667eea;">
-                                        <i class="fas fa-shield-alt"></i> ${inv.role === 'admin' ? 'إداري' : 'محرر'}
-                                    </span>
-                                    <span style="margin: 0 10px;">|</span>
-                                    <small style="color: #999;">
-                                        <i class="fas fa-calendar"></i> ${new Date(inv.created_at).toLocaleDateString('ar-EG')}
-                                    </small>
-                                    ${!isExpired && inv.status === 'pending' ? `
-                                        <span style="margin: 0 10px;">|</span>
-                                        <small style="color: #ff9800;">
-                                            <i class="fas fa-clock"></i> تنتهي: ${new Date(inv.expires_at).toLocaleDateString('ar-EG')}
-                                        </small>
-                                    ` : ''}
-                                </p>
-                            </div>
-                            <div class="item-actions">
-                                ${inv.status === 'pending' && !isExpired ? `
-                                    <button class="btn btn-info btn-small" onclick="copyInviteLink('${inv.token}')">
-                                        <i class="fas fa-copy"></i> نسخ الرابط
-                                    </button>
-                                    <button class="btn btn-warning btn-small" onclick="resendInvite('${inv.id}')">
-                                        <i class="fas fa-redo"></i> تجديد
-                                    </button>
-                                ` : ''}
-                                <button class="btn btn-danger btn-small" onclick="deleteInvite('${inv.id}')">
-                                    <i class="fas fa-trash"></i> حذف
-                                </button>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-            } catch (error) {
-                console.error('خطأ في تحميل الدعوات:', error);
-                const container = document.getElementById('invitationsList');
-                container.innerHTML = `
-                    <div class="empty-state">
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <h3>حدث خطأ في تحميل الدعوات</h3>
-                    </div>
-                `;
-            }
-        }
-
-        // نسخ رابط الدعوة
-        async function copyInviteLink(token) {
-            const link = `${window.location.origin}/signup.html?token=${token}`;
-            try {
-                await navigator.clipboard.writeText(link);
-                alert('✅ تم نسخ الرابط!\n\n' + link);
-            } catch (err) {
-                prompt('انسخ هذا الرابط:', link);
-            }
-        }
-
-        // إعادة إرسال دعوة (تجديد)
-        async function resendInvite(invitationId) {
-            if (!confirm('هل تريد تجديد هذه الدعوة؟\nسيتم تمديد صلاحيتها لـ 7 أيام إضافية.')) return;
-
-            try {
-                await api.resendInvitation(invitationId);
-                alert('✅ تم تجديد الدعوة بنجاح');
-                await loadInvitations();
-            } catch (error) {
-                console.error('خطأ في إعادة الإرسال:', error);
-                alert('❌ حدث خطأ: ' + error.message);
-            }
-        }
-
-        // حذف دعوة
-        async function deleteInvite(invitationId) {
-            if (!confirm('هل تريد حذف هذه الدعوة؟')) return;
-
-            try {
-                await api.deleteInvitation(invitationId);
-                alert('✅ تم حذف الدعوة');
-                await loadInvitations();
-            } catch (error) {
-                console.error('خطأ في حذف الدعوة:', error);
-                alert('❌ حدث خطأ: ' + error.message);
-            }
-        }
-
-        // حذف عضو
-        async function deleteTeamMember(userId, userName) {
-            if (!confirm(`⚠️ هل أنت متأكد من حذف ${userName} من فريق العمل؟\n\nسيتم حذف جميع بياناته ولن يتمكن من الوصول للوحة التحكم.`)) return;
-
-            try {
-                await api.deleteUser(userId);
-                alert('✅ تم حذف العضو بنجاح');
-                await loadTeamMembers();
-            } catch (error) {
-                console.error('خطأ في حذف العضو:', error);
                 alert('❌ حدث خطأ: ' + error.message);
             }
         }
@@ -2010,7 +2859,7 @@
                         <div class="item-actions">
                             ${book.published ? 
                                 `<button class="btn btn-warning btn-small" onclick="togglePublish('${book.id}', false)">
-                                    <i class="fas fa-eye-slash"></i> إلغاء النشر
+                                    إلغاء النشر
                                 </button>` :
                                 `<button class="btn btn-success btn-small" onclick="togglePublish('${book.id}', true)">
                                     <i class="fas fa-globe"></i> نشر الكتاب
@@ -2117,7 +2966,7 @@
                         </div>
                         <div class="item-actions">
                             <button class="btn btn-info btn-small" onclick="previewPage('${page.id}', ${index + 1}, \`${page.content.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`)">
-                                <i class="fas fa-eye"></i> معاينة
+                                معاينة
                             </button>
                             <button class="btn btn-warning btn-small" onclick="editPage('${page.id}', \`${page.content.replace(/`/g, '\\`').replace(/\$/g, '\\$')}\`)">
                                 <i class="fas fa-edit"></i> تعديل
@@ -2201,13 +3050,35 @@
         }
 
         // تعديل صفحة
-        function editPage(pageId, content) {
-            currentEditingPageId = pageId;
-            document.getElementById('pageContent').value = content;
-            document.querySelector('#pageForm button[type="submit"]').innerHTML = '<i class="fas fa-save"></i> تحديث الصفحة';
-            
-            // التمرير للنموذج
-            document.getElementById('pageForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        async function editPage(pageId, content) {
+            try {
+                // عرض نافذة التعديل
+                const result = await showEditDialog({
+                    title: 'تعديل الصفحة',
+                    fields: [
+                        {
+                            id: 'editPageContent',
+                            label: 'محتوى الصفحة',
+                            type: 'textarea',
+                            value: content,
+                            required: true,
+                            icon: 'fas fa-align-right',
+                            placeholder: 'اكتب محتوى الصفحة هنا... يمكنك استخدام HTML'
+                        }
+                    ]
+                });
+
+                if (!result) return;
+
+                // تحديث الصفحة
+                await api.updatePage(pageId, result.editPageContent);
+                await showAlert('تم تحديث الصفحة بنجاح', 'success');
+                await loadBookPages();
+
+            } catch (error) {
+                console.error('خطأ في تعديل الصفحة:', error);
+                await showAlert('حدث خطأ: ' + error.message, 'error');
+            }
         }
 
         // تحريك صفحة لأعلى
@@ -2268,11 +3139,12 @@
 
         // حذف صفحة
         async function deletePage(pageId) {
-            if (!confirm('⚠️ هل أنت متأكد من حذف هذه الصفحة؟')) return;
+            const confirmed = await showConfirm('هل أنت متأكد من حذف هذه الصفحة؟', 'تأكيد حذف الصفحة');
+            if (!confirmed) return;
 
             try {
                 await api.deletePage(pageId);
-                alert('✅ تم حذف الصفحة بنجاح');
+                await showAlert('تم حذف الصفحة بنجاح', 'success');
                 await loadBookPages();
                 await loadStats();
             } catch (error) {
@@ -2384,25 +3256,52 @@
         }
 
         // تعديل جزء
-        function editPart(partId, partNumber) {
-            currentEditingPartId = partId;
-            document.getElementById('partNumber').value = partNumber;
-            document.querySelector('#partForm button[type="submit"]').innerHTML = '<i class="fas fa-save"></i> تحديث الجزء';
-            
-            document.getElementById('partForm').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        async function editPart(partId, partNumber) {
+            try {
+                // عرض نافذة التعديل
+                const result = await showEditDialog({
+                    title: 'تعديل الجزء',
+                    fields: [
+                        {
+                            id: 'editPartNumber',
+                            label: 'رقم الجزء',
+                            type: 'number',
+                            value: partNumber,
+                            required: true,
+                            icon: 'fas fa-hashtag'
+                        }
+                    ]
+                });
+
+                if (!result) return;
+
+                // تحديث الجزء
+                await api.updatePart(partId, { part_number: parseInt(result.editPartNumber) });
+                await showAlert('تم تحديث الجزء بنجاح', 'success');
+                await loadBookParts();
+
+            } catch (error) {
+                console.error('خطأ في تعديل الجزء:', error);
+                await showAlert('حدث خطأ: ' + error.message, 'error');
+            }
         }
 
         // حذف جزء
         async function deletePart(partId) {
-            if (!confirm('⚠️ هل أنت متأكد من حذف هذا الجزء؟ سيتم فك ارتباط صفحاته من الجزء.')) return;
+            const confirmed = await showConfirm(
+                'هل أنت متأكد من حذف هذا الجزء؟<br>سيتم فك ارتباط صفحاته من الجزء.',
+                'تأكيد حذف الجزء'
+            );
+            
+            if (!confirmed) return;
 
             try {
                 await api.deletePart(partId);
-                alert('✅ تم حذف الجزء بنجاح');
+                await showAlert('تم حذف الجزء بنجاح', 'success');
                 await loadBookParts();
             } catch (error) {
                 console.error('خطأ في حذف الجزء:', error);
-                alert('❌ حدث خطأ: ' + error.message);
+                await showAlert('حدث خطأ: ' + error.message, 'error');
             }
         }
 
@@ -2453,6 +3352,1052 @@
             await loadBookPages();
         }
 
+        // ===================================
+        // إدارة فريق العمل
+        // ===================================
+
+        // تحميل الأدوار
+        async function loadRoles() {
+            try {
+                const roles = await api.getAllRoles();
+                const roleSelect = document.getElementById('invitationRole');
+                
+                roleSelect.innerHTML = '<option value="">اختر الدور...</option>' +
+                    roles.map(role => `<option value="${role.id}">${role.display_name}</option>`).join('');
+            } catch (error) {
+                console.error('خطأ في تحميل الأدوار:', error);
+            }
+        }
+
+        // تحميل أعضاء الفريق
+        async function loadTeamMembers() {
+            try {
+                const users = await api.getAllUsers();
+                const container = document.getElementById('teamMembersList');
+
+                if (users.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-users"></i>
+                            <h3>لا يوجد أعضاء</h3>
+                            <p>ابدأ بدعوة أعضاء جدد للفريق</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = users.map(user => {
+                    const roleClass = user.user_roles?.name === 'admin' ? 'badge-success' : 'badge-info';
+                    const statusClass = user.is_active ? 'badge-success' : 'badge-warning';
+                    const lastLogin = user.last_login ? new Date(user.last_login).toLocaleDateString('ar-EG') : 'لم يسجل دخول بعد';
+                    
+                    return `
+                        <div class="item-card">
+                            <div class="item-info">
+                                <h3>${user.full_name || user.email}</h3>
+                                <p>
+                                    <i class="fas fa-envelope"></i> ${user.email}<br>
+                                    <i class="fas fa-user-tag"></i> <span class="badge ${roleClass}">${user.user_roles?.display_name || 'غير محدد'}</span>
+                                    <span class="badge ${statusClass}">${user.is_active ? 'نشط' : 'غير نشط'}</span><br>
+                                    <i class="fas fa-clock"></i> آخر دخول: ${lastLogin}
+                                </p>
+                            </div>
+                            <div class="item-actions">
+                                ${authGuard.isAdmin() && user.id !== authGuard.getCurrentUser()?.id ? `
+                                    <button class="btn btn-small btn-warning" onclick="toggleUserStatus('${user.id}', ${!user.is_active})">
+                                        <i class="fas fa-${user.is_active ? 'ban' : 'check'}"></i>
+                                        ${user.is_active ? 'تعطيل' : 'تفعيل'}
+                                    </button>
+                                    <button class="btn btn-small btn-danger" onclick="deleteTeamMember('${user.id}')">
+                                        <i class="fas fa-trash"></i> حذف
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error('خطأ في تحميل أعضاء الفريق:', error);
+                document.getElementById('teamMembersList').innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h3>حدث خطأ</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // تحميل الدعوات
+        async function loadInvitations() {
+            try {
+                const invitations = await api.getAllInvitations();
+                const container = document.getElementById('invitationsList');
+
+                if (invitations.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-envelope-open-text"></i>
+                            <h3>لا توجد دعوات</h3>
+                            <p>لم يتم إرسال أي دعوات بعد</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = invitations.map(inv => {
+                    const statusBadge = {
+                        'pending': '<span class="badge badge-warning">قيد الانتظار</span>',
+                        'accepted': '<span class="badge badge-success">مقبولة</span>',
+                        'expired': '<span class="badge" style="background: #fee; color: #c33;">منتهية</span>'
+                    }[inv.status] || inv.status;
+
+                    const expiresAt = new Date(inv.expires_at).toLocaleDateString('ar-EG');
+                    const invitedBy = inv.invited_by_user?.full_name || inv.invited_by_user?.email || 'غير معروف';
+                    
+                    return `
+                        <div class="item-card">
+                            <div class="item-info">
+                                <h3>${inv.email}</h3>
+                                <p>
+                                    <i class="fas fa-user-tag"></i> ${inv.user_roles?.display_name || 'غير محدد'}<br>
+                                    <i class="fas fa-user"></i> دعوة من: ${invitedBy}<br>
+                                    <i class="fas fa-calendar"></i> تنتهي في: ${expiresAt}<br>
+                                    ${statusBadge}
+                                </p>
+                            </div>
+                            <div class="item-actions">
+                                ${inv.status === 'pending' ? `
+                                    <button class="btn btn-small btn-info" onclick="copyInvitationLink('${inv.token}')">
+                                        <i class="fas fa-copy"></i> نسخ الرابط
+                                    </button>
+                                    <button class="btn btn-small btn-success" onclick="resendInvitation('${inv.id}')">
+                                        <i class="fas fa-paper-plane"></i> إعادة إرسال
+                                    </button>
+                                    <button class="btn btn-small btn-danger" onclick="deleteInvitation('${inv.id}')">
+                                        <i class="fas fa-trash"></i> حذف
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error('خطأ في تحميل الدعوات:', error);
+                document.getElementById('invitationsList').innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h3>حدث خطأ</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // إرسال دعوة
+        async function sendInvitation(event) {
+            event.preventDefault();
+
+            if (!authGuard.isAdmin()) {
+                alert('⚠️ هذه الميزة متاحة للإداريين فقط');
+                return;
+            }
+
+            const email = document.getElementById('invitationEmail').value.trim();
+            const roleId = document.getElementById('invitationRole').value;
+
+            if (!email || !roleId) {
+                alert('⚠️ الرجاء ملء جميع الحقول');
+                return;
+            }
+
+            try {
+                // 1. إنشاء الدعوة في قاعدة البيانات
+                const result = await api.createInvitation(email, roleId);
+
+                if (!result.success) {
+                    throw new Error(result.error);
+                }
+
+                console.log('✅ تم إنشاء الدعوة بنجاح');
+
+                // 2. محاولة إرسال البريد الإلكتروني تلقائياً
+                console.log('🔄 محاولة إرسال البريد الإلكتروني...');
+                const emailResult = await api.sendInvitationEmail(result.data.id);
+
+                // إنشاء رابط الدعوة
+                const invitationLink = emailResult.invitationLink || 
+                    `${window.location.origin}/signup.html?token=${result.data.token}`;
+
+                if (emailResult.success) {
+                    // ✅ نجح إرسال البريد فعلياً
+                    console.log('✅ تم إرسال البريد بنجاح');
+                    alert(`✅ تم إرسال الدعوة بنجاح إلى ${email}\n\n📧 تحقق من صندوق الوارد (أو البريد المزعج)`);
+                } else {
+                    // 📋 الوضع اليدوي - الرابط جاهز
+                    console.log('📋 الوضع اليدوي:', emailResult.error);
+                    
+                    // نسخ الرابط تلقائياً
+                    try {
+                        await navigator.clipboard.writeText(invitationLink);
+                        console.log('📋 تم نسخ الرابط إلى الحافظة');
+                    } catch (clipboardError) {
+                        console.warn('فشل النسخ التلقائي:', clipboardError);
+                    }
+                    
+                    // رسالة واضحة للمستخدم
+                    alert(`✅ تم إنشاء الدعوة بنجاح!\n\n` +
+                          `📋 تم نسخ رابط الدعوة. أرسله للشخص المدعو:\n\n` +
+                          `📧 ${email}\n\n` +
+                          `🔗 ${invitationLink}\n\n` +
+                          `💡 يمكنك إرساله عبر WhatsApp أو Telegram أو أي وسيلة أخرى`);
+                }
+
+                clearInvitationForm();
+                await loadInvitations();
+            } catch (error) {
+                console.error('خطأ في إرسال الدعوة:', error);
+                alert('❌ حدث خطأ: ' + error.message);
+            }
+        }
+
+        // نسخ رابط الدعوة
+        async function copyInvitationLink(token) {
+            try {
+                const invitationLink = `${window.location.origin}/signup.html?token=${token}`;
+                await navigator.clipboard.writeText(invitationLink);
+                alert('✅ تم نسخ رابط الدعوة بنجاح!');
+            } catch (error) {
+                console.error('خطأ في نسخ الرابط:', error);
+                alert('❌ فشل نسخ الرابط');
+            }
+        }
+
+        // إعادة إرسال دعوة
+        async function resendInvitation(invitationId) {
+            try {
+                const result = await api.sendInvitationEmail(invitationId);
+                
+                if (result.success) {
+                    alert('✅ تم إعادة إرسال الدعوة بنجاح!');
+                } else {
+                    alert('⚠️ تم إنشاء الدعوة ولكن فشل إرسال البريد. يمكنك نسخ الرابط وإرساله يدوياً.');
+                }
+            } catch (error) {
+                console.error('خطأ في إعادة إرسال الدعوة:', error);
+                alert('❌ حدث خطأ: ' + error.message);
+            }
+        }
+
+        // حذف دعوة
+        async function deleteInvitation(invitationId) {
+            const confirmed = await showConfirm('هل أنت متأكد من حذف هذه الدعوة؟', 'تأكيد حذف الدعوة');
+            if (!confirmed) return;
+
+            try {
+                await api.deleteInvitation(invitationId);
+                await showAlert('تم حذف الدعوة بنجاح', 'success');
+                await loadInvitations();
+            } catch (error) {
+                console.error('خطأ في حذف الدعوة:', error);
+                alert('❌ حدث خطأ: ' + error.message);
+            }
+        }
+
+        // تبديل حالة المستخدم (تفعيل/تعطيل)
+        async function toggleUserStatus(userId, newStatus) {
+            const action = newStatus ? 'تفعيل' : 'تعطيل';
+            const confirmed = await showConfirm(`هل أنت متأكد من ${action} هذا المستخدم؟`, `تأكيد ${action} المستخدم`);
+            if (!confirmed) return;
+
+            try {
+                await api.updateUser(userId, { is_active: newStatus });
+                alert(`✅ تم ${action} المستخدم بنجاح`);
+                await loadTeamMembers();
+            } catch (error) {
+                console.error('خطأ في تحديث حالة المستخدم:', error);
+                alert('❌ حدث خطأ: ' + error.message);
+            }
+        }
+
+        // حذف عضو من الفريق
+        async function deleteTeamMember(userId) {
+            const confirmed = await showConfirm('هل أنت متأكد من حذف هذا العضو؟<br><br><strong>سيتم:</strong><br>• حذف الحساب<br>• حذف دعوته من الدعوات المرسلة<br>• نقل بياناته إلى الحسابات المحذوفة', 'تأكيد حذف العضو');
+            if (!confirmed) return;
+
+            const reason = await showPrompt('أدخل سبب الحذف (اختياري):', 'سبب الحذف', '');
+
+            try {
+                const result = await api.deleteUserWithArchive(userId, reason);
+                
+                let message = '✅ تم حذف العضو بنجاح\n\n';
+                if (result.deleted_user) {
+                    message += `📧 البريد: ${result.deleted_user.email}\n`;
+                    if (result.deleted_user.full_name) {
+                        message += `👤 الاسم: ${result.deleted_user.full_name}\n`;
+                    }
+                }
+                if (result.deleted_invitations_count > 0) {
+                    message += `🗑️ تم حذف ${result.deleted_invitations_count} دعوة مرتبطة`;
+                }
+                
+                alert(message);
+                await loadTeamMembers();
+                await loadInvitations();
+                await loadDeletedAccounts();
+            } catch (error) {
+                console.error('خطأ في حذف العضو:', error);
+                alert('❌ حدث خطأ: ' + error.message);
+            }
+        }
+
+        // مسح نموذج الدعوة
+        function clearInvitationForm() {
+            document.getElementById('invitationForm').reset();
+        }
+
+        // تحميل الحسابات المحذوفة
+        async function loadDeletedAccounts() {
+            try {
+                const accounts = await api.getDeletedAccounts();
+                const container = document.getElementById('deletedAccountsList');
+
+                if (accounts.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-trash-restore"></i>
+                            <h3>لا توجد حسابات محذوفة</h3>
+                            <p>لم يتم حذف أي حسابات بعد</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = accounts.map(account => {
+                    const deletedAt = new Date(account.deleted_at).toLocaleString('ar-EG');
+                    const deletedBy = account.deleted_by_user?.full_name || account.deleted_by_user?.email || 'غير معروف';
+                    
+                    return `
+                        <div class="item-card" style="background: #fff5f5; border-left: 4px solid #f44336;">
+                            <div class="item-info">
+                                <h3>${account.full_name || account.email}</h3>
+                                <p>
+                                    <i class="fas fa-envelope"></i> ${account.email}<br>
+                                    <i class="fas fa-user-tag"></i> <span class="badge badge-secondary">${account.role_display_name || 'غير محدد'}</span><br>
+                                    <i class="fas fa-user-shield"></i> حذف بواسطة: ${deletedBy}<br>
+                                    <i class="fas fa-calendar-times"></i> تاريخ الحذف: ${deletedAt}
+                                    ${account.deletion_reason ? `<br><i class="fas fa-comment"></i> السبب: ${account.deletion_reason}` : ''}
+                                    ${account.full_name ? `<br><i class="fas fa-envelope-open"></i> ${account.full_name}` : ''}
+                                </p>
+                            </div>
+                            <div class="item-actions">
+                                <button class="btn btn-small btn-danger" onclick="permanentlyDeleteAccount('${account.id}', '${account.full_name || account.email}')">
+                                    <i class="fas fa-trash-alt"></i> حذف نهائي
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (error) {
+                console.error('خطأ في تحميل الحسابات المحذوفة:', error);
+                document.getElementById('deletedAccountsList').innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <h3>حدث خطأ</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // حذف حساب محذوف نهائياً
+        async function permanentlyDeleteAccount(accountId, email) {
+            const confirmed = await showConfirm(`<strong>تحذير: حذف نهائي!</strong><br><br>هل أنت متأكد من حذف حساب "<strong>${email}</strong>" نهائياً؟<br><br>⚠️ <strong>لن يمكن استرجاع البيانات بعد ذلك!</strong>`, 'تأكيد الحذف النهائي');
+            if (!confirmed) return;
+
+            try {
+                await api.permanentlyDeleteAccount(accountId);
+                alert('✅ تم الحذف النهائي بنجاح');
+                await loadDeletedAccounts();
+            } catch (error) {
+                console.error('خطأ في الحذف النهائي:', error);
+                alert('❌ حدث خطأ: ' + error.message);
+            }
+        }
+
+        // ==================== دوال الملف الشخصي ====================
+
+        // تحميل بيانات الملف الشخصي
+        async function loadUserProfile() {
+            try {
+                const { data: { user } } = await api.supabase.auth.getUser();
+                
+                if (!user) {
+                    alert('❌ لم يتم العثور على بيانات المستخدم');
+                    return;
+                }
+
+                // الحصول على بيانات المستخدم من جدول users
+                const { data: userData, error } = await api.supabase
+                    .from('users')
+                    .select('*, user_roles(display_name)')
+                    .eq('id', user.id)
+                    .single();
+
+                if (error) throw error;
+
+                // ملء البيانات في الحقول
+                document.getElementById('profileUserName').textContent = userData.full_name || user.email;
+                document.getElementById('profileUserEmail').textContent = user.email;
+                document.getElementById('profileUserRole').textContent = userData.user_roles?.display_name || 'مستخدم';
+                
+                document.getElementById('profileFullName').value = userData.full_name || '';
+                document.getElementById('profileEmail').value = user.email;
+                
+                // عرض الصورة الشخصية إذا كانت موجودة
+                if (userData.avatar_url) {
+                    document.getElementById('profileAvatarImg').src = userData.avatar_url;
+                    document.getElementById('profileAvatarImg').style.display = 'block';
+                    document.getElementById('profileAvatarIcon').style.display = 'none';
+                } else {
+                    document.getElementById('profileAvatarImg').style.display = 'none';
+                    document.getElementById('profileAvatarIcon').style.display = 'block';
+                }
+
+            } catch (error) {
+                console.error('خطأ في تحميل الملف الشخصي:', error);
+                alert('❌ حدث خطأ في تحميل البيانات: ' + error.message);
+            }
+        }
+
+        // تحديث الملف الشخصي
+        async function updateProfile(event) {
+            event.preventDefault();
+
+            try {
+                const { data: { user } } = await api.supabase.auth.getUser();
+                
+                if (!user) {
+                    alert('❌ لم يتم العثور على بيانات المستخدم');
+                    return;
+                }
+
+                const fullName = document.getElementById('profileFullName').value.trim();
+                const avatarFile = document.getElementById('profileAvatar').files[0];
+                
+                let avatarUrl = null;
+
+                // رفع الصورة إذا تم اختيار صورة جديدة
+                if (avatarFile) {
+                    // التحقق من حجم الملف (2MB)
+                    if (avatarFile.size > 2 * 1024 * 1024) {
+                        alert('❌ حجم الصورة يجب أن يكون أقل من 2MB');
+                        return;
+                    }
+
+                    // التحقق من نوع الملف
+                    if (!avatarFile.type.startsWith('image/')) {
+                        alert('❌ يجب اختيار ملف صورة');
+                        return;
+                    }
+
+                    // رفع الصورة إلى Supabase Storage
+                    const fileExt = avatarFile.name.split('.').pop();
+                    const fileName = `${user.id}-${Date.now()}.${fileExt}`;
+                    const filePath = `avatars/${fileName}`;
+
+                    const { error: uploadError } = await api.supabase.storage
+                        .from('user-avatars')
+                        .upload(filePath, avatarFile, {
+                            cacheControl: '3600',
+                            upsert: false
+                        });
+
+                    if (uploadError) throw uploadError;
+
+                    // الحصول على رابط الصورة
+                    const { data: urlData } = api.supabase.storage
+                        .from('user-avatars')
+                        .getPublicUrl(filePath);
+
+                    avatarUrl = urlData.publicUrl;
+                }
+
+                // تحديث البيانات في جدول users
+                const updateData = {
+                    full_name: fullName,
+                    updated_at: new Date().toISOString()
+                };
+
+                if (avatarUrl) {
+                    updateData.avatar_url = avatarUrl;
+                }
+
+                const { error } = await api.supabase
+                    .from('users')
+                    .update(updateData)
+                    .eq('id', user.id);
+
+                if (error) throw error;
+
+                await showAlert('تم تحديث الملف الشخصي بنجاح', 'success');
+                await loadUserProfile();
+
+            } catch (error) {
+                console.error('خطأ في تحديث الملف الشخصي:', error);
+                alert('❌ حدث خطأ: ' + error.message);
+            }
+        }
+
+        // تغيير كلمة المرور
+        async function changePassword(event) {
+            event.preventDefault();
+
+            const currentPassword = document.getElementById('currentPassword').value;
+            const newPassword = document.getElementById('newPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            // التحقق من تطابق كلمة المرور الجديدة
+            if (newPassword !== confirmPassword) {
+                alert('❌ كلمة المرور الجديدة غير متطابقة');
+                return;
+            }
+
+            // التحقق من طول كلمة المرور
+            if (newPassword.length < 6) {
+                alert('❌ يجب أن تكون كلمة المرور 6 أحرف على الأقل');
+                return;
+            }
+
+            try {
+                // تحديث كلمة المرور
+                const { error } = await api.supabase.auth.updateUser({
+                    password: newPassword
+                });
+
+                if (error) throw error;
+
+                await showAlert('تم تغيير كلمة المرور بنجاح', 'success');
+                clearPasswordForm();
+
+            } catch (error) {
+                console.error('خطأ في تغيير كلمة المرور:', error);
+                alert('❌ حدث خطأ: ' + error.message);
+            }
+        }
+
+        // مسح نموذج كلمة المرور
+        function clearPasswordForm() {
+            document.getElementById('passwordForm').reset();
+        }
+
+        // معالجة اختيار الملف وعرض المعاينة
+        function handleFileSelect(event, previewId) {
+            const file = event.target.files[0];
+            const preview = document.getElementById(previewId);
+            
+            if (!file) {
+                preview.classList.remove('active');
+                return;
+            }
+
+            // التحقق من نوع الملف
+            if (!file.type.startsWith('image/')) {
+                alert('❌ يجب اختيار ملف صورة');
+                event.target.value = '';
+                preview.classList.remove('active');
+                return;
+            }
+
+            // التحقق من حجم الملف (5MB)
+            if (file.size > 5 * 1024 * 1024) {
+                alert('❌ حجم الصورة يجب أن يكون أقل من 5MB');
+                event.target.value = '';
+                preview.classList.remove('active');
+                return;
+            }
+
+            // عرض معاينة الصورة
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const img = preview.querySelector('.file-preview-image');
+                const nameEl = preview.querySelector('.file-preview-name');
+                const sizeEl = preview.querySelector('.file-preview-size');
+                
+                img.src = e.target.result;
+                nameEl.textContent = file.name;
+                sizeEl.textContent = formatFileSize(file.size);
+                preview.classList.add('active');
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // إزالة الملف المحدد
+        function removeFile(inputId, previewId) {
+            const input = document.getElementById(inputId);
+            const preview = document.getElementById(previewId);
+            
+            input.value = '';
+            preview.classList.remove('active');
+        }
+
+        // تنسيق حجم الملف
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+        }
+
+        // تفعيل السحب والإفلات لجميع حقول رفع الصور
+        document.addEventListener('DOMContentLoaded', function() {
+            const fileLabels = document.querySelectorAll('.file-upload-label');
+            
+            fileLabels.forEach(label => {
+                const inputId = label.getAttribute('for');
+                const input = document.getElementById(inputId);
+                
+                if (!input) return;
+                
+                // منع السلوك الافتراضي
+                ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                    label.addEventListener(eventName, preventDefaults, false);
+                });
+                
+                function preventDefaults(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+                
+                // تأثيرات بصرية عند السحب
+                ['dragenter', 'dragover'].forEach(eventName => {
+                    label.addEventListener(eventName, () => {
+                        label.style.borderColor = '#f5c842';
+                        label.style.background = 'linear-gradient(135deg, rgba(236, 176, 7, 0.15) 0%, rgba(245, 200, 66, 0.2) 100%)';
+                        label.style.transform = 'scale(1.02)';
+                    });
+                });
+                
+                ['dragleave', 'drop'].forEach(eventName => {
+                    label.addEventListener(eventName, () => {
+                        label.style.borderColor = '#ECB007';
+                        label.style.background = 'linear-gradient(135deg, rgba(236, 176, 7, 0.05) 0%, rgba(245, 200, 66, 0.1) 100%)';
+                        label.style.transform = 'scale(1)';
+                    });
+                });
+                
+                // معالجة الإفلات
+                label.addEventListener('drop', function(e) {
+                    const files = e.dataTransfer.files;
+                    if (files.length > 0) {
+                        input.files = files;
+                        input.dispatchEvent(new Event('change', { bubbles: true }));
+                    }
+                });
+            });
+        });
+
+        // معاينة الصورة قبل الرفع (للصورة الشخصية في الهيدر)
+        function previewAvatar(event) {
+            const file = event.target.files[0];
+            
+            if (!file) return;
+
+            // عرض الصورة في الهيدر مباشرة
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const headerImg = document.getElementById('userAvatarImg');
+                const headerIcon = document.getElementById('userAvatarIcon');
+                const profileImg = document.getElementById('profileAvatarImg');
+                const profileIcon = document.getElementById('profileAvatarIcon');
+                
+                if (headerImg) {
+                    headerImg.src = e.target.result;
+                    headerImg.style.display = 'block';
+                    if (headerIcon) headerIcon.style.display = 'none';
+                }
+                
+                if (profileImg) {
+                    profileImg.src = e.target.result;
+                    profileImg.style.display = 'block';
+                    if (profileIcon) profileIcon.style.display = 'none';
+                }
+            };
+            reader.readAsDataURL(file);
+        }
+
+        // تسجيل الخروج
+        async function logout() {
+            const confirmed = await showConfirm('هل تريد تسجيل الخروج؟', 'تأكيد تسجيل الخروج');
+            if (!confirmed) return;
+
+            try {
+                await api.signOut();
+                window.location.href = 'login.html';
+            } catch (error) {
+                console.error('خطأ في تسجيل الخروج:', error);
+                await showAlert('حدث خطأ أثناء تسجيل الخروج', 'error');
+            }
+        }
+
+        // تأكيد حذف الحساب
+        async function confirmDeleteAccount() {
+            const confirmation = await showPrompt(
+                '⚠️ <strong>تحذير: حذف الحساب نهائياً!</strong><br><br>هذا الإجراء لا يمكن التراجع عنه. سيتم حذف جميع بياناتك.<br><br>للتأكيد، اكتب "حذف الحساب" في المربع أدناه:',
+                'تأكيد حذف الحساب'
+            );
+
+            if (confirmation !== 'حذف الحساب') {
+                if (confirmation !== null) {
+                    await showAlert('تم إلغاء العملية', 'info');
+                }
+                return;
+            }
+
+            try {
+                const { data: { user } } = await api.supabase.auth.getUser();
+                
+                if (!user) {
+                    alert('❌ لم يتم العثور على بيانات المستخدم');
+                    return;
+                }
+
+                // حذف الحساب (سيتم نقله إلى deleted_accounts)
+                const { error } = await api.supabase
+                    .from('users')
+                    .update({
+                        deleted_at: new Date().toISOString(),
+                        deleted_by: user.id
+                    })
+                    .eq('id', user.id);
+
+                if (error) throw error;
+
+                await showAlert('تم حذف الحساب بنجاح. سيتم تسجيل خروجك الآن.', 'success');
+                
+                // تسجيل الخروج
+                await api.supabase.auth.signOut();
+                window.location.href = 'login.html';
+
+            } catch (error) {
+                console.error('خطأ في حذف الحساب:', error);
+                alert('❌ حدث خطأ: ' + error.message);
+            }
+        }
+
+    </script>
+
+    <!-- Custom Dialog -->
+    <div id="customDialogOverlay" class="custom-dialog-overlay" onclick="closeCustomDialog()">
+        <div class="custom-dialog" onclick="event.stopPropagation()">
+            <div id="customDialogHeader" class="custom-dialog-header">
+                <i id="customDialogIcon" class="custom-dialog-icon"></i>
+                <h3 id="customDialogTitle" class="custom-dialog-title"></h3>
+            </div>
+            <div id="customDialogBody" class="custom-dialog-body"></div>
+            <div id="customDialogFooter" class="custom-dialog-footer"></div>
+        </div>
+    </div>
+
+    <footer>
+        <p> جميع الحقوق محفوظة للإخبارية الجُدد <span id="currentYear"></span> © </p>
+    </footer>
+
+    <script>
+        // تحديث السنة تلقائياً
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+
+        // ===================================
+        // دوال النوافذ المنبثقة المخصصة
+        // ===================================
+
+        let dialogResolve = null;
+
+        // إغلاق النافذة
+        function closeCustomDialog() {
+            const overlay = document.getElementById('customDialogOverlay');
+            overlay.classList.remove('active');
+            if (dialogResolve) {
+                dialogResolve(null);
+                dialogResolve = null;
+            }
+        }
+
+        // نافذة تنبيه (Alert)
+        function showAlert(message, type = 'info') {
+            return new Promise((resolve) => {
+                const overlay = document.getElementById('customDialogOverlay');
+                const header = document.getElementById('customDialogHeader');
+                const icon = document.getElementById('customDialogIcon');
+                const title = document.getElementById('customDialogTitle');
+                const body = document.getElementById('customDialogBody');
+                const footer = document.getElementById('customDialogFooter');
+
+                // تحديد النوع والأيقونة
+                let iconClass, titleText, headerClass;
+                switch(type) {
+                    case 'success':
+                        iconClass = 'fas fa-check-circle';
+                        titleText = 'نجح';
+                        headerClass = 'success';
+                        break;
+                    case 'error':
+                        iconClass = 'fas fa-times-circle';
+                        titleText = 'خطأ';
+                        headerClass = 'error';
+                        break;
+                    case 'warning':
+                        iconClass = 'fas fa-exclamation-triangle';
+                        titleText = 'تحذير';
+                        headerClass = 'warning';
+                        break;
+                    default:
+                        iconClass = 'fas fa-info-circle';
+                        titleText = 'معلومة';
+                        headerClass = '';
+                }
+
+                // تعيين المحتوى
+                header.className = 'custom-dialog-header ' + headerClass;
+                icon.className = 'custom-dialog-icon ' + iconClass;
+                title.textContent = titleText;
+                body.innerHTML = message;
+                
+                // إنشاء زر الإغلاق
+                footer.innerHTML = `
+                    <button class="dialog-btn dialog-btn-primary" onclick="closeCustomDialog()">
+                        <i class="fas fa-check"></i> حسناً
+                    </button>
+                `;
+
+                overlay.classList.add('active');
+                dialogResolve = resolve;
+            });
+        }
+
+        // نافذة تأكيد (Confirm)
+        function showConfirm(message, title = 'تأكيد') {
+            return new Promise((resolve) => {
+                const overlay = document.getElementById('customDialogOverlay');
+                const header = document.getElementById('customDialogHeader');
+                const icon = document.getElementById('customDialogIcon');
+                const titleEl = document.getElementById('customDialogTitle');
+                const body = document.getElementById('customDialogBody');
+                const footer = document.getElementById('customDialogFooter');
+
+                // تعيين المحتوى
+                header.className = 'custom-dialog-header warning';
+                icon.className = 'custom-dialog-icon fas fa-question-circle';
+                titleEl.textContent = title;
+                body.innerHTML = message;
+                
+                // إنشاء الأزرار
+                footer.innerHTML = `
+                    <button class="dialog-btn dialog-btn-secondary" onclick="closeCustomDialog()">
+                        <i class="fas fa-times"></i> إلغاء
+                    </button>
+                    <button class="dialog-btn dialog-btn-primary" onclick="confirmDialog(true)">
+                        <i class="fas fa-check"></i> تأكيد
+                    </button>
+                `;
+
+                overlay.classList.add('active');
+                dialogResolve = resolve;
+            });
+        }
+
+        // نافذة إدخال نص (Prompt)
+        function showPrompt(message, title = 'إدخال', defaultValue = '') {
+            return new Promise((resolve) => {
+                const overlay = document.getElementById('customDialogOverlay');
+                const header = document.getElementById('customDialogHeader');
+                const icon = document.getElementById('customDialogIcon');
+                const titleEl = document.getElementById('customDialogTitle');
+                const body = document.getElementById('customDialogBody');
+                const footer = document.getElementById('customDialogFooter');
+
+                // تعيين المحتوى
+                header.className = 'custom-dialog-header';
+                icon.className = 'custom-dialog-icon fas fa-edit';
+                titleEl.textContent = title;
+                body.innerHTML = `
+                    ${message}
+                    <input type="text" id="promptInput" class="custom-dialog-input" value="${defaultValue}" placeholder="أدخل النص هنا...">
+                `;
+                
+                // إنشاء الأزرار
+                footer.innerHTML = `
+                    <button class="dialog-btn dialog-btn-secondary" onclick="closeCustomDialog()">
+                        <i class="fas fa-times"></i> إلغاء
+                    </button>
+                    <button class="dialog-btn dialog-btn-primary" onclick="confirmPrompt()">
+                        <i class="fas fa-check"></i> تأكيد
+                    </button>
+                `;
+
+                overlay.classList.add('active');
+                dialogResolve = resolve;
+
+                // التركيز على حقل الإدخال
+                setTimeout(() => {
+                    document.getElementById('promptInput')?.focus();
+                }, 100);
+            });
+        }
+
+        // تأكيد الحوار
+        function confirmDialog(result) {
+            const overlay = document.getElementById('customDialogOverlay');
+            overlay.classList.remove('active');
+            if (dialogResolve) {
+                dialogResolve(result);
+                dialogResolve = null;
+            }
+        }
+
+        // تأكيد الإدخال
+        function confirmPrompt() {
+            const input = document.getElementById('promptInput');
+            const value = input ? input.value : null;
+            const overlay = document.getElementById('customDialogOverlay');
+            overlay.classList.remove('active');
+            if (dialogResolve) {
+                dialogResolve(value);
+                dialogResolve = null;
+            }
+        }
+
+        // نافذة اختيار القسم
+        let selectedCategoryId = null;
+        
+        function selectCategory(categoryId) {
+            selectedCategoryId = categoryId;
+            confirmDialog(categoryId);
+        }
+
+        function showCategorySelector(content, title = 'اختر القسم') {
+            return new Promise((resolve) => {
+                selectedCategoryId = null;
+                const overlay = document.getElementById('customDialogOverlay');
+                const header = document.getElementById('customDialogHeader');
+                const icon = document.getElementById('customDialogIcon');
+                const titleEl = document.getElementById('customDialogTitle');
+                const body = document.getElementById('customDialogBody');
+                const footer = document.getElementById('customDialogFooter');
+
+                // تعيين المحتوى
+                header.className = 'custom-dialog-header';
+                icon.className = 'custom-dialog-icon fas fa-folder-open';
+                titleEl.textContent = title;
+                body.innerHTML = content;
+                
+                // إنشاء الأزرار
+                footer.innerHTML = `
+                    <button class="dialog-btn dialog-btn-secondary" onclick="closeCustomDialog()">
+                        <i class="fas fa-times"></i> إلغاء
+                    </button>
+                `;
+
+                overlay.classList.add('active');
+                dialogResolve = resolve;
+            });
+        }
+
+        // نافذة تعديل مع حقول متعددة
+        function showEditDialog(config) {
+            return new Promise((resolve) => {
+                const overlay = document.getElementById('customDialogOverlay');
+                const header = document.getElementById('customDialogHeader');
+                const icon = document.getElementById('customDialogIcon');
+                const titleEl = document.getElementById('customDialogTitle');
+                const body = document.getElementById('customDialogBody');
+                const footer = document.getElementById('customDialogFooter');
+
+                // تعيين المحتوى
+                header.className = 'custom-dialog-header';
+                icon.className = 'custom-dialog-icon fas fa-edit';
+                titleEl.textContent = config.title || 'تعديل';
+                
+                // إنشاء الحقول
+                let fieldsHTML = '<form id="editDialogForm" style="text-align: right;">';
+                config.fields.forEach(field => {
+                    fieldsHTML += `
+                        <div class="form-group" style="margin-bottom: 20px;">
+                            <label style="display: block; margin-bottom: 8px; color: #333; font-weight: 600;">
+                                <i class="${field.icon}"></i> ${field.label}
+                                ${field.required ? '<span style="color: red;">*</span>' : ''}
+                            </label>
+                            ${field.type === 'textarea' 
+                                ? `<textarea 
+                                    id="${field.id}" 
+                                    class="custom-dialog-input" 
+                                    style="min-height: 100px; resize: vertical;"
+                                    ${field.required ? 'required' : ''}
+                                    placeholder="${field.placeholder || ''}"
+                                >${field.value || ''}</textarea>`
+                                : `<input 
+                                    type="${field.type}" 
+                                    id="${field.id}" 
+                                    class="custom-dialog-input"
+                                    value="${field.value || ''}"
+                                    ${field.required ? 'required' : ''}
+                                    placeholder="${field.placeholder || ''}"
+                                />`
+                            }
+                        </div>
+                    `;
+                });
+                fieldsHTML += '</form>';
+                
+                body.innerHTML = fieldsHTML;
+                
+                // إنشاء الأزرار
+                footer.innerHTML = `
+                    <button class="dialog-btn dialog-btn-secondary" onclick="closeCustomDialog()">
+                        <i class="fas fa-times"></i> إلغاء
+                    </button>
+                    <button class="dialog-btn dialog-btn-primary" onclick="submitEditDialog()">
+                        <i class="fas fa-save"></i> حفظ
+                    </button>
+                `;
+
+                overlay.classList.add('active');
+                dialogResolve = resolve;
+
+                // التركيز على أول حقل
+                setTimeout(() => {
+                    const firstField = document.getElementById(config.fields[0].id);
+                    if (firstField) firstField.focus();
+                }, 100);
+            });
+        }
+
+        // إرسال نموذج التعديل
+        function submitEditDialog() {
+            const form = document.getElementById('editDialogForm');
+            if (!form.checkValidity()) {
+                form.reportValidity();
+                return;
+            }
+
+            const formData = {};
+            const inputs = form.querySelectorAll('input, textarea');
+            inputs.forEach(input => {
+                formData[input.id] = input.value;
+            });
+
+            const overlay = document.getElementById('customDialogOverlay');
+            overlay.classList.remove('active');
+            
+            if (dialogResolve) {
+                dialogResolve(formData);
+                dialogResolve = null;
+            }
+        }
+
+        // استبدال alert الأصلية
+        window.alert = showAlert;
     </script>
 </body>
 </html>

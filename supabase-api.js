@@ -1,6 +1,23 @@
 // ملف API للتعامل مع Supabase
 // يحتوي على جميع الدوال المطلوبة للتفاعل مع قاعدة البيانات
 
+// إعدادات Supabase
+const SUPABASE_CONFIG = {
+    url: 'https://yfudytvojcusgemyager.supabase.co',
+    anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlmdWR5dHZvamN1c2dlbXlhZ2VyIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQ3NzU1OTgsImV4cCI6MjA4MDM1MTU5OH0.iPowb3xPmMeAwxy63zdbMdHzRYI26Q9tOjB5Efxr9EQ',
+    tables: {
+        categories: 'categories',
+        books: 'books',
+        parts: 'parts',
+        pages: 'pages',
+        contact_messages: 'contact_messages',
+        visitors: 'visitors',
+        users: 'users',
+        user_roles: 'user_roles',
+        invitations: 'invitations'
+    }
+};
+
 class SupabaseAPI {
     constructor() {
         this.supabase = null;
@@ -15,6 +32,11 @@ class SupabaseAPI {
             // التحقق من وجود مكتبة Supabase
             if (typeof supabase === 'undefined') {
                 throw new Error('مكتبة Supabase غير محملة. تأكد من إضافة السكريبت في HTML');
+            }
+
+            // التحقق من إعدادات Supabase
+            if (SUPABASE_CONFIG.url === 'YOUR_SUPABASE_URL' || SUPABASE_CONFIG.anonKey === 'YOUR_SUPABASE_ANON_KEY') {
+                throw new Error('يرجى تحديث إعدادات Supabase في ملف supabase-api.js');
             }
 
             // إنشاء عميل Supabase
@@ -814,6 +836,15 @@ class SupabaseAPI {
     }
 
     // ===================================
+    // دوال مساعدة
+    // ===================================
+
+    // التحقق من حالة الاتصال
+    isConnected() {
+        return this.initialized && this.supabase !== null;
+    }
+
+    // ===================================
     // دوال المصادقة (Authentication)
     // ===================================
 
@@ -826,14 +857,16 @@ class SupabaseAPI {
             });
 
             if (error) throw error;
-            
-            // تسجيل النشاط
-            await this.logActivity('login', { email });
-            
-            return data;
+
+            // تحديث آخر تسجيل دخول
+            if (data.user) {
+                await this.updateUserLastLogin(data.user.id);
+            }
+
+            return { success: true, data };
         } catch (error) {
             console.error('خطأ في تسجيل الدخول:', error);
-            throw error;
+            return { success: false, error: error.message };
         }
     }
 
@@ -842,118 +875,160 @@ class SupabaseAPI {
         try {
             const { error } = await this.supabase.auth.signOut();
             if (error) throw error;
-            
-            // تسجيل النشاط
-            await this.logActivity('logout', {});
-            
-            return true;
+            return { success: true };
         } catch (error) {
             console.error('خطأ في تسجيل الخروج:', error);
-            throw error;
+            return { success: false, error: error.message };
         }
     }
 
-    // الحصول على المستخدم الحالي
-    async getCurrentUser() {
+    // التسجيل بدعوة
+    async signUpWithInvitation(email, password, invitationToken) {
         try {
-            const { data: { user }, error } = await this.supabase.auth.getUser();
-            if (error) throw error;
-            return user;
+            // التسجيل في Supabase Auth مع تعطيل Email Confirmation للدعوات
+            const { data: authData, error: authError } = await this.supabase.auth.signUp({
+                email,
+                password,
+                options: {
+                    emailRedirectTo: window.location.origin + '/dashboard.html',
+                    data: {
+                        invitation_token: invitationToken
+                    }
+                }
+            });
+
+            if (authError) throw authError;
+
+            // التحقق من أن المستخدم تم إنشاؤه
+            if (!authData.user) {
+                throw new Error('فشل إنشاء المستخدم');
+            }
+
+            console.log('✅ تم إنشاء المستخدم في Auth:', authData.user.id);
+
+            // الانتظار قليلاً للتأكد من إنشاء السجل في auth.users
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            // قبول الدعوة وإنشاء سجل المستخدم
+            const { data: acceptData, error: acceptError } = await this.supabase
+                .rpc('accept_invitation', {
+                    invitation_token: invitationToken,
+                    user_id: authData.user.id
+                });
+
+            if (acceptError) {
+                console.error('خطأ في accept_invitation:', acceptError);
+                throw acceptError;
+            }
+
+            if (!acceptData) {
+                throw new Error('الدعوة غير صالحة أو منتهية الصلاحية');
+            }
+
+            console.log('✅ تم قبول الدعوة بنجاح');
+
+            return { success: true, data: authData };
         } catch (error) {
-            console.error('خطأ في جلب المستخدم:', error);
-            return null;
+            console.error('خطأ في التسجيل بالدعوة:', error);
+            return { success: false, error: error.message };
         }
     }
 
     // الحصول على الجلسة الحالية
     async getSession() {
         try {
-            const { data: { session }, error } = await this.supabase.auth.getSession();
+            const { data, error } = await this.supabase.auth.getSession();
             if (error) throw error;
-            return session;
+            return data.session;
         } catch (error) {
-            console.error('خطأ في جلب الجلسة:', error);
+            console.error('خطأ في الحصول على الجلسة:', error);
             return null;
         }
     }
 
-    // التسجيل بدعوة
-    async signUpWithInvitation(token, password, fullName) {
+    // الحصول على المستخدم الحالي
+    async getCurrentUser() {
         try {
-            // التحقق من الدعوة
-            const { data: invitation, error: invError } = await this.supabase
-                .from('invitations')
-                .select('*')
-                .eq('token', token)
-                .eq('status', 'pending')
+            const { data: { user }, error: authError } = await this.supabase.auth.getUser();
+            
+            if (authError) throw authError;
+            if (!user) return null;
+
+            // جلب بيانات المستخدم من جدول users
+            const { data: userData, error: userError } = await this.supabase
+                .from(SUPABASE_CONFIG.tables.users)
+                .select(`
+                    *,
+                    user_roles (
+                        name,
+                        display_name,
+                        permissions
+                    )
+                `)
+                .eq('id', user.id)
                 .single();
 
-            if (invError || !invitation) {
-                throw new Error('الدعوة غير صالحة أو منتهية الصلاحية');
-            }
+            if (userError) throw userError;
 
-            // التحقق من انتهاء الصلاحية
-            if (new Date(invitation.expires_at) < new Date()) {
-                throw new Error('انتهت صلاحية الدعوة');
-            }
+            return {
+                ...userData,
+                role_name: userData.user_roles?.name,
+                role_display_name: userData.user_roles?.display_name,
+                permissions: userData.user_roles?.permissions
+            };
+        } catch (error) {
+            console.error('خطأ في الحصول على المستخدم:', error);
+            return null;
+        }
+    }
 
-            // إنشاء الحساب
-            const { data: authData, error: signUpError } = await this.supabase.auth.signUp({
-                email: invitation.email,
-                password: password,
-                options: {
-                    data: {
-                        full_name: fullName,
-                        role: invitation.role
-                    }
-                }
+    // تحديث آخر تسجيل دخول
+    async updateUserLastLogin(userId) {
+        try {
+            const { error } = await this.supabase
+                .from(SUPABASE_CONFIG.tables.users)
+                .update({ last_login: new Date().toISOString() })
+                .eq('id', userId);
+
+            if (error) throw error;
+            return true;
+        } catch (error) {
+            console.error('خطأ في تحديث آخر تسجيل دخول:', error);
+            return false;
+        }
+    }
+
+    // إعادة تعيين كلمة المرور
+    async resetPassword(email) {
+        try {
+            const { error } = await this.supabase.auth.resetPasswordForEmail(email, {
+                redirectTo: `${window.location.origin}/reset-password.html`
             });
 
-            if (signUpError) throw signUpError;
-
-            // تحديث حالة الدعوة
-            await this.supabase
-                .from('invitations')
-                .update({
-                    status: 'accepted',
-                    accepted_at: new Date().toISOString()
-                })
-                .eq('id', invitation.id);
-
-            return authData;
-        } catch (error) {
-            console.error('خطأ في التسجيل:', error);
-            throw error;
-        }
-    }
-
-    // ===================================
-    // دوال الملفات الشخصية (Profiles)
-    // ===================================
-
-    // جلب الملف الشخصي
-    async getProfile(userId) {
-        try {
-            const { data, error } = await this.supabase
-                .from('profiles')
-                .select('*')
-                .eq('id', userId)
-                .single();
-
             if (error) throw error;
-            return data;
+            return { success: true };
         } catch (error) {
-            console.error('خطأ في جلب الملف الشخصي:', error);
-            return null;
+            console.error('خطأ في إعادة تعيين كلمة المرور:', error);
+            return { success: false, error: error.message };
         }
     }
 
-    // جلب جميع المستخدمين (للإداريين فقط)
+    // ===================================
+    // دوال المستخدمين (Users)
+    // ===================================
+
+    // جلب جميع المستخدمين
     async getAllUsers() {
         try {
             const { data, error } = await this.supabase
-                .from('profiles')
-                .select('*')
+                .from(SUPABASE_CONFIG.tables.users)
+                .select(`
+                    *,
+                    user_roles (
+                        name,
+                        display_name
+                    )
+                `)
                 .order('created_at', { ascending: false });
 
             if (error) throw error;
@@ -964,41 +1039,57 @@ class SupabaseAPI {
         }
     }
 
-    // تحديث الملف الشخصي
-    async updateProfile(userId, updates) {
+    // جلب مستخدم واحد
+    async getUser(userId) {
         try {
             const { data, error } = await this.supabase
-                .from('profiles')
+                .from(SUPABASE_CONFIG.tables.users)
+                .select(`
+                    *,
+                    user_roles (
+                        name,
+                        display_name,
+                        permissions
+                    )
+                `)
+                .eq('id', userId)
+                .single();
+
+            if (error) throw error;
+            return data;
+        } catch (error) {
+            console.error('خطأ في جلب المستخدم:', error);
+            return null;
+        }
+    }
+
+    // تحديث مستخدم
+    async updateUser(userId, updates) {
+        try {
+            const { data, error } = await this.supabase
+                .from(SUPABASE_CONFIG.tables.users)
                 .update(updates)
                 .eq('id', userId)
                 .select()
                 .single();
 
             if (error) throw error;
-            
-            // تسجيل النشاط
-            await this.logActivity('update_profile', { userId, updates });
-            
             return data;
         } catch (error) {
-            console.error('خطأ في تحديث الملف الشخصي:', error);
+            console.error('خطأ في تحديث المستخدم:', error);
             throw error;
         }
     }
 
-    // حذف مستخدم (للإداريين فقط)
+    // حذف مستخدم (الطريقة القديمة - للتوافق)
     async deleteUser(userId) {
         try {
             const { error } = await this.supabase
-                .from('profiles')
+                .from(SUPABASE_CONFIG.tables.users)
                 .delete()
                 .eq('id', userId);
 
             if (error) throw error;
-            
-            // تسجيل النشاط
-            await this.logActivity('delete_user', { userId });
-            
             return true;
         } catch (error) {
             console.error('خطأ في حذف المستخدم:', error);
@@ -1006,173 +1097,143 @@ class SupabaseAPI {
         }
     }
 
+    // حذف مستخدم مع الأرشفة (الطريقة الجديدة)
+    async deleteUserWithArchive(userId, reason = null) {
+        try {
+            const currentUser = await this.getCurrentUser();
+            
+            const { data, error } = await this.supabase
+                .rpc('delete_user_with_archive', {
+                    target_user_id: userId,
+                    deleter_user_id: currentUser?.id,
+                    reason: reason
+                });
+
+            if (error) throw error;
+            
+            if (!data.success) {
+                throw new Error(data.error || 'فشل حذف المستخدم');
+            }
+            
+            return data;
+        } catch (error) {
+            console.error('خطأ في حذف المستخدم:', error);
+            throw error;
+        }
+    }
+
+    // جلب جميع الحسابات المحذوفة
+    async getDeletedAccounts() {
+        try {
+            const { data, error } = await this.supabase
+                .from('deleted_accounts')
+                .select(`
+                    *,
+                    deleted_by_user:users!deleted_accounts_deleted_by_fkey (
+                        email,
+                        full_name
+                    )
+                `)
+                .order('deleted_at', { ascending: false });
+
+            if (error) throw error;
+            return data || [];
+        } catch (error) {
+            console.error('خطأ في جلب الحسابات المحذوفة:', error);
+            return [];
+        }
+    }
+
+    // حذف حساب محذوف نهائياً
+    async permanentlyDeleteAccount(deletedAccountId) {
+        try {
+            const { data, error } = await this.supabase
+                .rpc('permanently_delete_account', {
+                    deleted_account_id: deletedAccountId
+                });
+
+            if (error) throw error;
+            return data;
+        } catch (error) {
+            console.error('خطأ في الحذف النهائي:', error);
+            throw error;
+        }
+    }
+
+    // ===================================
+    // دوال الأدوار (Roles)
+    // ===================================
+
+    // جلب جميع الأدوار
+    async getAllRoles() {
+        try {
+            const { data, error } = await this.supabase
+                .from(SUPABASE_CONFIG.tables.user_roles)
+                .select('*')
+                .order('name', { ascending: true });
+
+            if (error) throw error;
+            return data || [];
+        } catch (error) {
+            console.error('خطأ في جلب الأدوار:', error);
+            return [];
+        }
+    }
+
     // ===================================
     // دوال الدعوات (Invitations)
     // ===================================
 
-    // إنشاء دعوة جديدة (للإداريين فقط)
-    async createInvitation(email, role) {
+    // إنشاء دعوة جديدة
+    async createInvitation(email, roleId) {
         try {
-            // التحقق من صلاحيات الإداري
-            const user = await this.getCurrentUser();
-            const profile = await this.getProfile(user?.id);
+            // إنشاء رمز فريد للدعوة
+            const token = this.generateInvitationToken();
             
-            if (!profile || profile.role !== 'admin') {
-                throw new Error('غير مصرح لك بإرسال الدعوات. الإداريون فقط.');
-            }
-
-            const token = this.generateToken();
+            // تاريخ انتهاء الدعوة (7 أيام من الآن)
             const expiresAt = new Date();
-            expiresAt.setDate(expiresAt.getDate() + 7); // تنتهي بعد 7 أيام
+            expiresAt.setDate(expiresAt.getDate() + 7);
+
+            // الحصول على المستخدم الحالي
+            const currentUser = await this.getCurrentUser();
 
             const { data, error } = await this.supabase
-                .from('invitations')
+                .from(SUPABASE_CONFIG.tables.invitations)
                 .insert([{
                     email,
-                    role,
-                    invited_by: user?.id,
+                    role_id: roleId,
+                    invited_by: currentUser?.id,
                     token,
-                    expires_at: expiresAt.toISOString()
+                    expires_at: expiresAt.toISOString(),
+                    status: 'pending'
                 }])
                 .select()
                 .single();
 
             if (error) throw error;
-            
-            // تسجيل النشاط
-            await this.logActivity('create_invitation', { email, role });
-            
-            // إرسال البريد الإلكتروني
-            try {
-                const inviteLink = `${window.location.origin}/signup.html?token=${token}`;
-                await this.sendInvitationEmail(email, role, inviteLink, profile.full_name);
-                console.log('✅ تم إرسال البريد الإلكتروني بنجاح');
-            } catch (emailError) {
-                console.warn('⚠️ فشل إرسال البريد الإلكتروني:', emailError);
-                // لا نرمي خطأ هنا لأن الدعوة تم إنشاؤها بنجاح
-                // المستخدم يمكنه نسخ الرابط يدوياً
-            }
-            
-            return data;
+            return { success: true, data };
         } catch (error) {
             console.error('خطأ في إنشاء الدعوة:', error);
-            throw error;
+            return { success: false, error: error.message };
         }
-    }
-
-    // إرسال بريد إلكتروني للدعوة
-    async sendInvitationEmail(email, role, inviteLink, inviterName) {
-        try {
-            // محاولة استخدام Edge Function أولاً
-            try {
-                const { data, error } = await this.supabase.functions.invoke('send-invitation', {
-                    body: {
-                        email,
-                        role,
-                        inviteLink,
-                        inviterName
-                    }
-                });
-
-                if (error) throw error;
-                return data;
-            } catch (edgeFunctionError) {
-                console.warn('⚠️ Edge Function غير متاح، استخدام Resend API...');
-                
-                // البديل: استخدام Resend API مباشرة
-                // ضع API Key هنا من https://resend.com
-                const RESEND_API_KEY = 'YOUR_RESEND_API_KEY_HERE';
-                
-                if (RESEND_API_KEY === 'YOUR_RESEND_API_KEY_HERE') {
-                    throw new Error('يرجى إضافة Resend API Key في supabase-api.js');
-                }
-                
-                return await this.sendViaResend(email, role, inviteLink, inviterName, RESEND_API_KEY);
-            }
-        } catch (error) {
-            console.error('خطأ في إرسال البريد:', error);
-            throw error;
-        }
-    }
-
-    // إرسال عبر Resend API (بديل)
-    async sendViaResend(email, role, inviteLink, inviterName, apiKey) {
-        const roleText = role === 'admin' ? 'إداري' : 'محرر';
-        
-        const emailHtml = `
-<!DOCTYPE html>
-<html dir="rtl" lang="ar">
-<head><meta charset="UTF-8"></head>
-<body style="margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, sans-serif; background: #f4f4f4;">
-    <table style="width: 100%; border-collapse: collapse;">
-        <tr>
-            <td align="center" style="padding: 40px 0;">
-                <table style="width: 600px; background: white; border-radius: 10px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
-                    <tr>
-                        <td style="padding: 40px; text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px 10px 0 0;">
-                            <h1 style="margin: 0; color: white; font-size: 28px;">📧<br>دعوة للانضمام</h1>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 40px;">
-                            <h2 style="color: #333; margin: 0 0 20px 0;">مرحباً!</h2>
-                            <p style="color: #666; line-height: 1.8;">تم دعوتك من قبل <strong style="color: #667eea;">${inviterName}</strong> للانضمام إلى فريق العمل.</p>
-                            <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; border-right: 4px solid #667eea; margin: 20px 0;">
-                                <p style="margin: 0; color: #333;"><strong>الدور المخصص لك:</strong> <span style="color: #667eea; font-weight: bold;">${roleText}</span></p>
-                            </div>
-                            <table style="margin: 30px 0;">
-                                <tr>
-                                    <td style="text-align: center;">
-                                        <a href="${inviteLink}" style="display: inline-block; padding: 15px 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 8px; font-weight: bold;">قبول الدعوة والانضمام</a>
-                                    </td>
-                                </tr>
-                            </table>
-                            <p style="color: #999; font-size: 14px;">أو انسخ الرابط:<br><a href="${inviteLink}" style="color: #667eea;">${inviteLink}</a></p>
-                            <div style="background: #fff3cd; padding: 15px; border-radius: 8px; border-right: 4px solid #ffc107; margin: 30px 0 0 0;">
-                                <p style="margin: 0; color: #856404; font-size: 14px;">⚠️ <strong>ملاحظة:</strong> صالحة لمدة 7 أيام فقط.</p>
-                            </div>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="padding: 30px; background: #f8f9fa; border-radius: 0 0 10px 10px; text-align: center;">
-                            <p style="margin: 0; color: #999; font-size: 14px;">إذا لم تكن تتوقع هذه الدعوة، يمكنك تجاهلها.</p>
-                        </td>
-                    </tr>
-                </table>
-            </td>
-        </tr>
-    </table>
-</body>
-</html>`;
-
-        const response = await fetch('https://api.resend.com/emails', {
-            method: 'POST',
-            headers: {
-                'Authorization': `Bearer ${apiKey}`,
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                from: 'نظام الدعوات <onboarding@resend.dev>',
-                to: email,
-                subject: 'دعوة للانضمام إلى فريق العمل',
-                html: emailHtml
-            })
-        });
-
-        if (!response.ok) {
-            const error = await response.json();
-            throw new Error(error.message || 'فشل إرسال البريد');
-        }
-
-        return await response.json();
     }
 
     // جلب جميع الدعوات
-    async getInvitations() {
+    async getAllInvitations() {
         try {
             const { data, error } = await this.supabase
-                .from('invitations')
-                .select('*')
+                .from(SUPABASE_CONFIG.tables.invitations)
+                .select(`
+                    *,
+                    user_roles (
+                        name,
+                        display_name
+                    ),
+                    invited_by_user:users!invitations_invited_by_fkey (
+                        email,
+                        full_name
+                    )
+                `)
                 .order('created_at', { ascending: false });
 
             if (error) throw error;
@@ -1183,53 +1244,15 @@ class SupabaseAPI {
         }
     }
 
-    // التحقق من الدعوة
-    async verifyInvitation(token) {
-        try {
-            // استخدام maybeSingle() بدلاً من single() لتجنب خطأ 406
-            const { data, error } = await this.supabase
-                .from('invitations')
-                .select('*')
-                .eq('token', token)
-                .eq('status', 'pending')
-                .maybeSingle();
-
-            // إذا كان هناك خطأ في الاستعلام نفسه
-            if (error) {
-                console.error('خطأ في الاستعلام:', error);
-                throw error;
-            }
-
-            // إذا لم يتم العثور على دعوة
-            if (!data) {
-                return { valid: false, message: 'الدعوة غير موجودة أو تم استخدامها' };
-            }
-
-            // التحقق من انتهاء الصلاحية
-            if (new Date(data.expires_at) < new Date()) {
-                return { valid: false, message: 'انتهت صلاحية الدعوة' };
-            }
-
-            return { valid: true, invitation: data };
-        } catch (error) {
-            console.error('خطأ في التحقق من الدعوة:', error);
-            return { valid: false, message: 'حدث خطأ أثناء التحقق من الدعوة' };
-        }
-    }
-
     // حذف دعوة
     async deleteInvitation(invitationId) {
         try {
             const { error } = await this.supabase
-                .from('invitations')
+                .from(SUPABASE_CONFIG.tables.invitations)
                 .delete()
                 .eq('id', invitationId);
 
             if (error) throw error;
-            
-            // تسجيل النشاط
-            await this.logActivity('delete_invitation', { invitationId });
-            
             return true;
         } catch (error) {
             console.error('خطأ في حذف الدعوة:', error);
@@ -1237,91 +1260,222 @@ class SupabaseAPI {
         }
     }
 
-    // إعادة إرسال دعوة
-    async resendInvitation(invitationId) {
+    // التحقق من صلاحية الدعوة
+    async validateInvitation(token) {
         try {
-            const expiresAt = new Date();
-            expiresAt.setDate(expiresAt.getDate() + 7);
-
             const { data, error } = await this.supabase
-                .from('invitations')
-                .update({
-                    expires_at: expiresAt.toISOString(),
-                    status: 'pending'
-                })
-                .eq('id', invitationId)
-                .select()
+                .from(SUPABASE_CONFIG.tables.invitations)
+                .select('*')
+                .eq('token', token)
+                .eq('status', 'pending')
                 .single();
 
             if (error) throw error;
-            
-            // تسجيل النشاط
-            await this.logActivity('resend_invitation', { invitationId });
-            
-            return data;
+
+            // التحقق من انتهاء الصلاحية
+            const expiresAt = new Date(data.expires_at);
+            const now = new Date();
+
+            if (now > expiresAt) {
+                return { valid: false, error: 'انتهت صلاحية الدعوة' };
+            }
+
+            return { valid: true, data };
         } catch (error) {
-            console.error('خطأ في إعادة إرسال الدعوة:', error);
-            throw error;
+            console.error('خطأ في التحقق من الدعوة:', error);
+            return { valid: false, error: 'الدعوة غير صالحة' };
         }
     }
 
-    // ===================================
-    // دوال سجل النشاطات (Activity Log)
-    // ===================================
-
-    // تسجيل نشاط
-    async logActivity(action, details = {}) {
+    // إرسال دعوة عبر البريد الإلكتروني
+    async sendInvitationEmail(invitationId) {
+        let invitation = null;
+        let invitationLink = '';
+        
         try {
-            const user = await this.getCurrentUser();
-            
-            const { error } = await this.supabase
-                .from('activity_log')
-                .insert([{
-                    user_id: user?.id,
-                    action,
-                    details,
-                    ip_address: null, // يمكن إضافة IP من الخادم
-                    user_agent: navigator.userAgent
-                }]);
-
-            if (error) throw error;
-        } catch (error) {
-            console.error('خطأ في تسجيل النشاط:', error);
-        }
-    }
-
-    // جلب سجل النشاطات
-    async getActivityLog(limit = 50) {
-        try {
-            const { data, error } = await this.supabase
-                .from('activity_log')
+            // جلب بيانات الدعوة
+            const { data: invData, error: invError } = await this.supabase
+                .from(SUPABASE_CONFIG.tables.invitations)
                 .select(`
                     *,
-                    profiles:user_id (full_name, email)
+                    user_roles (
+                        display_name
+                    ),
+                    invited_by_user:users!invitations_invited_by_fkey (
+                        email,
+                        full_name
+                    )
                 `)
-                .order('created_at', { ascending: false })
-                .limit(limit);
+                .eq('id', invitationId)
+                .single();
 
-            if (error) throw error;
-            return data || [];
+            if (invError) throw invError;
+            if (!invData) throw new Error('الدعوة غير موجودة');
+            
+            invitation = invData;
+
+            // إنشاء رابط الدعوة
+            invitationLink = `${window.location.origin}/signup.html?token=${invitation.token}`;
+            
+            console.log('📧 محاولة إرسال البريد الإلكتروني...');
+            console.log('📧 ملاحظة: إرسال البريد يتطلب Edge Function منشورة');
+            console.log('📋 رابط الدعوة:', invitationLink);
+
+            // محاولة استدعاء Edge Function إذا كانت موجودة
+            try {
+                const { data, error } = await this.supabase.functions.invoke('send-invitation', {
+                    body: { 
+                        invitationId,
+                        siteUrl: window.location.origin  // إرسال الرابط الحالي
+                    }
+                });
+
+                if (error) {
+                    console.warn('⚠️ خطأ في Edge Function:', error.message);
+                    throw error;
+                }
+
+                // التحقق من نتيجة Edge Function
+                if (data && data.success === true) {
+                    console.log('✅ تم إرسال البريد بنجاح عبر Edge Function');
+                    return { success: true, data, invitationLink };
+                } else {
+                    // البريد لم يُرسل - استخدام الوضع اليدوي
+                    console.log('📋 الوضع اليدوي: الرابط جاهز للنسخ');
+                    return { 
+                        success: false, 
+                        error: data?.error || 'إرسال البريد غير متاح حالياً. يمكنك نسخ الرابط وإرساله يدوياً.',
+                        invitationLink,
+                        manualMode: true
+                    };
+                }
+            } catch (edgeFunctionError) {
+                // Edge Function غير متوفرة أو فشلت
+                console.warn('⚠️ Edge Function غير متوفرة:', edgeFunctionError.message);
+                
+                return { 
+                    success: false, 
+                    error: 'إرسال البريد غير متاح حالياً. يمكنك نسخ الرابط وإرساله يدوياً.',
+                    invitationLink,
+                    manualMode: true
+                };
+            }
         } catch (error) {
-            console.error('خطأ في جلب سجل النشاطات:', error);
-            return [];
+            console.error('❌ خطأ في معالجة الدعوة:', error);
+            
+            return { 
+                success: false, 
+                error: error.message || 'حدث خطأ غير متوقع',
+                invitationLink: invitationLink || `${window.location.origin}/signup.html`,
+                manualMode: true
+            };
         }
+    }
+
+    // إنشاء قالب البريد الإلكتروني
+    createInvitationEmailTemplate(invitation, invitationLink) {
+        const roleName = invitation.user_roles?.display_name || 'عضو';
+        const invitedBy = invitation.invited_by_user?.full_name || invitation.invited_by_user?.email || 'الإدارة';
+        const expiryDate = new Date(invitation.expires_at).toLocaleDateString('ar-EG');
+
+        return `
+            <div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background: #f5f5f5;">
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 10px 10px 0 0; text-align: center;">
+                    <h1 style="margin: 0; font-size: 24px;">المكتبة الرقمية</h1>
+                    <p style="margin: 10px 0 0 0; opacity: 0.9;">دعوة للانضمام إلى الفريق</p>
+                </div>
+                
+                <div style="background: white; padding: 30px; border-radius: 0 0 10px 10px;">
+                    <h2 style="color: #333; margin-top: 0;">مرحباً!</h2>
+                    
+                    <p style="color: #666; line-height: 1.6;">
+                        تمت دعوتك للانضمام إلى فريق المكتبة الرقمية بصفة <strong>${roleName}</strong>.
+                    </p>
+                    
+                    <p style="color: #666; line-height: 1.6;">
+                        <strong>دعوة من:</strong> ${invitedBy}
+                    </p>
+                    
+                    <p style="color: #666; line-height: 1.6;">
+                        <strong>البريد الإلكتروني:</strong> ${invitation.email}
+                    </p>
+                    
+                    <p style="color: #666; line-height: 1.6;">
+                        للانضمام، يرجى النقر على الزر أدناه لإنشاء حسابك:
+                    </p>
+                    
+                    <div style="text-align: center; margin: 30px 0;">
+                        <a href="${invitationLink}" 
+                           style="display: inline-block; padding: 15px 40px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 10px; font-weight: bold; font-size: 16px;">
+                            إنشاء الحساب
+                        </a>
+                    </div>
+                    
+                    <p style="color: #999; font-size: 14px; line-height: 1.6;">
+                        أو انسخ الرابط التالي في المتصفح:<br>
+                        <a href="${invitationLink}" style="color: #667eea; word-break: break-all;">${invitationLink}</a>
+                    </p>
+                    
+                    <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+                        <p style="color: #999; font-size: 13px; margin: 0;">
+                            <strong>ملاحظة:</strong> هذه الدعوة صالحة حتى ${expiryDate}
+                        </p>
+                        <p style="color: #999; font-size: 13px; margin: 10px 0 0 0;">
+                            إذا لم تطلب هذه الدعوة، يمكنك تجاهل هذا البريد.
+                        </p>
+                    </div>
+                </div>
+                
+                <div style="text-align: center; padding: 20px; color: #999; font-size: 12px;">
+                    <p style="margin: 0;">© 2024 المكتبة الرقمية. جميع الحقوق محفوظة.</p>
+                </div>
+            </div>
+        `;
+    }
+
+    // توليد رمز دعوة فريد
+    generateInvitationToken() {
+        return 'inv_' + Math.random().toString(36).substring(2) + Date.now().toString(36);
     }
 
     // ===================================
     // دوال مساعدة
     // ===================================
 
-    // توليد رمز عشوائي للدعوة
-    generateToken() {
-        return 'inv_' + Date.now() + '_' + Math.random().toString(36).substr(2, 16);
-    }
+    // إنشاء أول مستخدم إداري
+    async createFirstAdmin(email, password, fullName) {
+        try {
+            // التسجيل في Supabase Auth
+            const { data: authData, error: authError } = await this.supabase.auth.signUp({
+                email,
+                password
+            });
 
-    // التحقق من حالة الاتصال
-    isConnected() {
-        return this.initialized && this.supabase !== null;
+            if (authError) throw authError;
+
+            // استدعاء دالة إنشاء الإداري الأول
+            const { data: adminData, error: adminError } = await this.supabase
+                .rpc('create_first_admin', {
+                    admin_email: email,
+                    admin_user_id: authData.user.id
+                });
+
+            if (adminError) throw adminError;
+
+            if (!adminData) {
+                throw new Error('يوجد مستخدمون بالفعل في النظام');
+            }
+
+            // تحديث الاسم الكامل
+            if (fullName) {
+                await this.updateUser(authData.user.id, { full_name: fullName });
+            }
+
+            return { success: true, data: authData };
+        } catch (error) {
+            console.error('خطأ في إنشاء الإداري الأول:', error);
+            return { success: false, error: error.message };
+        }
     }
 }
 
