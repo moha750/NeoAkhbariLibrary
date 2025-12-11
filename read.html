@@ -1632,10 +1632,11 @@
             // تطبيق حجم الخط الحالي
             updateFontSize();
             
-            // تطبيق حالة التشكيل
-            applyTashkeelState();
+            // تطبيق جميع التحويلات
+            applyContentTransformations();
             
-            // تطبيق حالة السند
+            // تحديث أزرار التحكم
+            applyTashkeelState();
             applySanadState();
             
             // تحديث breadcrumb لعرض رقم الصفحة الحالية
@@ -1837,33 +1838,14 @@
         // تبديل التشكيل
         function toggleTashkeel() {
             isTashkeelHidden = !isTashkeelHidden;
-            const pageContent = document.querySelector('#pageContent > div');
-            const btn = document.getElementById('tashkeelToggleBtn');
+            applyContentTransformations();
             
-            if (pageContent && currentBookPages[currentPageIndex]) {
-                const pageId = currentBookPages[currentPageIndex].id;
-                
+            const btn = document.getElementById('tashkeelToggleBtn');
+            if (btn) {
                 if (isTashkeelHidden) {
-                    // حفظ المحتوى الأصلي إذا لم يكن محفوظاً
-                    if (!originalContent[pageId]) {
-                        originalContent[pageId] = pageContent.innerHTML;
-                    }
-                    // إزالة التشكيل
-                    const textWithoutTashkeel = removeTashkeel(originalContent[pageId]);
-                    pageContent.innerHTML = textWithoutTashkeel;
-                    
-                    if (btn) {
-                        btn.innerHTML = '<i class="fas fa-eye"></i> إظهار التشكيل';
-                    }
+                    btn.innerHTML = '<i class="fas fa-eye"></i> إظهار التشكيل';
                 } else {
-                    // إعادة المحتوى الأصلي
-                    if (originalContent[pageId]) {
-                        pageContent.innerHTML = originalContent[pageId];
-                    }
-                    
-                    if (btn) {
-                        btn.innerHTML = '<i class="fas fa-eye-slash"></i> إخفاء التشكيل';
-                    }
+                    btn.innerHTML = '<i class="fas fa-eye-slash"></i> إخفاء التشكيل';
                 }
             }
             
@@ -1873,86 +1855,71 @@
         // تبديل السند
         function toggleSanad() {
             isSanadHidden = !isSanadHidden;
-            const pageContent = document.querySelector('#pageContent > div');
-            const btn = document.getElementById('sanadToggleBtn');
+            applyContentTransformations();
             
-            if (pageContent && currentBookPages[currentPageIndex]) {
-                const pageId = currentBookPages[currentPageIndex].id;
-                
+            const btn = document.getElementById('sanadToggleBtn');
+            if (btn) {
                 if (isSanadHidden) {
-                    // حفظ المحتوى الأصلي إذا لم يكن محفوظاً
-                    if (!originalContent[pageId]) {
-                        originalContent[pageId] = pageContent.innerHTML;
-                    }
-                    // إزالة السند
-                    const textWithoutSanad = removeSanad(originalContent[pageId]);
-                    pageContent.innerHTML = textWithoutSanad;
-                    
-                    if (btn) {
-                        btn.innerHTML = '<i class="fas fa-user"></i> إظهار السند';
-                    }
+                    btn.innerHTML = '<i class="fas fa-user"></i> إظهار السند';
                 } else {
-                    // إعادة المحتوى الأصلي
-                    if (originalContent[pageId]) {
-                        pageContent.innerHTML = originalContent[pageId];
-                    }
-                    
-                    if (btn) {
-                        btn.innerHTML = '<i class="fas fa-user-slash"></i> إخفاء السند';
-                    }
+                    btn.innerHTML = '<i class="fas fa-user-slash"></i> إخفاء السند';
                 }
             }
             
             localStorage.setItem('sanadHidden', isSanadHidden);
         }
 
-        // تطبيق حالة السند على الصفحة
-        function applySanadState() {
+        // تطبيق جميع التحويلات على المحتوى (السند والتشكيل)
+        function applyContentTransformations() {
             const pageContent = document.querySelector('#pageContent > div');
-            const btn = document.getElementById('sanadToggleBtn');
             
-            if (pageContent && currentBookPages[currentPageIndex] && isSanadHidden) {
+            if (pageContent && currentBookPages[currentPageIndex]) {
                 const pageId = currentBookPages[currentPageIndex].id;
                 
-                // حفظ المحتوى الأصلي
+                // حفظ المحتوى الأصلي إذا لم يكن محفوظاً
                 if (!originalContent[pageId]) {
                     originalContent[pageId] = pageContent.innerHTML;
                 }
                 
-                // إزالة السند
-                const textWithoutSanad = removeSanad(originalContent[pageId]);
-                pageContent.innerHTML = textWithoutSanad;
+                // البدء من المحتوى الأصلي
+                let transformedContent = originalContent[pageId];
                 
-                if (btn) {
-                    btn.innerHTML = '<i class="fas fa-user"></i> إظهار السند';
+                // تطبيق إزالة السند أولاً
+                if (isSanadHidden) {
+                    transformedContent = removeSanad(transformedContent);
                 }
-            } else if (btn && !isSanadHidden) {
-                btn.innerHTML = '<i class="fas fa-user-slash"></i> إخفاء السند';
+                
+                // ثم تطبيق إزالة التشكيل
+                if (isTashkeelHidden) {
+                    transformedContent = removeTashkeel(transformedContent);
+                }
+                
+                // تحديث المحتوى
+                pageContent.innerHTML = transformedContent;
+            }
+        }
+
+        // تطبيق حالة السند على الصفحة
+        function applySanadState() {
+            const btn = document.getElementById('sanadToggleBtn');
+            if (btn) {
+                if (isSanadHidden) {
+                    btn.innerHTML = '<i class="fas fa-user"></i> إظهار السند';
+                } else {
+                    btn.innerHTML = '<i class="fas fa-user-slash"></i> إخفاء السند';
+                }
             }
         }
 
         // تطبيق حالة التشكيل على الصفحة
         function applyTashkeelState() {
-            const pageContent = document.querySelector('#pageContent > div');
             const btn = document.getElementById('tashkeelToggleBtn');
-            
-            if (pageContent && currentBookPages[currentPageIndex] && isTashkeelHidden) {
-                const pageId = currentBookPages[currentPageIndex].id;
-                
-                // حفظ المحتوى الأصلي
-                if (!originalContent[pageId]) {
-                    originalContent[pageId] = pageContent.innerHTML;
-                }
-                
-                // إزالة التشكيل
-                const textWithoutTashkeel = removeTashkeel(originalContent[pageId]);
-                pageContent.innerHTML = textWithoutTashkeel;
-                
-                if (btn) {
+            if (btn) {
+                if (isTashkeelHidden) {
                     btn.innerHTML = '<i class="fas fa-eye"></i> إظهار التشكيل';
+                } else {
+                    btn.innerHTML = '<i class="fas fa-eye-slash"></i> إخفاء التشكيل';
                 }
-            } else if (btn && !isTashkeelHidden) {
-                btn.innerHTML = '<i class="fas fa-eye-slash"></i> إخفاء التشكيل';
             }
         }
 
