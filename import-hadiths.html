@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>استيراد بيانات الأحاديث - المكتبة الرقمية</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #FCFCF9;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(236, 176, 7, 0.15);
+            margin-bottom: 30px;
+        }
+
+        h1 {
+            color: #ECB007;
+            margin-bottom: 10px;
+            font-size: 2em;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 1.1em;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            color: #333;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: #ECB007;
+            box-shadow: 0 0 0 3px rgba(236, 176, 7, 0.1);
+        }
+
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .file-input-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 20px;
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
+            color: white;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+            font-size: 1.1em;
+        }
+
+        .file-input-label:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(236, 176, 7, 0.4);
+        }
+
+        .file-name {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: bold;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .progress-section {
+            display: none;
+            margin-top: 30px;
+        }
+
+        .progress-section.active {
+            display: block;
+        }
+
+        .progress-bar-container {
+            width: 100%;
+            height: 30px;
+            background: #e0e0e0;
+            border-radius: 15px;
+            overflow: hidden;
+            margin-bottom: 15px;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .log-container {
+            max-height: 400px;
+            overflow-y: auto;
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        .log-entry {
+            padding: 8px;
+            margin-bottom: 5px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .log-entry.success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .log-entry.error {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .log-entry.info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .summary-item {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .summary-item .number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #ECB007;
+            margin-bottom: 5px;
+        }
+
+        .summary-item .label {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .alert-warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card">
+            <h1><i class="fas fa-file-import"></i> استيراد بيانات الأحاديث</h1>
+            <p class="subtitle">استيراد الكتب والصفحات من ملفات JSON</p>
+
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i>
+                <div>
+                    <strong>ملاحظة:</strong> هذه الأداة تستخرج اسم الكتاب ورقم الصفحة من ملفات JSON وتضيفها إلى قاعدة البيانات.
+                </div>
+            </div>
+
+            <form id="importForm">
+                <div class="form-group">
+                    <label><i class="fas fa-folder"></i> اختر القسم</label>
+                    <select id="categorySelect" required>
+                        <option value="">اختر القسم...</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label><i class="fas fa-file-upload"></i> اختر ملفات JSON</label>
+                    <div class="file-input-wrapper">
+                        <input type="file" id="jsonFiles" accept=".json" multiple required>
+                        <label for="jsonFiles" class="file-input-label">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <span>اضغط لاختيار الملفات</span>
+                        </label>
+                    </div>
+                    <div id="fileNames" class="file-name" style="display: none;"></div>
+                </div>
+
+                <button type="submit" class="btn btn-primary" id="importBtn">
+                    <i class="fas fa-play"></i>
+                    <span>بدء الاستيراد</span>
+                </button>
+            </form>
+
+            <div class="progress-section" id="progressSection">
+                <h3 style="color: #ECB007; margin-bottom: 15px;">
+                    <i class="fas fa-spinner fa-spin"></i> جاري الاستيراد...
+                </h3>
+                
+                <div class="progress-bar-container">
+                    <div class="progress-bar" id="progressBar">0%</div>
+                </div>
+
+                <div class="summary" id="summary">
+                    <div class="summary-item">
+                        <div class="number" id="processedFiles">0</div>
+                        <div class="label">ملفات معالجة</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="number" id="totalHadiths">0</div>
+                        <div class="label">إجمالي الأحاديث</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="number" id="importedPages">0</div>
+                        <div class="label">صفحات مستوردة</div>
+                    </div>
+                    <div class="summary-item">
+                        <div class="number" id="errors">0</div>
+                        <div class="label">أخطاء</div>
+                    </div>
+                </div>
+
+                <div class="log-container" id="logContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="supabase-api.js"></script>
+    <script>
+        let importStats = {
+            processedFiles: 0,
+            totalHadiths: 0,
+            importedPages: 0,
+            errors: 0
+        };
+
+        // تحميل الأقسام
+        async function loadCategories() {
+            try {
+                await api.init();
+                const categories = await api.getCategories();
+                const select = document.getElementById('categorySelect');
+                
+                categories.forEach(cat => {
+                    const option = document.createElement('option');
+                    option.value = cat.id;
+                    option.textContent = cat.name;
+                    select.appendChild(option);
+                });
+            } catch (error) {
+                console.error('خطأ في تحميل الأقسام:', error);
+                addLog('error', 'فشل تحميل الأقسام: ' + error.message);
+            }
+        }
+
+        // عرض أسماء الملفات المختارة
+        document.getElementById('jsonFiles').addEventListener('change', function(e) {
+            const files = Array.from(e.target.files);
+            const fileNamesDiv = document.getElementById('fileNames');
+            
+            if (files.length > 0) {
+                fileNamesDiv.style.display = 'block';
+                fileNamesDiv.innerHTML = `<i class="fas fa-check-circle" style="color: #28a745;"></i> تم اختيار ${files.length} ملف`;
+            } else {
+                fileNamesDiv.style.display = 'none';
+            }
+        });
+
+        // معالجة النموذج
+        document.getElementById('importForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const categoryId = document.getElementById('categorySelect').value;
+            const files = document.getElementById('jsonFiles').files;
+            
+            if (!categoryId || files.length === 0) {
+                alert('يرجى اختيار القسم والملفات');
+                return;
+            }
+
+            // تهيئة API
+            await api.init();
+
+            // إعادة تعيين الإحصائيات
+            importStats = {
+                processedFiles: 0,
+                totalHadiths: 0,
+                importedPages: 0,
+                errors: 0
+            };
+
+            // إظهار قسم التقدم
+            document.getElementById('progressSection').classList.add('active');
+            document.getElementById('importBtn').disabled = true;
+            document.getElementById('logContainer').innerHTML = '';
+
+            addLog('info', `بدء استيراد ${files.length} ملف...`);
+
+            // معالجة كل ملف
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                await processFile(file, categoryId);
+                
+                importStats.processedFiles++;
+                updateProgress((i + 1) / files.length * 100);
+                updateStats();
+            }
+
+            addLog('success', '✓ اكتمل الاستيراد بنجاح!');
+            document.getElementById('importBtn').disabled = false;
+        });
+
+        // معالجة ملف واحد
+        async function processFile(file, categoryId) {
+            try {
+                addLog('info', `معالجة: ${file.name}`);
+                
+                const content = await file.text();
+                const hadiths = JSON.parse(content);
+                
+                if (!Array.isArray(hadiths) || hadiths.length === 0) {
+                    addLog('error', `الملف ${file.name} لا يحتوي على بيانات صحيحة`);
+                    importStats.errors++;
+                    return;
+                }
+
+                // استخراج معلومات الكتاب من أول حديث
+                const firstHadith = hadiths[0];
+                const bookTitle = firstHadith.bookTitle || firstHadith.bookTitleShort;
+                
+                if (!bookTitle) {
+                    addLog('error', `لم يتم العثور على اسم الكتاب في ${file.name}`);
+                    importStats.errors++;
+                    return;
+                }
+
+                // البحث عن الكتاب أو إنشاؤه
+                let book = await findOrCreateBook(bookTitle, categoryId);
+                
+                if (!book) {
+                    addLog('error', `فشل إنشاء الكتاب: ${bookTitle}`);
+                    importStats.errors++;
+                    return;
+                }
+
+                // تجميع الأحاديث حسب الجزء ورقم الصفحة
+                const volPageGroups = {};
+                hadiths.forEach(hadith => {
+                    const volNum = hadith.vol || null;
+                    const pageNum = hadith.pageNum;
+                    const key = `${volNum}_${pageNum}`;
+                    
+                    if (!volPageGroups[key]) {
+                        volPageGroups[key] = {
+                            vol: volNum,
+                            pageNum: pageNum,
+                            hadiths: []
+                        };
+                    }
+                    volPageGroups[key].hadiths.push(hadith);
+                });
+
+                // إنشاء صفحة لكل مجموعة
+                const groups = Object.values(volPageGroups).sort((a, b) => {
+                    if (a.vol !== b.vol) return (a.vol || 0) - (b.vol || 0);
+                    return a.pageNum - b.pageNum;
+                });
+                
+                for (const group of groups) {
+                    // إنشاء الجزء إذا كان موجوداً
+                    let partId = null;
+                    if (group.vol) {
+                        const part = await findOrCreatePart(book.id, group.vol);
+                        if (part) {
+                            partId = part.id;
+                        }
+                    }
+                    
+                    // إنشاء الصفحة
+                    await addPageFromHadiths(book.id, group.pageNum, group.hadiths, partId);
+                    importStats.importedPages++;
+                }
+                
+                importStats.totalHadiths += hadiths.length;
+                
+                const pageNums = groups.map(g => g.pageNum);
+                const volNums = [...new Set(groups.map(g => g.vol).filter(v => v))];
+                const volInfo = volNums.length > 0 ? ` - الأجزاء: ${volNums.join(', ')}` : '';
+                addLog('success', `✓ ${file.name}: ${hadiths.length} حديث في ${groups.length} صفحة (${pageNums.join(', ')})${volInfo}`);
+                
+            } catch (error) {
+                console.error('خطأ في معالجة الملف:', error);
+                addLog('error', `خطأ في ${file.name}: ${error.message}`);
+                importStats.errors++;
+            }
+        }
+
+        // البحث عن كتاب أو إنشاؤه
+        async function findOrCreateBook(title, categoryId) {
+            try {
+                // البحث عن الكتاب
+                const allBooks = await api.getAllBooks();
+                let book = allBooks.find(b => b.title === title);
+                
+                if (book) {
+                    addLog('info', `تم العثور على الكتاب: ${title}`);
+                    return book;
+                }
+                
+                // إنشاء كتاب جديد
+                addLog('info', `إنشاء كتاب جديد: ${title}`);
+                book = await api.addBook({
+                    title: title,
+                    category_id: categoryId,
+                    published: false
+                });
+                
+                return book;
+            } catch (error) {
+                console.error('خطأ في findOrCreateBook:', error);
+                throw error;
+            }
+        }
+
+        // البحث عن جزء أو إنشاؤه
+        async function findOrCreatePart(bookId, partNumber) {
+            try {
+                // البحث عن الجزء
+                const parts = await api.getBookParts(bookId);
+                let part = parts.find(p => p.part_number === partNumber);
+                
+                if (part) {
+                    return part;
+                }
+                
+                // إنشاء جزء جديد
+                addLog('info', `إنشاء جزء ${partNumber}`);
+                part = await api.addPart(bookId, partNumber);
+                
+                return part;
+            } catch (error) {
+                console.error('خطأ في findOrCreatePart:', error);
+                addLog('error', `فشل إنشاء الجزء ${partNumber}: ${error.message}`);
+                return null;
+            }
+        }
+
+        // إضافة صفحة من الأحاديث
+        async function addPageFromHadiths(bookId, pageNumber, hadiths, partId = null) {
+            try {
+                // تجميع نصوص الأحاديث
+                const content = hadiths.map((h, index) => {
+                    const hadithText = h.text || h.cleaned_text || '';
+                    const qaelInfo = h.qaelTitleList ? `\n[${h.qaelTitleList}]` : '';
+                    return `--- حديث ${index + 1} ---\n${hadithText}${qaelInfo}\n`;
+                }).join('\n');
+
+                // إضافة الصفحة مع ربطها بالجزء إذا كان موجوداً
+                await api.addPage(bookId, pageNumber, content, partId);
+                
+            } catch (error) {
+                console.error('خطأ في addPageFromHadiths:', error);
+                throw error;
+            }
+        }
+
+        // إضافة سجل
+        function addLog(type, message) {
+            const logContainer = document.getElementById('logContainer');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            
+            const icon = type === 'success' ? 'fa-check-circle' : 
+                        type === 'error' ? 'fa-exclamation-circle' : 
+                        'fa-info-circle';
+            
+            entry.innerHTML = `
+                <i class="fas ${icon}"></i>
+                <span>${message}</span>
+            `;
+            
+            logContainer.appendChild(entry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        // تحديث شريط التقدم
+        function updateProgress(percent) {
+            const progressBar = document.getElementById('progressBar');
+            progressBar.style.width = percent + '%';
+            progressBar.textContent = Math.round(percent) + '%';
+        }
+
+        // تحديث الإحصائيات
+        function updateStats() {
+            document.getElementById('processedFiles').textContent = importStats.processedFiles;
+            document.getElementById('totalHadiths').textContent = importStats.totalHadiths;
+            document.getElementById('importedPages').textContent = importStats.importedPages;
+            document.getElementById('errors').textContent = importStats.errors;
+        }
+
+        // تحميل البيانات عند بدء الصفحة
+        window.addEventListener('DOMContentLoaded', loadCategories);
+    </script>
+</body>
+</html>
