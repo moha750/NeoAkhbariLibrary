@@ -110,7 +110,7 @@ class AuthGuard {
         if (this.isAdmin()) return true;
 
         // المحرر يمكنه الوصول فقط للمحتوى
-        const editorAllowedTabs = ['categories', 'books', 'parts', 'pages', 'publish'];
+        const editorAllowedTabs = ['categories', 'books', 'parts', 'chapters', 'pages', 'publish'];
         
         if (this.isEditor()) {
             return editorAllowedTabs.includes(tabName);

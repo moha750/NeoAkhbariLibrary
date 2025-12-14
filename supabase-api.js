@@ -9,6 +9,7 @@ const SUPABASE_CONFIG = {
         categories: 'categories',
         books: 'books',
         parts: 'parts',
+        chapters: 'chapters',
         pages: 'pages',
         contact_messages: 'contact_messages',
         visitors: 'visitors',
@@ -50,6 +51,161 @@ class SupabaseAPI {
         } catch (error) {
             console.error('❌ خطأ في الاتصال بـ Supabase:', error);
             throw error;
+        }
+    }
+
+    // ===================================
+    // دوال الأبواب (Chapters)
+    // ===================================
+
+    // جلب أبواب كتاب (بما فيها الأبواب التي لا تتبع جزء)
+    async getBookChapters(bookId) {
+        try {
+            const { data, error } = await this.supabase
+                .from(SUPABASE_CONFIG.tables.chapters)
+                .select('*')
+                .eq('book_id', bookId)
+                .order('part_id', { ascending: true })
+                .order('title', { ascending: true });
+
+            if (error) throw error;
+            return data || [];
+        } catch (error) {
+            console.error('خطأ في جلب أبواب الكتاب:', error);
+            return [];
+        }
+    }
+
+    // جلب أبواب جزء معين
+    async getPartChapters(partId) {
+        try {
+            const { data, error } = await this.supabase
+                .from(SUPABASE_CONFIG.tables.chapters)
+                .select('*')
+                .eq('part_id', partId)
+                .order('title', { ascending: true });
+
+            if (error) throw error;
+            return data || [];
+        } catch (error) {
+            console.error('خطأ في جلب أبواب الجزء:', error);
+            return [];
+        }
+    }
+
+    // جلب أبواب كتاب غير مرتبطة بجزء (للكتب بدون أجزاء)
+    async getBookRootChapters(bookId) {
+        try {
+            const { data, error } = await this.supabase
+                .from(SUPABASE_CONFIG.tables.chapters)
+                .select('*')
+                .eq('book_id', bookId)
+                .is('part_id', null)
+                .order('title', { ascending: true });
+
+            if (error) throw error;
+            return data || [];
+        } catch (error) {
+            console.error('خطأ في جلب أبواب الكتاب (بدون أجزاء):', error);
+            return [];
+        }
+    }
+
+    // جلب باب واحد
+    async getChapter(chapterId) {
+        try {
+            const { data, error } = await this.supabase
+                .from(SUPABASE_CONFIG.tables.chapters)
+                .select('*')
+                .eq('id', chapterId)
+                .single();
+
+            if (error) throw error;
+            return data;
+        } catch (error) {
+            console.error('خطأ في جلب الباب:', error);
+            return null;
+        }
+    }
+
+    // إضافة باب
+    async addChapter(bookId, title, partId = null) {
+        try {
+            if (!title || !String(title).trim()) {
+                throw new Error('اسم الباب (title) مطلوب');
+            }
+
+            const chapterData = {
+                book_id: bookId,
+                title: String(title).trim()
+            };
+
+            if (partId) {
+                chapterData.part_id = partId;
+            }
+
+            const { data, error } = await this.supabase
+                .from(SUPABASE_CONFIG.tables.chapters)
+                .insert([chapterData])
+                .select()
+                .single();
+
+            if (error) throw error;
+            return data;
+        } catch (error) {
+            console.error('خطأ في إضافة الباب:', error);
+            throw error;
+        }
+    }
+
+    // تحديث باب
+    async updateChapter(chapterId, updates) {
+        try {
+            const { data, error } = await this.supabase
+                .from(SUPABASE_CONFIG.tables.chapters)
+                .update(updates)
+                .eq('id', chapterId)
+                .select()
+                .single();
+
+            if (error) throw error;
+            return data;
+        } catch (error) {
+            console.error('خطأ في تحديث الباب:', error);
+            throw error;
+        }
+    }
+
+    // حذف باب
+    async deleteChapter(chapterId) {
+        try {
+            const { error } = await this.supabase
+                .from(SUPABASE_CONFIG.tables.chapters)
+                .delete()
+                .eq('id', chapterId);
+
+            if (error) throw error;
+            return true;
+        } catch (error) {
+            console.error('خطأ في حذف الباب:', error);
+            throw error;
+        }
+    }
+
+    // جلب صفحات باب معين
+    async getChapterPages(chapterId) {
+        try {
+            const { data, error } = await this.supabase
+                .from(SUPABASE_CONFIG.tables.pages)
+                .select('*')
+                .eq('chapter_id', chapterId)
+                .order('page_number', { ascending: true });
+
+            if (error) throw error;
+            return data || [];
+        } catch (error) {
+            console.error('خطأ في جلب صفحات الباب:', error);
+            return [];
         }
     }
 
@@ -500,7 +656,7 @@ class SupabaseAPI {
     }
 
     // إضافة صفحة
-    async addPage(bookId, pageNumber, content, partId = null) {
+    async addPage(bookId, pageNumber, content, partId = null, chapterId = null) {
         try {
             const pageData = {
                 book_id: bookId,
@@ -511,6 +667,11 @@ class SupabaseAPI {
             // إضافة part_id فقط إذا كان موجوداً
             if (partId) {
                 pageData.part_id = partId;
+            }
+
+            // إضافة chapter_id فقط إذا كان موجوداً
+            if (chapterId) {
+                pageData.chapter_id = chapterId;
             }
 
             const { data, error } = await this.supabase
@@ -559,6 +720,24 @@ class SupabaseAPI {
             return data;
         } catch (error) {
             console.error('خطأ في تحديث رقم الصفحة:', error);
+            throw error;
+        }
+    }
+
+    // تحديث chapter_id للصفحة (ربط/فك ربط صفحة بباب)
+    async updatePageChapter(pageId, chapterId) {
+        try {
+            const { data, error } = await this.supabase
+                .from(SUPABASE_CONFIG.tables.pages)
+                .update({ chapter_id: chapterId })
+                .eq('id', pageId)
+                .select()
+                .single();
+
+            if (error) throw error;
+            return data;
+        } catch (error) {
+            console.error('خطأ في تحديث باب الصفحة:', error);
             throw error;
         }
     }

@@ -1309,6 +1309,36 @@
             return text.replace(tashkeelRegex, '');
         }
 
+        function normalizeArabic(text) {
+            if (!text) return '';
+            let s = String(text).toLowerCase();
+            s = removeTashkeel(s);
+            s = s
+                .replace(/[إأآٱ]/g, 'ا')
+                .replace(/ؤ/g, 'و')
+                .replace(/ئ/g, 'ي')
+                .replace(/ى/g, 'ي')
+                .replace(/ة/g, 'ه')
+                .replace(/ء/g, '')
+                .replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d));
+            return s;
+        }
+
+        function normalizedCharToRegexClass(ch) {
+            switch (ch) {
+                case 'ا':
+                    return '[اأإآٱ]';
+                case 'و':
+                    return '[وؤ]';
+                case 'ي':
+                    return '[يىئ]';
+                case 'ه':
+                    return '[هة]';
+                default:
+                    return escapeRegex(ch);
+            }
+        }
+
         // إزالة السند من النص
         function removeSanad(text) {
             // إزالة كل محتوى <Document>...</Document>
@@ -1333,6 +1363,12 @@
             return urlParams.get('part');
         }
 
+        // الحصول على معرف الباب من URL
+        function getChapterId() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('chapter');
+        }
+
         // الحصول على رقم الصفحة من URL
         function getPageNumber() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -1349,6 +1385,7 @@
         async function loadBook() {
             const bookId = getBookId();
             const partId = getPartId();
+            const chapterId = getChapterId();
             const pageNumber = getPageNumber();
             const searchQuery = getSearchQuery();
             
@@ -1365,14 +1402,22 @@
                     return;
                 }
 
-                // تحميل صفحات الكتاب أو الجزء
-                if (partId) {
+                // تحميل صفحات الكتاب أو الجزء أو الباب
+                if (chapterId) {
+                    currentBookPages = await api.getChapterPages(chapterId);
+                } else if (partId) {
                     // تحميل صفحات جزء معين
                     currentBookPages = await api.getPartPages(partId);
                 } else {
                     // تحميل جميع صفحات الكتاب
                     currentBookPages = await api.getBookPages(bookId);
                 }
+
+                // إعادة ترقيم الصفحات بشكل متسلسل من 1
+                currentBookPages.forEach((page, index) => {
+                    page.original_page_number = page.page_number; // حفظ رقم الصفحة الأصلي
+                    page.page_number = index + 1; // إعادة الترقيم من 1
+                });
 
                 // تحديث عدد المشاهدات
                 await api.incrementBookViews(bookId);
@@ -1418,6 +1463,7 @@
         // تحديث breadcrumb
         async function updateBreadcrumb() {
             const partId = getPartId();
+            const chapterId = getChapterId();
             let category = null;
             if (currentBook.category_id) {
                 category = await api.getCategory(currentBook.category_id);
@@ -1440,22 +1486,26 @@
                 `;
             }
             
-            // إضافة الكتاب
+            // إضافة الكتاب / الجزء / الباب
             if (partId) {
-                // إذا كنا في جزء، اجعل الكتاب رابطاً للأجزاء
                 const bookParts = await api.getBookParts(currentBook.id);
                 if (bookParts.length > 0) {
                     breadcrumbHTML += `
                         <a href="parts.html?id=${currentBook.id}" class="breadcrumb-item"><i class="fas fa-book"></i> ${currentBook.title}</a>
                         <span class="breadcrumb-separator">›</span>
                     `;
-                    
-                    // إضافة الجزء الحالي
+
                     const currentPart = bookParts.find(p => p.id === partId);
                     if (currentPart) {
-                        breadcrumbHTML += `
-                            <span class="breadcrumb-item active"><i class="fas fa-layer-group"></i> الجزء ${currentPart.part_number}</span>
-                        `;
+                        if (chapterId) {
+                            breadcrumbHTML += `
+                                <a href="chapters.html?id=${currentBook.id}&part=${partId}" class="breadcrumb-item"><i class="fas fa-layer-group"></i> الجزء ${currentPart.part_number}</a>
+                            `;
+                        } else {
+                            breadcrumbHTML += `
+                                <span class="breadcrumb-item active"><i class="fas fa-layer-group"></i> الجزء ${currentPart.part_number}</span>
+                            `;
+                        }
                     }
                 } else {
                     breadcrumbHTML += `
@@ -1463,9 +1513,25 @@
                     `;
                 }
             } else {
-                breadcrumbHTML += `
-                    <span class="breadcrumb-item active"><i class="fas fa-book"></i> ${currentBook.title}</span>
-                `;
+                if (chapterId) {
+                    breadcrumbHTML += `
+                        <a href="chapters.html?id=${currentBook.id}" class="breadcrumb-item"><i class="fas fa-book"></i> ${currentBook.title}</a>
+                    `;
+                } else {
+                    breadcrumbHTML += `
+                        <span class="breadcrumb-item active"><i class="fas fa-book"></i> ${currentBook.title}</span>
+                    `;
+                }
+            }
+
+            if (chapterId) {
+                const chapter = await api.getChapter(chapterId);
+                if (chapter) {
+                    breadcrumbHTML += `
+                        <span class="breadcrumb-separator">›</span>
+                        <span class="breadcrumb-item active"><i class="fas fa-list-ol"></i> ${chapter.title}</span>
+                    `;
+                }
             }
             
             // إضافة رقم الصفحة الحالية
@@ -1531,7 +1597,7 @@
         // الانتقال إلى جزء معين
         function goToPart(partId) {
             const bookId = getBookId();
-            window.location.href = `read.html?id=${bookId}&part=${partId}`;
+            window.location.href = `chapters.html?id=${bookId}&part=${partId}`;
         }
 
         // الانتقال إلى الجزء السابق
@@ -1601,6 +1667,30 @@
             }
         });
 
+        function countHadithMarkers(content) {
+            if (!content) return 0;
+            const matches = content.match(/---\s*حديث\s*\d+\s*---/g);
+            return matches ? matches.length : 0;
+        }
+
+        function getHadithStartNumberForPage(pageIndex) {
+            let countBefore = 0;
+            for (let i = 0; i < pageIndex; i++) {
+                countBefore += countHadithMarkers(currentBookPages[i]?.content);
+            }
+            return countBefore + 1;
+        }
+
+        function renumberHadithMarkers(content, startNumber) {
+            if (!content) return content;
+            let currentNumber = startNumber;
+            return content.replace(/---\s*حديث\s*\d+\s*---/g, () => {
+                const replaced = `--- حديث ${currentNumber} ---`;
+                currentNumber++;
+                return replaced;
+            });
+        }
+
         // عرض الصفحة الحالية
         function displayCurrentPage() {
             const pagesContainer = document.getElementById('pagesContainer');
@@ -1619,10 +1709,12 @@
             }
 
             const page = currentBookPages[currentPageIndex];
+            const hadithStartNumber = getHadithStartNumberForPage(currentPageIndex);
+            const displayedPageContent = renumberHadithMarkers(page.content, hadithStartNumber);
             
             pagesContainer.innerHTML = `
                 <div class="page-content" id="pageContent">
-                    <div>${page.content}</div>
+                    <div>${displayedPageContent}</div>
                     <div class="page-navigation" id="pageNavigation">
                         ${generatePageNumbers()}
                     </div>
@@ -1989,20 +2081,21 @@
             searchResults = [];
             currentSearchIndex = 0;
 
+            const searchNormalized = normalizeArabic(searchTerm);
+
             // البحث في جميع الصفحات
             searchResults = [];
             currentBookPages.forEach((page, pageIndex) => {
-                const content = page.content.toLowerCase();
-                const searchLower = searchTerm.toLowerCase();
+                const contentNormalized = normalizeArabic(page.content);
                 let position = 0;
 
-                while ((position = content.indexOf(searchLower, position)) !== -1) {
+                while ((position = contentNormalized.indexOf(searchNormalized, position)) !== -1) {
                     searchResults.push({
                         pageIndex: pageIndex,
                         position: position,
                         text: searchTerm
                     });
-                    position += searchLower.length;
+                    position += searchNormalized.length;
                 }
             });
 
@@ -2084,13 +2177,17 @@
             const resultsInPage = searchResults.filter(r => r.pageIndex === currentPageIndex);
             
             if (resultsInPage.length > 0) {
-                const regex = new RegExp(`(${escapeRegex(searchTerm)})`, 'gi');
-                let highlightedContent = content.replace(regex, (match, p1, offset) => {
+                const searchNormalized = normalizeArabic(searchTerm);
+
+                const regexPattern = searchNormalized
+                    .split('')
+                    .map(char => normalizedCharToRegexClass(char) + '[\\u064B-\\u065F\\u0670\\u0640]*')
+                    .join('');
+                
+                const regex = new RegExp(`(${regexPattern})`, 'gi');
+                let highlightedContent = content.replace(regex, (match) => {
                     // التحقق إذا كانت هذه النتيجة الحالية
-                    const isCurrent = resultsInPage.some((r, idx) => {
-                        const globalIndex = searchResults.indexOf(r);
-                        return globalIndex === currentSearchIndex && r.position === offset;
-                    });
+                    const isCurrent = false; // سنحددها لاحقاً
                     
                     if (isCurrent) {
                         return `<span class="highlight current" id="currentHighlight">${match}</span>`;
@@ -2101,8 +2198,18 @@
 
                 pageContent.innerHTML = highlightedContent;
 
-                // التمرير للنتيجة الحالية
+                // التمرير للنتيجة الأولى
                 setTimeout(() => {
+                    const currentResult = searchResults[currentSearchIndex];
+                    const currentIndexInPage = currentResult && currentResult.pageIndex === currentPageIndex
+                        ? resultsInPage.indexOf(currentResult)
+                        : 0;
+                    const highlights = document.querySelectorAll('.highlight');
+                    if (highlights.length > 0) {
+                        const idx = Math.min(Math.max(currentIndexInPage, 0), highlights.length - 1);
+                        highlights[idx].classList.add('current');
+                        highlights[idx].id = 'currentHighlight';
+                    }
                     const currentHighlight = document.getElementById('currentHighlight');
                     if (currentHighlight) {
                         currentHighlight.scrollIntoView({ behavior: 'smooth', block: 'center' });

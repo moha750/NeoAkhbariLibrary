@@ -470,6 +470,8 @@
                     return a.pageNum - b.pageNum;
                 });
                 
+                let normalizedPageNumber = 1;
+                let normalizedHadithNumber = 1;
                 for (const group of groups) {
                     // إنشاء الجزء إذا كان موجوداً
                     let partId = null;
@@ -481,13 +483,15 @@
                     }
                     
                     // إنشاء الصفحة
-                    await addPageFromHadiths(book.id, group.pageNum, group.hadiths, partId);
+                    await addPageFromHadiths(book.id, normalizedPageNumber, group.hadiths, partId, normalizedHadithNumber);
                     importStats.importedPages++;
+                    normalizedPageNumber++;
+                    normalizedHadithNumber += group.hadiths.length;
                 }
                 
                 importStats.totalHadiths += hadiths.length;
                 
-                const pageNums = groups.map(g => g.pageNum);
+                const pageNums = groups.map((_, index) => index + 1);
                 const volNums = [...new Set(groups.map(g => g.vol).filter(v => v))];
                 const volInfo = volNums.length > 0 ? ` - الأجزاء: ${volNums.join(', ')}` : '';
                 addLog('success', `✓ ${file.name}: ${hadiths.length} حديث في ${groups.length} صفحة (${pageNums.join(', ')})${volInfo}`);
@@ -549,14 +553,40 @@
             }
         }
 
+        function normalizeHadithText(input) {
+            try {
+                if (input === null || input === undefined) return '';
+
+                let text = String(input);
+
+                // If the text contains HTML tags/entities, strip tags via DOM and keep only text content.
+                if (/[<>]|&nbsp;|&#160;|&amp;|&lt;|&gt;/.test(text)) {
+                    const tmp = document.createElement('div');
+                    tmp.innerHTML = text;
+                    text = tmp.textContent || tmp.innerText || '';
+                }
+
+                // Normalize NBSP (U+00A0) and collapse consecutive whitespace within lines.
+                text = text.replace(/\u00A0/g, ' ');
+
+                return text
+                    .split(/\r?\n/)
+                    .map(line => line.replace(/[\t ]+/g, ' ').trim())
+                    .join('\n')
+                    .trim();
+            } catch (_) {
+                return String(input || '').replace(/\u00A0/g, ' ');
+            }
+        }
+
         // إضافة صفحة من الأحاديث
-        async function addPageFromHadiths(bookId, pageNumber, hadiths, partId = null) {
+        async function addPageFromHadiths(bookId, pageNumber, hadiths, partId = null, startHadithNumber = 1) {
             try {
                 // تجميع نصوص الأحاديث
                 const content = hadiths.map((h, index) => {
-                    const hadithText = h.text || h.cleaned_text || '';
+                    const hadithText = normalizeHadithText(h.text || h.cleaned_text || '');
                     const qaelInfo = h.qaelTitleList ? `\n[${h.qaelTitleList}]` : '';
-                    return `--- حديث ${index + 1} ---\n${hadithText}${qaelInfo}\n`;
+                    return `--- حديث ${startHadithNumber + index} ---\n${hadithText}${qaelInfo}\n`;
                 }).join('\n');
 
                 // إضافة الصفحة مع ربطها بالجزء إذا كان موجوداً
