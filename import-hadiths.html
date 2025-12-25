@@ -469,10 +469,18 @@
                     if (a.vol !== b.vol) return (a.vol || 0) - (b.vol || 0);
                     return a.pageNum - b.pageNum;
                 });
+
+                // إعادة ترقيم الصفحات عند الاستيراد
+                // إذا كان الكتاب يحتوي صفحات مسبقاً نكمل بعد آخر رقم، وإلا نبدأ من 1
+                const existingPages = await api.getBookPages(book.id);
+                const lastPageNumber = (existingPages || []).reduce((max, p) => {
+                    const n = Number(p.page_number);
+                    return Number.isFinite(n) ? Math.max(max, n) : max;
+                }, 0);
+                const startPageNumber = lastPageNumber + 1;
                 
-                let normalizedPageNumber = 1;
-                let normalizedHadithNumber = 1;
-                for (const group of groups) {
+                for (let groupIndex = 0; groupIndex < groups.length; groupIndex++) {
+                    const group = groups[groupIndex];
                     // إنشاء الجزء إذا كان موجوداً
                     let partId = null;
                     if (group.vol) {
@@ -483,15 +491,14 @@
                     }
                     
                     // إنشاء الصفحة
-                    await addPageFromHadiths(book.id, normalizedPageNumber, group.hadiths, partId, normalizedHadithNumber);
+                    const newPageNumber = startPageNumber + groupIndex;
+                    await addPageFromHadiths(book.id, newPageNumber, group.hadiths, partId);
                     importStats.importedPages++;
-                    normalizedPageNumber++;
-                    normalizedHadithNumber += group.hadiths.length;
                 }
                 
                 importStats.totalHadiths += hadiths.length;
                 
-                const pageNums = groups.map((_, index) => index + 1);
+                const pageNums = groups.map((_, idx) => startPageNumber + idx);
                 const volNums = [...new Set(groups.map(g => g.vol).filter(v => v))];
                 const volInfo = volNums.length > 0 ? ` - الأجزاء: ${volNums.join(', ')}` : '';
                 addLog('success', `✓ ${file.name}: ${hadiths.length} حديث في ${groups.length} صفحة (${pageNums.join(', ')})${volInfo}`);
@@ -553,40 +560,114 @@
             }
         }
 
-        function normalizeHadithText(input) {
-            try {
-                if (input === null || input === undefined) return '';
+        function isWordChar(ch) {
+            if (!ch) return false;
+            return /[A-Za-z0-9\u0660-\u0669\u06F0-\u06F9\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF]/.test(ch);
+        }
 
-                let text = String(input);
+        function getTagKind(tag) {
+            if (!tag || tag[0] !== '<') return 'text';
+            if (/^<\//.test(tag)) return 'closing';
+            if (/\/>$/.test(tag)) return 'selfclosing';
+            if (/^<!/.test(tag) || /^<\?/.test(tag)) return 'other';
+            return 'opening';
+        }
 
-                // If the text contains HTML tags/entities, strip tags via DOM and keep only text content.
-                if (/[<>]|&nbsp;|&#160;|&amp;|&lt;|&gt;/.test(text)) {
-                    const tmp = document.createElement('div');
-                    tmp.innerHTML = text;
-                    text = tmp.textContent || tmp.innerText || '';
+        function firstNonSpaceChar(text) {
+            if (!text) return '';
+            const m = text.match(/\S/);
+            return m ? m[0] : '';
+        }
+
+        function lastNonSpaceChar(text) {
+            if (!text) return '';
+            for (let i = text.length - 1; i >= 0; i--) {
+                const ch = text[i];
+                if (ch !== ' ') return ch;
+            }
+            return '';
+        }
+
+        function normalizeTaggedArabicSpacing(input) {
+            if (typeof input !== 'string' || input.length === 0) return input;
+
+            const tokens = input.split(/(<[^>]+>)/g).filter(t => t !== '');
+            let result = '';
+            let depth = 0;
+            let lastTextChar = '';
+            let prevWasTag = false;
+            let prevTagKind = '';
+
+            for (let i = 0; i < tokens.length; i++) {
+                const token = tokens[i];
+                const isTag = token[0] === '<' && token[token.length - 1] === '>';
+
+                if (isTag) {
+                    const kind = getTagKind(token);
+
+                    if (prevWasTag) {
+                        result = result.replace(/ +$/g, '');
+                    }
+
+                    if (kind === 'opening' || kind === 'selfclosing' || kind === 'other') {
+                        if (depth === 0 && isWordChar(lastTextChar)) {
+                            result = result.replace(/ +$/g, '');
+                            if (result.length > 0) result += ' ';
+                        }
+                    }
+
+                    if (kind === 'closing') {
+                        result = result.replace(/ +$/g, '');
+                    }
+
+                    result += token;
+
+                    if (kind === 'opening') depth++;
+                    if (kind === 'closing') depth = Math.max(0, depth - 1);
+
+                    prevWasTag = true;
+                    prevTagKind = kind;
+                    continue;
                 }
 
-                // Normalize NBSP (U+00A0) and collapse consecutive whitespace within lines.
-                text = text.replace(/\u00A0/g, ' ');
+                let text = token.replace(/[\t\r\n]+/g, ' ');
+                text = text.replace(/ {2,}/g, ' ');
 
-                return text
-                    .split(/\r?\n/)
-                    .map(line => line.replace(/[\t ]+/g, ' ').trim())
-                    .join('\n')
-                    .trim();
-            } catch (_) {
-                return String(input || '').replace(/\u00A0/g, ' ');
+                if (prevWasTag && prevTagKind === 'opening') {
+                    text = text.replace(/^ +/g, '');
+                }
+
+                if (result.endsWith(' ')) {
+                    text = text.replace(/^ +/g, '');
+                }
+
+                if (depth === 0 && prevWasTag && (prevTagKind === 'closing' || prevTagKind === 'selfclosing' || prevTagKind === 'other')) {
+                    const firstCh = firstNonSpaceChar(text);
+                    if (isWordChar(lastTextChar) && isWordChar(firstCh) && !text.startsWith(' ') && !result.endsWith(' ')) {
+                        result += ' ';
+                    }
+                }
+
+                result += text;
+
+                const lastCh = lastNonSpaceChar(text);
+                if (lastCh) lastTextChar = lastCh;
+
+                prevWasTag = false;
+                prevTagKind = '';
             }
+
+            return result.replace(/ {2,}/g, ' ');
         }
 
         // إضافة صفحة من الأحاديث
-        async function addPageFromHadiths(bookId, pageNumber, hadiths, partId = null, startHadithNumber = 1) {
+        async function addPageFromHadiths(bookId, pageNumber, hadiths, partId = null) {
             try {
                 // تجميع نصوص الأحاديث
                 const content = hadiths.map((h, index) => {
-                    const hadithText = normalizeHadithText(h.text || h.cleaned_text || '');
+                    const hadithText = normalizeTaggedArabicSpacing(h.text || h.cleaned_text || '');
                     const qaelInfo = h.qaelTitleList ? `\n[${h.qaelTitleList}]` : '';
-                    return `--- حديث ${startHadithNumber + index} ---\n${hadithText}${qaelInfo}\n`;
+                    return `--- حديث ---\n${hadithText}${qaelInfo}\n`;
                 }).join('\n');
 
                 // إضافة الصفحة مع ربطها بالجزء إذا كان موجوداً

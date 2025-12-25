@@ -319,6 +319,7 @@
             left: 0;
             right: 0;
             bottom: 0;
+            pointer-events: none;
             z-index: 1000;
             animation: fadeIn 0.3s ease-out;
         }
@@ -505,18 +506,52 @@
             display: none !important;
         }
 
+        .hadith-separator {
+            text-align: center;
+            font-weight: 800;
+            color: #ECB007;
+            letter-spacing: 1px;
+            margin-top: 1.5rem;
+        }
+
+        .hadith-body {
+            white-space: pre-wrap;
+            margin-top: 1.5rem;
+            
+        }
+
         .reading-controls {
-            background: white;
-            padding: 10px;
-            border-radius: 20px;
-            box-shadow: 0 8px 30px rgba(236, 176, 7, 0.15);
-            margin-bottom: 20px;
+            position: sticky;
+            top: 12px;
+            z-index: 5;
             display: flex;
+            flex-wrap: nowrap;
             justify-content: space-between;
             align-items: center;
-            gap: 20px;
+            gap: 12px;
+            margin-bottom: 20px;
+            padding: 12px 14px;
+            border-radius: 16px;
+            border: 1px solid rgba(15, 23, 42, 0.12);
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 10px 24px rgba(2, 6, 23, 0.08);
             animation: fadeIn 0.6s ease-out 0.2s both;
-            border: 1px solid rgba(236, 176, 7, 0.1);
+        }
+
+        .control-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toggle-controls {
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 10px;
+            flex-wrap: nowrap;
         }
 
         .font-control {
@@ -526,35 +561,65 @@
         }
 
         .control-btn {
-            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 10px;
+            background: transparent;
+            color: #0f172a;
+            border: 1px solid rgba(15, 23, 42, 0.14);
+            padding: 10px 14px;
+            border-radius: 12px;
             cursor: pointer;
-            font-size: 1em;
-            transition: all 0.3s;
-            font-weight: 600;
-            box-shadow: 0 4px 15px rgba(236, 176, 7, 0.3);
+            font-size: 0.98em;
+            transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+            font-weight: 700;
+            box-shadow: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            min-height: 42px;
         }
 
         .control-btn:hover {
-            background: linear-gradient(135deg, #f5c842 0%, #ECB007 100%);
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(236, 176, 7, 0.4);
+            background: rgba(236, 176, 7, 0.14);
+            border-color: rgba(236, 176, 7, 0.45);
         }
 
         .control-btn:disabled {
-            background: #ccc;
+            background: rgba(148, 163, 184, 0.25);
+            border-color: rgba(148, 163, 184, 0.25);
+            color: rgba(15, 23, 42, 0.45);
             cursor: not-allowed;
         }
 
+        .control-btn-icon {
+            width: 42px;
+            padding: 0;
+            flex: 0 0 auto;
+        }
+
         .font-size-display {
-            color: #ECB007;
-            font-weight: bold;
-            min-width: 60px;
+            color: #0f172a;
+            font-weight: 800;
+            min-width: 74px;
             text-align: center;
-            font-size: 1.1em;
+            font-size: 1em;
+            padding: 10px 12px;
+            border-radius: 12px;
+            border: 1px solid rgba(15, 23, 42, 0.10);
+            background: rgba(15, 23, 42, 0.04);
+        }
+
+        .mobile-controls-toggle {
+            display: none;
+        }
+
+        .mobile-controls-menu {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .mobile-controls.is-open .mobile-controls-menu {
+            display: flex;
         }
 
         .page-content {
@@ -565,11 +630,14 @@
             line-height: 2;
             font-size: 1.2em;
             color: #333;
-            white-space: pre-wrap;
             word-wrap: break-word;
             min-height: 400px;
             animation: fadeInUp 0.6s ease-out 0.3s both;
             border: 1px solid rgba(236, 176, 7, 0.1);
+        }
+
+        #pageText {
+            white-space: pre-wrap;
         }
 
         .page-navigation {
@@ -577,7 +645,7 @@
             flex-direction: column;
             align-items: center;
             gap: 20px;
-            margin-top: 30px;
+            margin: 30px 0;
             padding-top: 30px;
             border-top: 3px solid rgba(236, 176, 7, 0.2);
         }
@@ -714,6 +782,15 @@
             border-color: transparent;
         }
 
+        #pageChapterTitle {
+            display:none;
+            text-align: center;
+            font-weight: 800;
+            font-size: 1.4em;
+            color: #ECB007;
+            margin: 2rem 0rem;
+        }
+
         .nav-arrow:disabled {
             opacity: 0.3;
             cursor: not-allowed;
@@ -748,8 +825,47 @@
 
         .dark-mode .page-content,
         .dark-mode .reading-controls {
-            background: #2d2d2d;
             color: #e0e0e0;
+        }
+
+        .dark-mode .page-content {
+            background: #2d2d2d;
+        }
+
+        .dark-mode .reading-controls {
+            background: rgba(45, 45, 45, 0.90);
+            border-color: rgba(255, 255, 255, 0.10);
+            box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+        }
+
+        .dark-mode .control-btn {
+            color: #e0e0e0;
+            border-color: rgba(255, 255, 255, 0.14);
+        }
+
+        .dark-mode .control-btn:hover {
+            background: rgba(236, 176, 7, 0.18);
+            border-color: rgba(236, 176, 7, 0.55);
+        }
+
+        .dark-mode .control-btn:disabled {
+            background: rgba(148, 163, 184, 0.18);
+            border-color: rgba(148, 163, 184, 0.18);
+            color: rgba(224, 224, 224, 0.45);
+        }
+
+        .dark-mode .font-size-display {
+            color: #f5c842;
+            border-color: rgba(255, 255, 255, 0.10);
+            background: rgba(0, 0, 0, 0.18);
+        }
+
+        @media (max-width: 777px) {
+            .dark-mode .mobile-controls-menu {
+                background: rgba(45, 45, 45, 0.96);
+                border-color: rgba(255, 255, 255, 0.10);
+                box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+            }
         }
 
         .dark-mode .page-number {
@@ -1141,7 +1257,7 @@
             }
 
             .reading-controls {
-                flex-direction: column;
+                flex-direction: row;
             }
 
             .page-number {
@@ -1186,6 +1302,64 @@
 
             .page-jump-label {
                 font-size: 0.85em;
+            }
+        }
+
+                @media (max-width: 777px) {
+            .toggle-controls {
+                justify-content: center;
+            }
+
+            .mobile-controls {
+                position: relative;
+            }
+
+            .mobile-controls-toggle {
+                display: inline-flex;
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .mobile-controls-toggle i {
+                transition: transform 0.2s ease;
+            }
+
+            .mobile-controls.is-open .mobile-controls-toggle .fa-chevron-down {
+                transform: rotate(180deg);
+            }
+
+            .mobile-controls-menu {
+                display: none;
+                position: absolute;
+                top: calc(100% + 10px);
+                left: 0;
+                right: 0;
+                z-index: 10;
+                padding: 10px;
+                border-radius: 14px;
+                border: 1px solid rgba(15, 23, 42, 0.12);
+                background: rgba(255, 255, 255, 0.96);
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                box-shadow: 0 16px 40px rgba(2, 6, 23, 0.12);
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+            }
+
+            .mobile-controls.is-open .mobile-controls-menu {
+                display: flex;
+            }
+
+            .mobile-controls-menu .control-btn {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .reading-controls {
+                flex-direction: column;
             }
         }
     </style>
@@ -1250,7 +1424,7 @@
             </div>
 
             <!-- Search Backdrop -->
-            <div class="search-backdrop" id="searchBackdrop" onclick="closeSearchResults()"></div>
+            <div class="search-backdrop" id="searchBackdrop"></div>
             
             <!-- Search Results (Floating) -->
             <div class="search-results" id="searchResults">
@@ -1268,14 +1442,26 @@
             </div>
 
             <div class="reading-controls">
-                <div class="font-control">
-                    <button class="control-btn" onclick="decreaseFontSize()"><i class="fas fa-minus"></i></button>
-                    <span class="font-size-display" id="fontSizeDisplay">100%</span>
-                    <button class="control-btn" onclick="increaseFontSize()"><i class="fas fa-plus"></i></button>
+                <div class="control-group">
+                    <div class="font-control">
+                        <button class="control-btn control-btn-icon" onclick="decreaseFontSize()" title="تصغير الخط"><i class="fas fa-minus"></i></button>
+                        <span class="font-size-display" id="fontSizeDisplay">100%</span>
+                        <button class="control-btn control-btn-icon" onclick="increaseFontSize()" title="تكبير الخط"><i class="fas fa-plus"></i></button>
+                    </div>
                 </div>
-                <button class="control-btn" id="tashkeelToggleBtn" onclick="toggleTashkeel()"><i class="fas fa-eye-slash"></i> إخفاء التشكيل</button>
-                <button class="control-btn" id="sanadToggleBtn" onclick="toggleSanad()"><i class="fas fa-user-slash"></i> إخفاء السند</button>
-                <button class="control-btn" id="themeToggleBtn" onclick="toggleTheme()"><i class="fas fa-moon"></i> الوضع الليلي</button>
+                <div class="toggle-controls">
+                    <div class="mobile-controls" id="mobileControls">
+                        <button class="control-btn mobile-controls-toggle" id="mobileControlsToggleBtn" type="button" aria-expanded="false" aria-controls="mobileControlsMenu" title="الخيارات">
+                            <span><i class="fas fa-sliders-h"></i> خيارات عرض الحديث</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </button>
+                        <div class="mobile-controls-menu" id="mobileControlsMenu" role="menu">
+                            <button class="control-btn" id="tashkeelToggleBtn" onclick="toggleTashkeel()"><i class="fas fa-eye-slash"></i> إخفاء التشكيل</button>
+                            <button class="control-btn" id="sanadToggleBtn" onclick="toggleSanad()"><i class="fas fa-user-slash"></i> إخفاء السند</button>
+                            <button class="control-btn" id="themeToggleBtn" onclick="toggleTheme()"><i class="fas fa-moon"></i> الوضع الليلي</button>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <div id="pagesContainer">
@@ -1301,42 +1487,74 @@
         let isTashkeelHidden = false;
         let isSanadHidden = false;
         let originalContent = {}; // حفظ المحتوى الأصلي لكل صفحة
+        let currentRenderToken = 0;
+        let hadithCountCache = {};
+        let searchIndexCache = new Map();
+        let searchDebounceTimer = null;
+        const ARABIC_SEARCH_NORMALIZATION = {
+            taMarbuta: 'h'
+        };
+
+        function normalizeBlankLines(text) {
+            if (typeof text !== 'string') return '';
+            let result = text.replace(/\r\n/g, '\n');
+            result = result.replace(/[\t ]+\n/g, '\n');
+            result = result.replace(/\n[\t ]*\n[\t ]*\n+/g, '\n\n');
+            return result.trim();
+        }
+
+        function parseHadithBlocks(content) {
+            if (typeof content !== 'string') return [];
+
+            const headerRegex = /^---\s*حديث\s*(\d+)?\s*---\s*$/gmi;
+            const matches = [];
+            let match;
+            while ((match = headerRegex.exec(content)) !== null) {
+                matches.push({
+                    index: match.index,
+                    length: match[0].length
+                });
+            }
+
+            if (matches.length === 0) {
+                const trimmed = normalizeBlankLines(content);
+                return trimmed ? [{ text: trimmed }] : [];
+            }
+
+            const blocks = [];
+            for (let i = 0; i < matches.length; i++) {
+                const start = matches[i].index + matches[i].length;
+                const end = (i + 1 < matches.length) ? matches[i + 1].index : content.length;
+                const text = normalizeBlankLines(content.slice(start, end));
+                if (text) {
+                    blocks.push({ text });
+                }
+            }
+            return blocks;
+        }
+
+        function getHadithCountForPage(page) {
+            if (!page) return 0;
+            const pageId = page.id || `${page.book_id || ''}_${page.part_id || ''}_${page.page_number || ''}`;
+            if (hadithCountCache[pageId] != null) return hadithCountCache[pageId];
+            const count = parseHadithBlocks(page.content || '').length;
+            hadithCountCache[pageId] = count;
+            return count;
+        }
+
+        function buildNumberedHadithHtml(blocks, startNumber) {
+            if (!Array.isArray(blocks) || blocks.length === 0) return '';
+            return blocks.map((b, idx) => {
+                const num = startNumber + idx;
+                return `<div class="hadith-separator">─── حديث ${num} ───</div><div class="hadith-body">${b.text}</div>`;
+            }).join('');
+        }
 
         // إزالة التشكيل من النص
         function removeTashkeel(text) {
             // حروف التشكيل العربية
             const tashkeelRegex = /[\u064B-\u065F\u0670\u0640]/g;
             return text.replace(tashkeelRegex, '');
-        }
-
-        function normalizeArabic(text) {
-            if (!text) return '';
-            let s = String(text).toLowerCase();
-            s = removeTashkeel(s);
-            s = s
-                .replace(/[إأآٱ]/g, 'ا')
-                .replace(/ؤ/g, 'و')
-                .replace(/ئ/g, 'ي')
-                .replace(/ى/g, 'ي')
-                .replace(/ة/g, 'ه')
-                .replace(/ء/g, '')
-                .replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d));
-            return s;
-        }
-
-        function normalizedCharToRegexClass(ch) {
-            switch (ch) {
-                case 'ا':
-                    return '[اأإآٱ]';
-                case 'و':
-                    return '[وؤ]';
-                case 'ي':
-                    return '[يىئ]';
-                case 'ه':
-                    return '[هة]';
-                default:
-                    return escapeRegex(ch);
-            }
         }
 
         // إزالة السند من النص
@@ -1351,6 +1569,113 @@
             return result.trim();
         }
 
+        function buildArabicNormalizationIndex(text, options = {}) {
+            const collapseWhitespace = options.collapseWhitespace !== false;
+            const taMarbuta = options.taMarbuta || ARABIC_SEARCH_NORMALIZATION.taMarbuta;
+            const stripHtml = options.stripHtml === true;
+
+            const input = (typeof text === 'string') ? text : '';
+            const source = stripHtml ? input.replace(/<[^>]*>/g, ' ') : input;
+
+            const normalizedChars = [];
+            const map = [];
+
+            let lastWasSpace = false;
+            const tashkeelRegex = /[\u0610-\u061A\u064B-\u065F\u0670\u06D6-\u06ED]/;
+
+            for (let i = 0; i < source.length; i++) {
+                const ch = source[i];
+
+                if (ch === '\u0640' || tashkeelRegex.test(ch)) {
+                    continue;
+                }
+
+                if (/\s/.test(ch)) {
+                    if (!collapseWhitespace) {
+                        normalizedChars.push(' ');
+                        map.push(i);
+                        lastWasSpace = true;
+                        continue;
+                    }
+
+                    if (!lastWasSpace) {
+                        normalizedChars.push(' ');
+                        map.push(i);
+                        lastWasSpace = true;
+                    }
+                    continue;
+                }
+
+                lastWasSpace = false;
+
+                let out = ch;
+
+                if (out === 'أ' || out === 'إ' || out === 'آ') out = 'ا';
+                else if (out === 'ى') out = 'ي';
+                else if (out === 'ؤ') out = 'و';
+                else if (out === 'ئ') out = 'ي';
+                else if (out === 'ء') out = '';
+                else if (out === 'ة') out = (taMarbuta === 't') ? 'ت' : (taMarbuta === 'h') ? 'ه' : 'ة';
+
+                out = out.toLowerCase();
+
+                if (!out) continue;
+
+                for (let j = 0; j < out.length; j++) {
+                    normalizedChars.push(out[j]);
+                    map.push(i);
+                }
+            }
+
+            const fullNormalized = normalizedChars.join('');
+            let normalized = fullNormalized;
+            if (collapseWhitespace) {
+                const leadingSpaces = (fullNormalized.match(/^\s+/) || [''])[0].length;
+                const trailingSpaces = (fullNormalized.match(/\s+$/) || [''])[0].length;
+                normalized = fullNormalized.trim();
+                if (!normalized) {
+                    map.length = 0;
+                } else {
+                    if (leadingSpaces > 0) {
+                        map.splice(0, leadingSpaces);
+                    }
+                    if (trailingSpaces > 0) {
+                        map.splice(map.length - trailingSpaces, trailingSpaces);
+                    }
+                }
+            }
+
+            return { normalized, map };
+        }
+
+        function normalizeArabic(text, options = {}) {
+            return buildArabicNormalizationIndex(text, options).normalized;
+        }
+
+        function getNormalizedSearchTokens(query) {
+            const normalized = normalizeArabic(query, { collapseWhitespace: true, stripHtml: true });
+            if (!normalized) return [];
+            return normalized.split(' ').map(t => t.trim()).filter(Boolean);
+        }
+
+        function getSearchableTextFromPage(page) {
+            const raw = (page && page.content) ? String(page.content) : '';
+            const transformed = isSanadHidden ? removeSanad(raw) : raw;
+            return transformed;
+        }
+
+        function getCachedNormalizedPageText(page, pageIndex) {
+            const pageId = page?.id || `${page?.book_id || ''}_${page?.part_id || ''}_${page?.page_number || ''}_${pageIndex}`;
+            const cacheKey = `${pageId}|sanad:${isSanadHidden ? 1 : 0}`;
+            const existing = searchIndexCache.get(cacheKey);
+            if (existing != null) return existing;
+
+            const text = getSearchableTextFromPage(page);
+            const normalized = normalizeArabic(text, { collapseWhitespace: true, stripHtml: true });
+            searchIndexCache.set(cacheKey, normalized);
+            return normalized;
+        }
+
         // الحصول على معرف الكتاب من URL
         function getBookId() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -1361,12 +1686,6 @@
         function getPartId() {
             const urlParams = new URLSearchParams(window.location.search);
             return urlParams.get('part');
-        }
-
-        // الحصول على معرف الباب من URL
-        function getChapterId() {
-            const urlParams = new URLSearchParams(window.location.search);
-            return urlParams.get('chapter');
         }
 
         // الحصول على رقم الصفحة من URL
@@ -1385,7 +1704,6 @@
         async function loadBook() {
             const bookId = getBookId();
             const partId = getPartId();
-            const chapterId = getChapterId();
             const pageNumber = getPageNumber();
             const searchQuery = getSearchQuery();
             
@@ -1402,10 +1720,8 @@
                     return;
                 }
 
-                // تحميل صفحات الكتاب أو الجزء أو الباب
-                if (chapterId) {
-                    currentBookPages = await api.getChapterPages(chapterId);
-                } else if (partId) {
+                // تحميل صفحات الكتاب أو الجزء
+                if (partId) {
                     // تحميل صفحات جزء معين
                     currentBookPages = await api.getPartPages(partId);
                 } else {
@@ -1413,11 +1729,7 @@
                     currentBookPages = await api.getBookPages(bookId);
                 }
 
-                // إعادة ترقيم الصفحات بشكل متسلسل من 1
-                currentBookPages.forEach((page, index) => {
-                    page.original_page_number = page.page_number; // حفظ رقم الصفحة الأصلي
-                    page.page_number = index + 1; // إعادة الترقيم من 1
-                });
+                searchIndexCache = new Map();
 
                 // تحديث عدد المشاهدات
                 await api.incrementBookViews(bookId);
@@ -1463,7 +1775,6 @@
         // تحديث breadcrumb
         async function updateBreadcrumb() {
             const partId = getPartId();
-            const chapterId = getChapterId();
             let category = null;
             if (currentBook.category_id) {
                 category = await api.getCategory(currentBook.category_id);
@@ -1486,26 +1797,22 @@
                 `;
             }
             
-            // إضافة الكتاب / الجزء / الباب
+            // إضافة الكتاب
             if (partId) {
+                // إذا كنا في جزء، اجعل الكتاب رابطاً للأجزاء
                 const bookParts = await api.getBookParts(currentBook.id);
                 if (bookParts.length > 0) {
                     breadcrumbHTML += `
                         <a href="parts.html?id=${currentBook.id}" class="breadcrumb-item"><i class="fas fa-book"></i> ${currentBook.title}</a>
                         <span class="breadcrumb-separator">›</span>
                     `;
-
+                    
+                    // إضافة الجزء الحالي
                     const currentPart = bookParts.find(p => p.id === partId);
                     if (currentPart) {
-                        if (chapterId) {
-                            breadcrumbHTML += `
-                                <a href="chapters.html?id=${currentBook.id}&part=${partId}" class="breadcrumb-item"><i class="fas fa-layer-group"></i> الجزء ${currentPart.part_number}</a>
-                            `;
-                        } else {
-                            breadcrumbHTML += `
-                                <span class="breadcrumb-item active"><i class="fas fa-layer-group"></i> الجزء ${currentPart.part_number}</span>
-                            `;
-                        }
+                        breadcrumbHTML += `
+                            <span class="breadcrumb-item active"><i class="fas fa-layer-group"></i> الجزء ${currentPart.part_number}</span>
+                        `;
                     }
                 } else {
                     breadcrumbHTML += `
@@ -1513,25 +1820,9 @@
                     `;
                 }
             } else {
-                if (chapterId) {
-                    breadcrumbHTML += `
-                        <a href="chapters.html?id=${currentBook.id}" class="breadcrumb-item"><i class="fas fa-book"></i> ${currentBook.title}</a>
-                    `;
-                } else {
-                    breadcrumbHTML += `
-                        <span class="breadcrumb-item active"><i class="fas fa-book"></i> ${currentBook.title}</span>
-                    `;
-                }
-            }
-
-            if (chapterId) {
-                const chapter = await api.getChapter(chapterId);
-                if (chapter) {
-                    breadcrumbHTML += `
-                        <span class="breadcrumb-separator">›</span>
-                        <span class="breadcrumb-item active"><i class="fas fa-list-ol"></i> ${chapter.title}</span>
-                    `;
-                }
+                breadcrumbHTML += `
+                    <span class="breadcrumb-item active"><i class="fas fa-book"></i> ${currentBook.title}</span>
+                `;
             }
             
             // إضافة رقم الصفحة الحالية
@@ -1597,7 +1888,7 @@
         // الانتقال إلى جزء معين
         function goToPart(partId) {
             const bookId = getBookId();
-            window.location.href = `chapters.html?id=${bookId}&part=${partId}`;
+            window.location.href = `read.html?id=${bookId}&part=${partId}`;
         }
 
         // الانتقال إلى الجزء السابق
@@ -1667,33 +1958,10 @@
             }
         });
 
-        function countHadithMarkers(content) {
-            if (!content) return 0;
-            const matches = content.match(/---\s*حديث\s*\d+\s*---/g);
-            return matches ? matches.length : 0;
-        }
-
-        function getHadithStartNumberForPage(pageIndex) {
-            let countBefore = 0;
-            for (let i = 0; i < pageIndex; i++) {
-                countBefore += countHadithMarkers(currentBookPages[i]?.content);
-            }
-            return countBefore + 1;
-        }
-
-        function renumberHadithMarkers(content, startNumber) {
-            if (!content) return content;
-            let currentNumber = startNumber;
-            return content.replace(/---\s*حديث\s*\d+\s*---/g, () => {
-                const replaced = `--- حديث ${currentNumber} ---`;
-                currentNumber++;
-                return replaced;
-            });
-        }
-
         // عرض الصفحة الحالية
-        function displayCurrentPage() {
+        async function displayCurrentPage() {
             const pagesContainer = document.getElementById('pagesContainer');
+            const renderToken = ++currentRenderToken;
             
             if (currentBookPages.length === 0) {
                 pagesContainer.innerHTML = `
@@ -1709,17 +1977,74 @@
             }
 
             const page = currentBookPages[currentPageIndex];
-            const hadithStartNumber = getHadithStartNumberForPage(currentPageIndex);
-            const displayedPageContent = renumberHadithMarkers(page.content, hadithStartNumber);
+
+            const bookId = getBookId();
+            const partId = getPartId();
+            const effectivePartId = partId || page?.part_id || null;
+            const initialPageContent = normalizeBlankLines(page?.content || '');
             
             pagesContainer.innerHTML = `
                 <div class="page-content" id="pageContent">
-                    <div>${displayedPageContent}</div>
+                    <div id="pageChapterTitle"></div>
+                    <div id="pageText">${initialPageContent}</div>
                     <div class="page-navigation" id="pageNavigation">
                         ${generatePageNumbers()}
                     </div>
                 </div>
             `;
+
+            try {
+                if (renderToken !== currentRenderToken) return;
+                if (!currentBook || !bookId || !page?.page_number) return;
+
+                const chapter = await api.getChapterForPage(bookId, page.page_number, effectivePartId);
+                if (renderToken !== currentRenderToken) return;
+
+                const titleEl = document.getElementById('pageChapterTitle');
+                if (titleEl) {
+                    if (chapter && chapter.title) {
+                        titleEl.textContent = `باب: ${chapter.title}`;
+                        titleEl.style.display = 'block';
+                    } else {
+                        titleEl.textContent = '';
+                        titleEl.style.display = 'none';
+                    }
+                }
+
+                const scopePages = (() => {
+                    let pages = currentBookPages.slice().sort((a, b) => Number(a.page_number) - Number(b.page_number));
+
+                    if (effectivePartId) {
+                        pages = pages.filter(p => String(p.part_id || '') === String(effectivePartId));
+                    }
+
+                    if (chapter && Number.isFinite(Number(chapter.page_start)) && Number.isFinite(Number(chapter.page_end))) {
+                        const start = Number(chapter.page_start);
+                        const end = Number(chapter.page_end);
+                        pages = pages.filter(p => Number(p.page_number) >= start && Number(p.page_number) <= end);
+                    }
+
+                    return pages;
+                })();
+
+                const currentPageNumber = Number(page.page_number);
+                let previousHadithsCount = 0;
+                for (const p of scopePages) {
+                    const pn = Number(p.page_number);
+                    if (pn < currentPageNumber) {
+                        previousHadithsCount += getHadithCountForPage(p);
+                    }
+                }
+
+                const blocks = parseHadithBlocks(page.content || '');
+                const pageTextEl = document.getElementById('pageText');
+                if (pageTextEl && blocks.length > 0) {
+                    pageTextEl.innerHTML = buildNumberedHadithHtml(blocks, previousHadithsCount + 1);
+                }
+            } catch (e) {
+            }
+
+            if (renderToken !== currentRenderToken) return;
 
             // تطبيق حجم الخط الحالي
             updateFontSize();
@@ -1902,9 +2227,14 @@
 
         // تحديث حجم الخط
         function updateFontSize() {
-            const content = document.getElementById('pageContent');
-            if (content) {
-                content.style.fontSize = (1.2 * currentFontSize / 100) + 'em';
+            const pageText = document.getElementById('pageText');
+            if (pageText) {
+                pageText.style.fontSize = (1.2 * currentFontSize / 100) + 'rem';
+            }
+
+            const pageChapterTitle = document.getElementById('pageChapterTitle');
+            if (pageChapterTitle) {
+                pageChapterTitle.style.fontSize = (1.4 * currentFontSize / 100) + 'rem';
             }
             document.getElementById('fontSizeDisplay').textContent = currentFontSize + '%';
             localStorage.setItem('fontSize', currentFontSize);
@@ -1963,7 +2293,7 @@
 
         // تطبيق جميع التحويلات على المحتوى (السند والتشكيل)
         function applyContentTransformations() {
-            const pageContent = document.querySelector('#pageContent > div');
+            const pageContent = document.getElementById('pageText');
             
             if (pageContent && currentBookPages[currentPageIndex]) {
                 const pageId = currentBookPages[currentPageIndex].id;
@@ -2081,21 +2411,30 @@
             searchResults = [];
             currentSearchIndex = 0;
 
-            const searchNormalized = normalizeArabic(searchTerm);
+            const tokens = getNormalizedSearchTokens(searchTerm);
+            if (tokens.length === 0) {
+                if (!autoSearch) {
+                    alert('⚠️ الرجاء إدخال كلمة للبحث');
+                }
+                return;
+            }
 
-            // البحث في جميع الصفحات
-            searchResults = [];
+            const primary = tokens[0];
             currentBookPages.forEach((page, pageIndex) => {
-                const contentNormalized = normalizeArabic(page.content);
-                let position = 0;
+                const contentNormalized = getCachedNormalizedPageText(page, pageIndex);
+                if (!contentNormalized) return;
 
-                while ((position = contentNormalized.indexOf(searchNormalized, position)) !== -1) {
+                const matchesAll = tokens.every(t => contentNormalized.indexOf(t) !== -1);
+                if (!matchesAll) return;
+
+                let position = 0;
+                while ((position = contentNormalized.indexOf(primary, position)) !== -1) {
                     searchResults.push({
                         pageIndex: pageIndex,
                         position: position,
                         text: searchTerm
                     });
-                    position += searchNormalized.length;
+                    position += primary.length;
                 }
             });
 
@@ -2159,11 +2498,13 @@
 
         // تسليط الضوء على نتائج البحث
         function highlightSearchResults() {
-            const pageContent = document.querySelector('#pageContent > div');
+            const pageContent = document.getElementById('pageText');
             if (!pageContent) return;
 
             const searchTerm = document.getElementById('searchInput').value.trim();
             if (!searchTerm) return;
+
+            const currentResult = searchResults[currentSearchIndex];
 
             // حفظ المحتوى الأصلي
             if (!originalPageContent) {
@@ -2171,51 +2512,107 @@
             }
 
             // إزالة التسليط السابق
-            let content = currentBookPages[currentPageIndex].content;
+            let content = originalPageContent || pageContent.innerHTML || currentBookPages[currentPageIndex].content;
 
-            // تسليط الضوء على جميع النتائج في الصفحة الحالية
+            const tokens = getNormalizedSearchTokens(searchTerm);
+            if (tokens.length === 0) return;
+            const primary = tokens[0];
+
             const resultsInPage = searchResults.filter(r => r.pageIndex === currentPageIndex);
-            
-            if (resultsInPage.length > 0) {
-                const searchNormalized = normalizeArabic(searchTerm);
+            if (resultsInPage.length === 0) return;
 
-                const regexPattern = searchNormalized
-                    .split('')
-                    .map(char => normalizedCharToRegexClass(char) + '[\\u064B-\\u065F\\u0670\\u0640]*')
-                    .join('');
-                
-                const regex = new RegExp(`(${regexPattern})`, 'gi');
-                let highlightedContent = content.replace(regex, (match) => {
-                    // التحقق إذا كانت هذه النتيجة الحالية
-                    const isCurrent = false; // سنحددها لاحقاً
-                    
-                    if (isCurrent) {
-                        return `<span class="highlight current" id="currentHighlight">${match}</span>`;
-                    } else {
-                        return `<span class="highlight">${match}</span>`;
-                    }
-                });
+            const currentIndexInPage = (currentResult && currentResult.pageIndex === currentPageIndex)
+                ? Math.max(0, resultsInPage.indexOf(currentResult))
+                : 0;
 
-                pageContent.innerHTML = highlightedContent;
+            pageContent.innerHTML = content;
 
-                // التمرير للنتيجة الأولى
-                setTimeout(() => {
-                    const currentResult = searchResults[currentSearchIndex];
-                    const currentIndexInPage = currentResult && currentResult.pageIndex === currentPageIndex
-                        ? resultsInPage.indexOf(currentResult)
-                        : 0;
-                    const highlights = document.querySelectorAll('.highlight');
-                    if (highlights.length > 0) {
-                        const idx = Math.min(Math.max(currentIndexInPage, 0), highlights.length - 1);
-                        highlights[idx].classList.add('current');
-                        highlights[idx].id = 'currentHighlight';
-                    }
-                    const currentHighlight = document.getElementById('currentHighlight');
-                    if (currentHighlight) {
-                        currentHighlight.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }
-                }, 100);
+            const walker = document.createTreeWalker(pageContent, NodeFilter.SHOW_TEXT, {
+                acceptNode: (node) => {
+                    if (!node || !node.nodeValue) return NodeFilter.FILTER_REJECT;
+                    const parent = node.parentElement;
+                    if (!parent) return NodeFilter.FILTER_REJECT;
+                    if (parent.closest('.highlight')) return NodeFilter.FILTER_REJECT;
+                    return NodeFilter.FILTER_ACCEPT;
+                }
+            });
+
+            const textNodes = [];
+            while (walker.nextNode()) {
+                textNodes.push(walker.currentNode);
             }
+
+            const normalizedNeedle = normalizeArabic(primary, { collapseWhitespace: false, stripHtml: false });
+            if (!normalizedNeedle) return;
+
+            for (const node of textNodes) {
+                const originalText = node.nodeValue;
+                const { normalized, map } = buildArabicNormalizationIndex(originalText, { collapseWhitespace: false, stripHtml: false });
+                if (!normalized) continue;
+
+                let pos = 0;
+                const ranges = [];
+                while ((pos = normalized.indexOf(normalizedNeedle, pos)) !== -1) {
+                    const startOrig = map[pos];
+                    const endOrig = map[pos + normalizedNeedle.length - 1] + 1;
+                    if (Number.isFinite(startOrig) && Number.isFinite(endOrig) && endOrig > startOrig) {
+                        ranges.push({ start: startOrig, end: endOrig });
+                    }
+                    pos += normalizedNeedle.length;
+                }
+
+                if (ranges.length === 0) continue;
+
+                ranges.sort((a, b) => a.start - b.start);
+                const merged = [];
+                for (const r of ranges) {
+                    const last = merged[merged.length - 1];
+                    if (!last || r.start > last.end) {
+                        merged.push({ start: r.start, end: r.end });
+                    } else {
+                        last.end = Math.max(last.end, r.end);
+                    }
+                }
+
+                const parent = node.parentNode;
+                if (!parent) continue;
+
+                const frag = document.createDocumentFragment();
+                let cursor = 0;
+                for (const r of merged) {
+                    if (r.start > cursor) {
+                        frag.appendChild(document.createTextNode(originalText.slice(cursor, r.start)));
+                    }
+                    const highlightSpan = document.createElement('span');
+                    highlightSpan.className = 'highlight';
+                    highlightSpan.textContent = originalText.slice(r.start, r.end);
+                    frag.appendChild(highlightSpan);
+                    cursor = r.end;
+                }
+                if (cursor < originalText.length) {
+                    frag.appendChild(document.createTextNode(originalText.slice(cursor)));
+                }
+
+                parent.replaceChild(frag, node);
+            }
+
+            setTimeout(() => {
+                const highlights = pageContent.querySelectorAll('.highlight');
+                if (highlights.length > 0) {
+                    highlights.forEach(h => {
+                        h.classList.remove('current');
+                        if (h.id === 'currentHighlight') h.removeAttribute('id');
+                    });
+
+                    const target = highlights[currentIndexInPage] || highlights[0];
+                    target.classList.add('current');
+                    target.id = 'currentHighlight';
+                }
+                const currentHighlight = document.getElementById('currentHighlight');
+                if (currentHighlight) {
+                    currentHighlight.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }, 100);
         }
 
         // دالة مساعدة لتجنب مشاكل regex
@@ -2234,7 +2631,10 @@
             if (originalPageContent) {
                 const pageContent = document.getElementById('pageContent');
                 if (pageContent) {
-                    pageContent.querySelector('div').innerHTML = originalPageContent;
+                    const pageText = document.getElementById('pageText');
+                    if (pageText) {
+                        pageText.innerHTML = originalPageContent;
+                    }
                 }
             }
             
@@ -2243,6 +2643,11 @@
             currentSearchIndex = 0;
             originalPageContent = '';
             document.getElementById('searchInput').value = '';
+
+            if (searchDebounceTimer) {
+                clearTimeout(searchDebounceTimer);
+                searchDebounceTimer = null;
+            }
         }
 
         // الانتقال للنتيجة التالية
@@ -2271,18 +2676,62 @@
 
                 // إعادة تعيين البحث عند تغيير النص
                 searchInput.addEventListener('input', function() {
-                    if (!this.value.trim()) {
-                        // إخفاء النتائج وإعادة المحتوى الأصلي
+                    const value = this.value.trim();
+                    if (!value) {
                         document.getElementById('searchResults').classList.remove('active');
+                        document.getElementById('searchBackdrop').classList.remove('active');
                         searchResults = [];
                         currentSearchIndex = 0;
-                        if (originalPageContent) {
-                            const pageContent = document.querySelector('#pageContent > div');
-                            if (pageContent && currentBookPages[currentPageIndex]) {
-                                pageContent.innerHTML = currentBookPages[currentPageIndex].content;
-                            }
-                            originalPageContent = '';
+                        originalPageContent = '';
+                        if (searchDebounceTimer) {
+                            clearTimeout(searchDebounceTimer);
+                            searchDebounceTimer = null;
                         }
+                        displayCurrentPage();
+                        return;
+                    }
+
+                    if (searchDebounceTimer) {
+                        clearTimeout(searchDebounceTimer);
+                    }
+                    searchDebounceTimer = setTimeout(() => {
+                        searchInBook(true);
+                    }, 250);
+                });
+            }
+
+            const mobileControls = document.getElementById('mobileControls');
+            const mobileControlsToggleBtn = document.getElementById('mobileControlsToggleBtn');
+            const mobileControlsMenu = document.getElementById('mobileControlsMenu');
+
+            if (mobileControls && mobileControlsToggleBtn && mobileControlsMenu) {
+                const closeMobileMenu = () => {
+                    mobileControls.classList.remove('is-open');
+                    mobileControlsToggleBtn.setAttribute('aria-expanded', 'false');
+                };
+
+                mobileControlsToggleBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    const isOpen = mobileControls.classList.toggle('is-open');
+                    mobileControlsToggleBtn.setAttribute('aria-expanded', String(isOpen));
+                });
+
+                document.addEventListener('click', function(e) {
+                    if (!mobileControls.contains(e.target)) {
+                        closeMobileMenu();
+                    }
+                });
+
+                document.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') {
+                        closeMobileMenu();
+                    }
+                });
+
+                mobileControlsMenu.addEventListener('click', function(e) {
+                    const clickedButton = e.target.closest('button');
+                    if (clickedButton) {
+                        closeMobileMenu();
                     }
                 });
             }

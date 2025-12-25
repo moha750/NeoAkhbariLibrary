@@ -8,8 +8,2428 @@
     
     <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="dashboard.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #FCFCF9;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px 0px;
+        }
+
+        /* Header Image */
+        .header-image {
+            max-width: 100%;
+            border-radius: 0px 0px 20px 20px; 
+            box-shadow: 0 4px 20px rgba(236, 176, 7, 0.2);
+            margin-bottom: 40px;
+        }
+
+        /* Header */
+        .header {
+            background: white;
+            padding: 30px 40px;
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(236, 176, 7, 0.15);
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px solid rgba(236, 176, 7, 0.1);
+        }
+
+        .header h1 {
+            color: #ECB007;
+            font-size: 2em;
+            text-shadow: 2px 2px 4px rgba(236, 176, 7, 0.1);
+        }
+
+        .header button:hover {
+            background: linear-gradient(135deg, #c82333 0%, #bd2130 100%);
+            border-color: #a71d2a;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(220, 53, 69, 0.5);
+        }
+
+        .user-avatar-header {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 3px 10px rgba(236, 176, 7, 0.3);
+            overflow: hidden;
+            flex-shrink: 0;
+            transition: all 0.3s;
+        }
+
+        .user-avatar-header:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(236, 176, 7, 0.5);
+        }
+
+        .user-info-header {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: bold;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(236, 176, 7, 0.3);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #f5c842 0%, #ECB007 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(236, 176, 7, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+        }
+
+        /* Stats Cards */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(236, 176, 7, 0.15);
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            transition: all 0.3s;
+            border: 1px solid rgba(236, 176, 7, 0.1);
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 50px rgba(236, 176, 7, 0.25);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8em;
+            color: white;
+        }
+
+        .stat-icon.books {
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
+        }
+
+        .stat-icon.categories {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .stat-icon.pages {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .stat-icon.messages {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+
+        .stat-info h3 {
+            color: #666;
+            font-size: 0.9em;
+            margin-bottom: 5px;
+        }
+
+        .stat-info .number {
+            color: #333;
+            font-size: 2em;
+            font-weight: bold;
+        }
+
+        /* Tabs */
+        .tabs {
+            background: white;
+            padding: 20px;
+            border-radius: 20px;
+            box-shadow: 0 8px 30px rgba(236, 176, 7, 0.15);
+            border: 1px solid rgba(236, 176, 7, 0.1);
+        }
+
+        .tabs-container {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .tab-buttons-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            border-bottom: 2px solid #e0e0e0;
+            padding-bottom: 15px;
+            position: relative;
+        }
+
+        /* مؤشرات التدرج للإشارة إلى وجود محتوى إضافي */
+        .tab-buttons-wrapper::before,
+        .tab-buttons-wrapper::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 15px;
+            width: 30px;
+            pointer-events: none;
+            z-index: 5;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .tab-buttons-wrapper::before {
+            left: 42px;
+            background: linear-gradient(to right, rgba(255,255,255), transparent);
+        }
+
+        .tab-buttons-wrapper::after {
+            right: 42px;
+            background: linear-gradient(to left, rgba(255,255,255), transparent);
+        }
+
+        .tab-buttons-wrapper.show-left-fade::before {
+            opacity: 1;
+        }
+
+        .tab-buttons-wrapper.show-right-fade::after {
+            opacity: 1;
+        }
+
+        .tab-nav-btn {
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
+            border: none;
+            color: white;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(236, 176, 7, 0.4);
+            font-size: 1.1em;
+            position: relative;
+            z-index: 10;
+        }
+
+        .tab-nav-btn:hover:not(:disabled) {
+            transform: scale(1.15);
+            box-shadow: 0 5px 15px rgba(236, 176, 7, 0.6);
+            background: linear-gradient(135deg, #f5c842 0%, #ECB007 100%);
+        }
+
+        .tab-nav-btn:active:not(:disabled) {
+            transform: scale(1.05);
+            box-shadow: 0 2px 8px rgba(236, 176, 7, 0.4);
+        }
+
+        .tab-nav-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            transform: scale(1);
+            box-shadow: 0 1px 4px rgba(236, 176, 7, 0.2);
+        }
+
+        .tab-nav-btn i {
+            transition: transform 0.3s ease;
+        }
+
+        .tab-nav-btn:hover:not(:disabled) i {
+            transform: translateX(0) scale(1.2);
+        }
+
+        /* تأثير النبض عند النقر */
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(236, 176, 7, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(236, 176, 7, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(236, 176, 7, 0);
+            }
+        }
+
+        .tab-nav-btn.pulse {
+            animation: pulse 0.5s;
+        }
+
+        .tab-buttons {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+            flex: 1;
+            padding: 10px 10px;
+            justify-content: space-between;
+        }
+
+        .tab-buttons::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        .tab-buttons::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .tab-buttons::-webkit-scrollbar-thumb {
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
+            border-radius: 10px;
+        }
+
+        .tab-buttons::-webkit-scrollbar-thumb:hover {
+            background: linear-gradient(135deg, #f5c842 0%, #ECB007 100%);
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 1em;
+            color: #666;
+            border-radius: 10px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+            flex-shrink: 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .tab-btn::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 3px;
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
+            transition: all 0.3s;
+            transform: translateX(-50%);
+        }
+
+        .tab-btn:hover {
+            background: #f0f0f0;
+            transform: translateY(-2px);
+        }
+
+        .tab-btn:hover::before {
+            width: 80%;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(236, 176, 7, 0.4);
+        }
+
+        .tab-btn i {
+            font-size: 1.1em;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Forms */
+        .form-section {
+            background: linear-gradient(135deg, rgba(236, 176, 7, 0.08) 0%, rgba(245, 200, 66, 0.12) 100%);
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border: 1px solid rgba(236, 176, 7, 0.15);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: bold;
+        }
+
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #ECB007;
+            box-shadow: 0 0 0 4px rgba(236, 176, 7, 0.1);
+        }
+
+        .form-group input[type="file"] {
+            display: none;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-wrapper i {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            font-size: 1.1em;
+        }
+
+        .input-wrapper i.toggle-password {
+            cursor: pointer;
+            left: 15px;
+            right: auto;
+            transition: all 0.5s;
+        }
+
+        .input-wrapper i.toggle-password:hover {
+            color: #ECB007;
+        }
+
+        .input-wrapper input {
+            padding-right: 45px;
+            padding-left: 45px;
+        }
+
+        .file-upload-wrapper {
+            position: relative;
+            display: block;
+            width: 100%;
+        }
+
+        .file-upload-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            padding: 30px 20px;
+            background: linear-gradient(135deg, rgba(236, 176, 7, 0.05) 0%, rgba(245, 200, 66, 0.1) 100%);
+            border: 2px dashed #ECB007;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            min-height: 120px;
+            flex-direction: column;
+        }
+
+        .file-upload-label:hover {
+            background: linear-gradient(135deg, rgba(236, 176, 7, 0.1) 0%, rgba(245, 200, 66, 0.15) 100%);
+            border-color: #f5c842;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(236, 176, 7, 0.2);
+        }
+
+        .file-upload-icon {
+            font-size: 3em;
+            color: #ECB007;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload-label:hover .file-upload-icon {
+            transform: scale(1.1);
+            color: #f5c842;
+        }
+
+        .file-upload-text {
+            color: #666;
+            font-size: 1em;
+        }
+
+        .file-upload-text strong {
+            color: #ECB007;
+            display: block;
+            margin-bottom: 5px;
+            font-size: 1.1em;
+        }
+
+        .file-upload-hint {
+            font-size: 0.85em;
+            color: #999;
+            margin-top: 5px;
+        }
+
+        .file-preview {
+            margin-top: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            border: 1px solid rgba(236, 176, 7, 0.2);
+            display: none;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .file-preview.active {
+            display: flex;
+        }
+
+        .file-preview-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 10px;
+            border: 2px solid #ECB007;
+        }
+
+        .file-preview-info {
+            flex: 1;
+        }
+
+        .file-preview-name {
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 5px;
+            word-break: break-all;
+        }
+
+        .file-preview-size {
+            color: #999;
+            font-size: 0.9em;
+        }
+
+        .file-preview-remove {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9em;
+        }
+
+        .file-preview-remove:hover {
+            background: #c82333;
+            transform: scale(1.05);
+        }
+
+        .form-group textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .form-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        /* Items List */
+        .items-list {
+            display: grid;
+            gap: 25px;
+        }
+
+        .item-card {
+            background: white;
+            padding: 0;
+            border-radius: 20px;
+            border: 2px solid #f0f0f0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            position: relative;
+            transition: all 0.7s;
+
+        }
+
+        .item-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 6px;
+            height: 100%;
+            background: linear-gradient(180deg, #ECB007 0%, #f5c842 100%);
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .item-card:hover {
+            border-color: #ECB007;
+            box-shadow: 0 12px 40px rgba(236, 176, 7, 0.25);
+            transform: translateY(-5px);
+            background: linear-gradient(135deg, rgba(236, 176, 7, 0.08) 0%, rgba(245, 200, 66, 0.12) 100%);
+        }
+
+        .item-info {
+            padding: 25px;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .item-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8em;
+            color: white;
+            box-shadow: 0 8px 20px rgba(236, 176, 7, 0.3);
+            transition: all 0.3s;
+        }
+
+        .item-card:hover .item-icon {
+            transform: rotate(10deg) scale(1.1);
+            box-shadow: 0 12px 30px rgba(236, 176, 7, 0.4);
+        }
+
+        .item-details {
+            flex: 1;
+        }
+
+        .item-info h3 {
+            color: #2c3e50;
+            margin-bottom: 8px;
+            font-size: 1.3em;
+            font-weight: 700;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .item-badge {
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(236, 176, 7, 0.3);
+        }
+
+        .item-info p {
+            color: #7f8c8d;
+            font-size: 0.95em;
+            line-height: 1.6;
+            margin: 0;
+        }
+
+        .item-actions {
+            display: flex;
+            gap: 12px;
+            padding: 25px;
+            background: linear-gradient(135deg, rgba(236, 176, 7, 0.03) 0%, rgba(245, 200, 66, 0.05) 100%);
+            border-right: 1px solid #f0f0f0;
+        }
+
+        /* Book Card Specific Styles */
+        .book-card {
+            background: white;
+            padding: 0;
+            border-radius: 20px;
+            border: 2px solid #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.7s;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .book-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 6px;
+            height: 100%;
+            background: linear-gradient(180deg, #ECB007 0%, #f5c842 100%);
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .book-card:hover {
+            border-color: #ECB007;
+            box-shadow: 0 12px 40px rgba(236, 176, 7, 0.25);
+            transform: translateY(-5px);
+            background: linear-gradient(135deg, rgba(236, 176, 7, 0.08) 0%, rgba(245, 200, 66, 0.12) 100%);
+        }
+
+        .book-card .item-info {
+            padding: 25px;
+            flex-direction: row;
+            align-items: flex-start;
+            gap: 20px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .book-card .item-details {
+            flex: 1;
+        }
+
+        .book-card .item-details h3 {
+            margin-bottom: 12px;
+            line-height: 1.4;
+        }
+
+        .book-card .item-details p {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+            line-height: 1.8;
+        }
+
+        .book-card .book-meta {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 6px 12px;
+            background: rgba(255, 255, 255, 0.8);
+            border-radius: 10px;
+            font-size: 0.9em;
+            white-space: nowrap;
+        }
+
+        .book-card .item-actions {
+            display: flex;
+            padding: 20px 25px;
+            background: linear-gradient(135deg, rgba(236, 176, 7, 0.03) 0%, rgba(245, 200, 66, 0.05) 100%);
+            border-right: none;
+            border-top: 1px solid #ECB007;
+            justify-content: center;
+        }
+
+        /* Part Card Specific Styles */
+        .part-card {
+            background: white;
+            padding: 0;
+            border-radius: 20px;
+            border: 2px solid #f0f0f0;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            transition: all 0.7s;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .part-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 6px;
+            height: 100%;
+            background: linear-gradient(180deg, #ECB007 0%, #f5c842 100%);
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .part-card:hover {
+            border-color: #ECB007;
+            box-shadow: 0 12px 40px rgba(236, 176, 7, 0.25);
+            transform: translateY(-5px);
+            background: linear-gradient(135deg, rgba(236, 176, 7, 0.08) 0%, rgba(245, 200, 66, 0.12) 100%);
+        }
+
+        .part-card .item-info {
+            padding: 25px;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .part-card .item-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8em;
+            color: white;
+            box-shadow: 0 8px 20px rgba(236, 176, 7, 0.3);
+            transition: all 0.3s;
+        }
+
+        .part-card:hover .item-icon {
+            transform: rotate(10deg) scale(1.1);
+            box-shadow: 0 12px 30px rgba(236, 176, 7, 0.4);
+        }
+
+        .part-card .item-details h3 {
+            color: #2c3e50;
+            margin: 0;
+            font-size: 1.3em;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .part-card .item-actions {
+            padding: 25px;
+            background: linear-gradient(135deg, rgba(236, 176, 7, 0.03) 0%, rgba(245, 200, 66, 0.05) 100%);
+            border-right: none;
+            border-left: 1px solid #f0f0f0;
+            display: flex;
+            gap: 12px;
+        }
+
+        /* Page Card Specific Styles */
+        .page-card {
+            background: white;
+            padding: 0;
+            border-radius: 20px;
+            border: 2px solid #f0f0f0;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.7s;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .page-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 6px;
+            height: 100%;
+            background: linear-gradient(180deg, #ECB007 0%, #f5c842 100%);
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .page-card:hover {
+            border-color: #ECB007;
+            box-shadow: 0 12px 40px rgba(236, 176, 7, 0.25);
+            transform: translateY(-5px);
+            background: linear-gradient(135deg, rgba(236, 176, 7, 0.08) 0%, rgba(245, 200, 66, 0.12) 100%);
+        }
+
+        .page-card .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 25px;
+            background: linear-gradient(135deg, rgba(236, 176, 7, 0.05) 0%, rgba(245, 200, 66, 0.08) 100%);
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .page-card .page-title {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .page-card .page-title .page-preview {
+            display: block;
+            color: #7f8c8d;
+            font-size: 0.85em;
+            line-height: 1.5;
+            margin-top: 5px;
+        }
+
+        .page-card .page-title h3 {
+            color: #2c3e50;
+            margin: 0;
+            font-size: 1.3em;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .page-card .page-title h3 i {
+            color: #ECB007;
+        }
+
+        .page-card .item-info {
+            display: none;
+        }
+
+        .page-card .item-actions {
+            padding: 20px 25px;
+            background: linear-gradient(135deg, rgba(236, 176, 7, 0.03) 0%, rgba(245, 200, 66, 0.05) 100%);
+            border-top: 1px solid #f0f0f0;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .page-order-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            padding: 8px 12px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .page-order-number {
+            font-weight: 700;
+            color: #ECB007;
+            font-size: 1em;
+            padding: 0 8px;
+            min-width: 35px;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(236, 176, 7, 0.1) 0%, rgba(245, 200, 66, 0.15) 100%);
+            border-radius: 6px;
+            line-height: 28px;
+        }
+
+        .btn-icon {
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
+            color: white;
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(236, 176, 7, 0.3);
+            font-size: 0.85em;
+        }
+
+        .btn-icon:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(236, 176, 7, 0.4);
+        }
+
+        .btn-icon:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            background: #ccc;
+            box-shadow: none;
+        }
+
+        /* Publish Card Specific Styles */
+        .publish-card {
+            background: white;
+            padding: 0;
+            border-radius: 20px;
+            border: 2px solid #f0f0f0;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            transition: all 0.7s;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .publish-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 6px;
+            height: 100%;
+            background: linear-gradient(180deg, #ECB007 0%, #f5c842 100%);
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .publish-card:hover {
+            border-color: #ECB007;
+            box-shadow: 0 12px 40px rgba(236, 176, 7, 0.25);
+            transform: translateY(-5px);
+            background: linear-gradient(135deg, rgba(236, 176, 7, 0.08) 0%, rgba(245, 200, 66, 0.12) 100%);
+        }
+
+        .publish-card .item-info {
+            padding: 25px;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .publish-card .item-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8em;
+            color: white;
+            box-shadow: 0 8px 20px rgba(236, 176, 7, 0.3);
+            transition: all 0.3s;
+        }
+
+        .publish-card:hover .item-icon {
+            transform: rotate(10deg) scale(1.1);
+            box-shadow: 0 12px 30px rgba(236, 176, 7, 0.4);
+        }
+
+        .publish-card .item-details {
+            flex: 1;
+        }
+
+        .publish-card .item-details h3 {
+            color: #2c3e50;
+            margin: 0 0 8px 0;
+            font-size: 1.3em;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .publish-card .publish-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+
+        .publish-card .publish-status.published {
+            background: rgba(40, 167, 69, 0.1);
+            color: #28a745;
+        }
+
+        .publish-card .publish-status.unpublished {
+            background: rgba(220, 53, 69, 0.1);
+            color: #dc3545;
+        }
+
+        .publish-card .item-actions {
+            padding: 25px;
+            background: linear-gradient(135deg, rgba(236, 176, 7, 0.03) 0%, rgba(245, 200, 66, 0.05) 100%);
+            border-right: none;
+            border-left: 1px solid #f0f0f0;
+            display: flex;
+            gap: 12px;
+        }
+
+        /* User Card Specific Styles - Modern Design */
+        .user-card {
+            background: white;
+            padding: 0;
+            border-radius: 24px;
+            border: none;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .user-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 95px;
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 50%, #ffd700 100%);
+            z-index: 0;
+        }
+
+        .user-card:hover {
+            box-shadow: 0 16px 50px rgba(236, 176, 7, 0.3);
+            transform: translateY(-8px);
+        }
+
+        .user-card .user-header {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px 20px 0px;
+        }
+
+        .user-card .user-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 5px solid white;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            transition: all 0.4s;
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 50%, #ffd700 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5em;
+            color: white;
+            font-weight: 700;
+            position: relative;
+        }
+
+        .user-card:hover .user-avatar {
+            transform: scale(1.08);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
+        }
+
+        .user-card .user-status-badge {
+            position: absolute;
+            bottom: 0px;
+            right: 0px;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .user-card .user-status-badge.active {
+            background: #28a745;
+        }
+
+        .user-card .user-status-badge.inactive {
+            background: #ffc107;
+        }
+
+        .user-card .user-name {
+            margin-top: 15px;
+            font-size: 1.4em;
+            font-weight: 700;
+            color: #ECB007;
+            text-align: center;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-card .user-role {
+            margin-top: 8px;
+            padding: 6px 16px;
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 50%, #ffd700 100%);
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-card .user-role.admin {
+            color: white;
+        }
+
+        .user-card .user-role.editor {
+            color: white;
+        }
+
+        .user-card .user-info {
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: white;
+        }
+
+        .user-card .info-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            transition: all 0.3s;
+        }
+
+        .user-card .info-item:hover {
+            background: #e9ecef;
+            transform: translateX(-3px);
+        }
+
+        .user-card .info-item i {
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
+            border-radius: 10px;
+            color: white;
+            font-size: 0.9em;
+            box-shadow: 0 2px 8px rgba(236, 176, 7, 0.3);
+        }
+
+        .user-card .info-item span {
+            flex: 1;
+            color: #495057;
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+
+        .user-card .user-actions {
+            padding: 20px;
+            display: flex;
+            gap: 10px;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+            text-align: center;
+        }
+
+        .user-card .user-actions button {
+            display: flex;
+            flex: 1;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            justify-content: center;
+        }
+
+        .user-card .user-actions button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Invitation Card Specific Styles - Modern Design */
+        .invitation-card {
+            background: white;
+            padding: 0;
+            border-radius: 24px;
+            border: none;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .invitation-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 95px;
+            background: linear-gradient(135deg, #17a2b8 0%, #20c9e0 50%, #5ddef4 100%);
+            z-index: 0;
+        }
+
+        .invitation-card.pending::before {
+            background: linear-gradient(135deg, #ffc107 0%, #ffcd38 50%, #ffd966 100%);
+        }
+
+        .invitation-card.accepted::before {
+            background: linear-gradient(135deg, #28a745 0%, #34ce57 50%, #5ced73 100%);
+        }
+
+        .invitation-card.expired::before {
+            background: linear-gradient(135deg, #dc3545 0%, #e74c3c 50%, #ff6b6b 100%);
+        }
+
+        .invitation-card:hover {
+            box-shadow: 0 16px 50px rgba(23, 162, 184, 0.3);
+            transform: translateY(-8px);
+        }
+
+        .invitation-card .invitation-header {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px 20px 0px;
+        }
+
+        .invitation-card .invitation-icon {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 5px solid white;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            transition: all 0.4s;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5em;
+            color: #17a2b8;
+            font-weight: 700;
+            position: relative;
+        }
+
+        .invitation-card.pending .invitation-icon {
+            color: #ffc107;
+        }
+
+        .invitation-card.accepted .invitation-icon {
+            color: #28a745;
+        }
+
+        .invitation-card.expired .invitation-icon {
+            color: #dc3545;
+        }
+
+        .invitation-card:hover .invitation-icon {
+            transform: scale(1.08);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
+        }
+
+        .invitation-card .invitation-email {
+            margin-top: 15px;
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #28a745 ;
+            text-align: center;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .invitation-card .invitation-status {
+            margin-top: 8px;
+            padding: 6px 16px;
+            background: linear-gradient(135deg, #17a2b8 0%, #20c9e0 50%, #5ddef4 100%);
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            color: white;
+        }
+
+        .invitation-card.pending .invitation-status {
+            background: linear-gradient(135deg, #ffc107 0%, #ffcd38 50%, #ffd966 100%);
+        }
+
+        .invitation-card.accepted .invitation-status {
+            background: linear-gradient(135deg, #28a745 0%, #34ce57 50%, #5ced73 100%);
+        }
+
+        .invitation-card.expired .invitation-status {
+            background: linear-gradient(135deg, #dc3545 0%, #e74c3c 50%, #ff6b6b 100%);
+        }
+
+        .invitation-card .invitation-info {
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: white;
+        }
+
+        .invitation-card .info-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 12px;
+            transition: all 0.3s;
+        }
+
+        .invitation-card .info-item:hover {
+            background: #e9ecef;
+            transform: translateX(-3px);
+        }
+
+        .invitation-card .info-item i {
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #17a2b8 0%, #20c9e0 100%);
+            border-radius: 10px;
+            color: white;
+            font-size: 0.9em;
+            box-shadow: 0 2px 8px rgba(23, 162, 184, 0.3);
+        }
+
+        .invitation-card.pending .info-item i {
+            background: linear-gradient(135deg, #ffc107 0%, #ffcd38 100%);
+        }
+
+        .invitation-card.accepted .info-item i {
+            background: linear-gradient(135deg, #28a745 0%, #34ce57 100%);
+        }
+
+        .invitation-card.expired .info-item i {
+            background: linear-gradient(135deg, #dc3545 0%, #e74c3c 100%);
+        }
+
+        .invitation-card .info-item span {
+            flex: 1;
+            color: #495057;
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+
+        .invitation-card .invitation-actions {
+            padding: 20px;
+            display: flex;
+            gap: 10px;
+            background: #f8f9fa;
+            border-top: 1px solid #e9ecef;
+            text-align: center;
+        }
+
+        .invitation-card .invitation-actions button {
+            display: flex;
+            flex: 1;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            justify-content: center;
+        }
+
+        .invitation-card .invitation-actions button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Deleted Account Card Specific Styles - Modern Design */
+        .deleted-account-card {
+            background: white;
+            padding: 0;
+            border-radius: 24px;
+            border: none;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            position: relative;
+        }
+
+        .deleted-account-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 95px;
+            background: linear-gradient(135deg, #dc3545 0%, #e74c3c 50%, #ff6b6b 100%);
+            z-index: 0;
+        }
+
+        .deleted-account-card:hover {
+            box-shadow: 0 16px 50px rgba(220, 53, 69, 0.3);
+            transform: translateY(-8px);
+        }
+
+        .deleted-account-card .deleted-header {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 30px 20px 0px;
+        }
+
+        .deleted-account-card .deleted-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 5px solid white;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+            transition: all 0.4s;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5em;
+            color: #dc3545;
+            font-weight: 700;
+            position: relative;
+        }
+
+        .deleted-account-card:hover .deleted-avatar {
+            transform: scale(1.08);
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.2);
+        }
+
+        .deleted-account-card .deleted-name {
+            margin-top: 15px;
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #dc3545;
+            text-align: center;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .deleted-account-card .deleted-badge {
+            margin-top: 8px;
+            padding: 6px 16px;
+            background: linear-gradient(135deg, #dc3545 0%, #e74c3c 50%, #ff6b6b 100%);
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            color: white;
+        }
+
+        .deleted-account-card .deleted-info {
+            padding: 25px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            background: white;
+        }
+
+        .deleted-account-card .info-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px;
+            background: #fff5f5;
+            border-radius: 12px;
+            transition: all 0.3s;
+        }
+
+        .deleted-account-card .info-item:hover {
+            background: #ffe5e5;
+            transform: translateX(-3px);
+        }
+
+        .deleted-account-card .info-item i {
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #dc3545 0%, #e74c3c 100%);
+            border-radius: 10px;
+            color: white;
+            font-size: 0.9em;
+            box-shadow: 0 2px 8px rgba(220, 53, 69, 0.3);
+        }
+
+        .deleted-account-card .info-item span {
+            flex: 1;
+            color: #495057;
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+
+        .deleted-account-card .deleted-actions {
+            padding: 20px;
+            display: flex;
+            gap: 10px;
+            background: #fff5f5;
+            border-top: 1px solid #ffe5e5;
+            text-align: center;
+        }
+
+        .deleted-account-card .deleted-actions button {
+            display: flex;
+            flex: 1;
+            padding: 12px;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            justify-content: center;
+        }
+
+        .deleted-account-card .deleted-actions button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn-small {
+            padding: 8px 16px;
+            font-size: 0.9em;
+        }
+
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+        }
+
+        .btn-info:hover {
+            background: #138496;
+        }
+
+        .btn-success {
+            background: #28a745;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        /* Page Order Controls */
+        .page-order-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+            margin-left: 15px;
+            padding-left: 15px;
+            border-left: 2px solid #e0e0e0;
+        }
+
+        .page-order-number {
+            font-weight: bold;
+            color: #ECB007;
+            font-size: 1.1em;
+            padding: 5px 10px;
+            background: rgba(236, 176, 7, 0.1);
+            border-radius: 5px;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        .btn-icon {
+            background: white;
+            border: 2px solid #ECB007;
+            color: #ECB007;
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            font-size: 0.9em;
+        }
+
+        .btn-icon:hover:not(:disabled) {
+            background: #ECB007;
+            color: white;
+            transform: scale(1.1);
+        }
+
+        .btn-icon:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .btn-warning {
+            background: #ffc107;
+            color: #333;
+        }
+
+        .btn-warning:hover {
+            background: #e0a800;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 80px 40px;
+            background: linear-gradient(135deg, rgba(236, 176, 7, 0.03) 0%, rgba(245, 200, 66, 0.05) 100%);
+            border-radius: 20px;
+            border: 2px dashed #e0e0e0;
+        }
+
+        .empty-state i {
+            font-size: 5em;
+            margin-bottom: 25px;
+            color: #ECB007;
+            opacity: 0.6;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .empty-state h3 {
+            color: #2c3e50;
+            font-size: 1.5em;
+            margin-bottom: 10px;
+        }
+
+        .empty-state p {
+            color: #7f8c8d;
+            font-size: 1.1em;
+        }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #ECB007;
+        }
+
+        .loading i {
+            font-size: 3em;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Badge */
+        .badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: bold;
+        }
+
+        .badge-success {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-warning {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 10000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 15px;
+            max-width: 900px;
+            width: 90%;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            animation: modalSlideIn 0.3s ease-out;
+        }
+
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            padding: 20px 30px;
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
+            color: white;
+            border-radius: 15px 15px 0 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 1.5em;
+        }
+
+        .modal-close {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            font-size: 1.2em;
+        }
+
+        .modal-close:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 30px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .modal-footer {
+            padding: 20px 30px;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+        }
+
+        .preview-content {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+            min-height: 300px;
+            line-height: 1.8;
+            font-size: 1.1em;
+            color: #333;
+            text-align: right;
+            direction: rtl;
+        }
+
+        .preview-content p {
+            margin-bottom: 15px;
+        }
+
+        .badge-info {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 20px;
+                text-align: center;
+            }
+
+            .user-info-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            .user-avatar-header {
+                width: 50px;
+                height: 50px;
+            }
+
+            .user-avatar-header i {
+                font-size: 24px !important;
+            }
+
+            .header h1 {
+                font-size: 1.5em;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .item-card {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+
+            .book-card .item-info {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .book-card .item-details p {
+                justify-content: center;
+            }
+
+            .book-card .item-actions {
+                justify-content: center;
+                gap: 10px;
+            }
+
+            .part-card {
+                flex-direction: column;
+            }
+
+            .part-card .item-info {
+                border-bottom: 1px solid #f0f0f0;
+            }
+
+            .part-card .item-actions {
+                border-left: none;
+                border-top: 1px solid #f0f0f0;
+                justify-content: center;
+            }
+
+            .page-card .page-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: stretch;
+            }
+
+            .page-card .page-title {
+                align-items: center;
+            }
+
+            .page-card .page-title .page-preview {
+                text-align: center;
+            }
+
+            .page-order-controls {
+                justify-content: center;
+            }
+
+            .btn-icon {
+                width: 36px;
+                height: 36px;
+            }
+
+            .publish-card {
+                flex-direction: column;
+            }
+
+            .publish-card .item-info {
+                border-bottom: 1px solid #f0f0f0;
+                flex-direction: column;
+            }
+
+            .publish-card .item-actions {
+                border-left: none;
+                border-top: 1px solid #f0f0f0;
+                justify-content: center;
+            }
+
+            .user-card .user-avatar {
+                width: 90px;
+                height: 90px;
+                font-size: 2.2em;
+            }
+
+            .user-card .user-name {
+                font-size: 1.2em;
+            }
+
+            .user-card .user-info {
+                padding: 20px;
+            }
+
+            .user-card .info-item {
+                padding: 8px;
+            }
+
+            .user-card .info-item i {
+                width: 32px;
+                height: 32px;
+                font-size: 0.85em;
+            }
+
+            .user-card .user-actions {
+                gap: 8px;
+            }
+
+            .invitation-card .invitation-icon {
+                width: 90px;
+                height: 90px;
+                font-size: 2.2em;
+            }
+
+            .invitation-card .invitation-email {
+                font-size: 1.2em;
+            }
+
+            .invitation-card .invitation-info {
+                padding: 20px;
+            }
+
+            .invitation-card .info-item {
+                padding: 8px;
+            }
+
+            .invitation-card .info-item i {
+                width: 32px;
+                height: 32px;
+                font-size: 0.85em;
+            }
+
+            .invitation-card .invitation-actions {
+                gap: 8px;
+            }
+
+            .deleted-account-card .deleted-avatar {
+                width: 90px;
+                height: 90px;
+                font-size: 2.2em;
+            }
+
+            .deleted-account-card .deleted-name {
+                font-size: 1.2em;
+            }
+
+            .deleted-account-card .deleted-info {
+                padding: 20px;
+            }
+
+            .deleted-account-card .info-item {
+                padding: 8px;
+            }
+
+            .deleted-account-card .info-item i {
+                width: 32px;
+                height: 32px;
+                font-size: 0.85em;
+            }
+
+            .deleted-account-card .deleted-actions {
+                gap: 8px;
+            }
+
+            .form-actions {
+                flex-direction: column;
+            }
+
+            /* تحسين التبويبات للموبايل */
+            .tab-nav-btn {
+                width: 38px;
+                height: 38px;
+                font-size: 1em;
+            }
+
+            .tab-btn {
+                padding: 10px 18px;
+                font-size: 0.9em;
+            }
+
+            .tab-btn i {
+                font-size: 1em;
+            }
+
+            .tab-buttons::-webkit-scrollbar {
+                height: 4px;
+            }
+
+            .tab-buttons-wrapper {
+                gap: 8px;
+            }
+
+            /* جعل أزرار الصفحات تحت المحتوى في الموبايل */
+            .page-order-controls {
+                flex-direction: row;
+                border-left: none;
+                border-top: 2px solid #e0e0e0;
+                margin-left: 0;
+                margin-top: 15px;
+                padding-left: 0;
+                padding-top: 15px;
+                width: 100%;
+                justify-content: center;
+            }
+
+            .item-info {
+                padding: 25px 25px 5px 25px;
+            }
+
+            .item-actions {
+                flex-wrap: wrap;
+                justify-content: center;
+                background: none;
+                border: none;
+                padding: 5px 25px 25px 25px;
+            }
+
+            .btn-small {
+                min-width: 100px;
+            }
+
+            .modal-content {
+                width: 95%;
+                max-height: 95vh;
+            }
+
+            .modal-body {
+                padding: 20px;
+            }
+
+            .preview-content {
+                padding: 20px;
+                font-size: 1em;
+            }
+        }
+
+        /* Analytics Styles */
+        .chart-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+            min-height: 200px;
+        }
+
+        .chart-bar {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            gap: 15px;
+        }
+
+        .chart-label {
+            min-width: 120px;
+            font-weight: 500;
+            color: #333;
+        }
+
+        .chart-bar-container {
+            flex: 1;
+            background: #f0f0f0;
+            border-radius: 5px;
+            height: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-bar-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
+            border-radius: 5px;
+            transition: width 0.5s ease;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 10px;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .visitors-table {
+            background: white;
+            border-radius: 10px;
+            border: 2px solid #e0e0e0;
+            overflow: hidden;
+        }
+
+        .visitors-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .visitors-table th {
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
+            color: white;
+            padding: 15px;
+            text-align: right;
+            font-weight: 600;
+        }
+
+        .visitors-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #e0e0e0;
+            color: #333;
+        }
+
+        .visitors-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .visitors-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .device-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 15px;
+            font-size: 0.85em;
+            font-weight: 500;
+        }
+
+        .device-desktop {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .device-mobile {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .device-tablet {
+            background: #e8f5e9;
+            color: #388e3c;
+        }
+
+        .visitor-new {
+            color: #f5576c;
+            font-weight: 600;
+        }
+
+        .visitor-returning {
+            color: #4facfe;
+            font-weight: 600;
+        }
+
+        /* Custom Alert/Confirm Dialog */
+        .custom-dialog-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.6);
+            z-index: 10000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .custom-dialog-overlay.active {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .custom-dialog {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 50px rgba(236, 176, 7, 0.3);
+            max-width: 500px;
+            width: 90%;
+            animation: slideDown 0.3s ease;
+            overflow: hidden;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .custom-dialog-header {
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
+            color: white;
+            padding: 20px 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .custom-dialog-header.success {
+            background: linear-gradient(135deg, #28a745 0%, #34ce57 100%);
+        }
+
+        .custom-dialog-header.error {
+            background: linear-gradient(135deg, #dc3545 0%, #e74c3c 100%);
+        }
+
+        .custom-dialog-header.warning {
+            background: linear-gradient(135deg, #ffc107 0%, #ffb300 100%);
+        }
+
+        .custom-dialog-icon {
+            font-size: 2em;
+            animation: bounceIn 0.5s ease;
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0); }
+            50% { transform: scale(1.2); }
+            100% { transform: scale(1); }
+        }
+
+        .custom-dialog-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin: 0;
+        }
+
+        .custom-dialog-body {
+            padding: 30px 25px;
+            color: #333;
+            font-size: 1.05em;
+            line-height: 1.6;
+            text-align: center;
+        }
+
+        .custom-dialog-input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 1em;
+            margin-top: 15px;
+            transition: all 0.3s;
+            direction: rtl;
+        }
+
+        .custom-dialog-input:focus {
+            outline: none;
+            border-color: #ECB007;
+            box-shadow: 0 0 0 4px rgba(236, 176, 7, 0.1);
+        }
+
+        .custom-dialog-footer {
+            padding: 20px 25px;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .dialog-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dialog-btn-primary {
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(236, 176, 7, 0.3);
+        }
+
+        .dialog-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(236, 176, 7, 0.4);
+        }
+
+        .dialog-btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .dialog-btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .dialog-btn-danger {
+            background: linear-gradient(135deg, #dc3545 0%, #e74c3c 100%);
+            color: white;
+        }
+
+        .dialog-btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(220, 53, 69, 0.4);
+        }
+
+        /* Category Selector Items */
+        .custom-dialog-body div[onclick^="selectCategory"] {
+            transition: all 0.3s;
+        }
+
+        .custom-dialog-body div[onclick^="selectCategory"]:hover {
+            box-shadow: 0 3px 10px rgba(236, 176, 7, 0.2);
+            border-color: #ECB007 !important;
+        }
+
+        /* Edit Dialog Textarea for Page Content */
+        #editPageContent {
+            min-height: 300px !important;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+        }
+
+        /* Footer */
+        footer {
+            text-align: center;
+            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
+            color: white;
+            padding: 30px 20px;
+            margin-top: 60px;
+            box-shadow: 0 -5px 20px rgba(236, 176, 7, 0.2);
+            font-size: 1.1em;
+            font-weight: 500;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+        }
+    </style>
 </head>
 <body>
     <!-- Header Image -->
@@ -20,11 +2440,11 @@
         <div class="header">
             <div class="user-info-header">
                 <div id="userAvatarContainer" class="user-avatar-header">
-                    <i id="userAvatarIcon" class="fas fa-user ds-inline-1"></i>
+                    <i id="userAvatarIcon" class="fas fa-user" style="font-size: 30px; color: white;"></i>
                     <img id="userAvatarImg" src="" alt="صورة المستخدم" style="display: none; width: 100%; height: 100%; object-fit: cover;">
                 </div>
                 <div>
-                    <h1 id="greetingText" class="ds-inline-2"></h1>
+                    <h1 id="greetingText" style="margin-bottom: 5px;"></h1>
                 </div>
             </div>
             <button onclick="logout()" style="background: linear-gradient(135deg, #dc3545 0%, #c82333 100%); border: 2px solid #bd2130; color: white; padding: 6px 14px; border-radius: 12px; cursor: pointer; font-size: 16px; font-weight: 600; transition: all 0.3s; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3);">
@@ -76,7 +2496,7 @@
             </div>
 
             <div class="stat-card">
-                <div class="stat-icon ds-inline-3">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);">
                     <i class="fas fa-users"></i>
                 </div>
                 <div class="stat-info">
@@ -86,7 +2506,7 @@
             </div>
 
             <div class="stat-card">
-                <div class="stat-icon ds-inline-3">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);">
                     <i class="fas fa-users"></i>
                 </div>
                 <div class="stat-info">
@@ -113,8 +2533,8 @@
                         <button class="tab-btn admin-only" onclick="switchTab('parts')">
                             <i class="fas fa-bookmark"></i> الأجزاء
                         </button>
-                        <button class="tab-btn" onclick="switchTab('chapters')">
-                            <i class="fas fa-list-ol"></i> الأبواب
+                        <button class="tab-btn admin-only" onclick="switchTab('chapters')">
+                            <i class="fas fa-list"></i> الأبواب
                         </button>
                         <button class="tab-btn" onclick="switchTab('pages')">
                             <i class="fas fa-file-alt"></i> الصفحات
@@ -144,7 +2564,7 @@
             <!-- Categories Tab -->
             <div id="categories-tab" class="tab-content active admin-only">
                 <div class="form-section">
-                    <h2 class="ds-inline-4">
+                    <h2 style="color: #ECB007; margin-bottom: 20px;">
                         <i class="fas fa-plus-circle"></i> إضافة قسم جديد
                     </h2>
                     <form id="categoryForm" onsubmit="saveCategory(event)">
@@ -167,14 +2587,14 @@
                     </form>
                 </div>
 
-                <div class="sec">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin: 30px 0 20px 0; padding: 20px; background: linear-gradient(135deg, rgba(236, 176, 7, 0.08) 0%, rgba(245, 200, 66, 0.12) 100%); border-radius: 15px; border-right: 5px solid #ECB007;">
                     <h3 style="margin: 0; color: #2c3e50; font-size: 1.4em; display: flex; align-items: center; gap: 12px;">
                         <span style="width: 45px; height: 45px; background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 4px 15px rgba(236, 176, 7, 0.3);">
                             <i class="fas fa-list"></i>
                         </span>
                         قائمة الأقسام
                     </h3>
-                    <span class="ds-inline-5">
+                    <span style="background: white; padding: 8px 16px; border-radius: 25px; font-weight: 600; color: #ECB007; box-shadow: 0 2px 10px rgba(0,0,0,0.08); font-size: 0.9em;">
                         <i class="fas fa-folder"></i> <span id="categoriesCount">0</span> قسم
                     </span>
                 </div>
@@ -186,150 +2606,10 @@
                 </div>
             </div>
 
-            <!-- Chapters Management Tab -->
-            <div id="chapters-tab" class="tab-content">
-                <div class="form-section">
-                    <h2 class="ds-inline-4">
-                        <i class="fas fa-list-ol"></i> إدارة أبواب الكتاب
-                    </h2>
-
-                    <div class="form-group">
-                        <label><i class="fas fa-book"></i> اختر الكتاب</label>
-                        <select id="chapterBookSelect" onchange="onBookSelectForChapters()" required>
-                            <option value="">اختر كتاباً لإدارة أبوابه</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group" id="chapterPartSelectGroup" style="display: none;">
-                        <label><i class="fas fa-bookmark"></i> اختر الجزء (اختياري)</label>
-                        <select id="chapterPartSelect" onchange="loadSelectedChapters()">
-                            <option value="">أبواب بدون جزء</option>
-                        </select>
-                        <small style="color: #666; display: block; margin-top: 5px;">
-                            <i class="fas fa-info-circle"></i> إذا كان للكتاب أجزاء يمكنك إضافة أبواب داخل جزء محدد أو تركها بدون جزء.
-                        </small>
-                    </div>
-
-                    <div id="chapterEditorSection" style="display: none;">
-                        <h3 class="ds-inline-6">
-                            <i class="fas fa-plus-circle"></i> إضافة باب جديد
-                        </h3>
-                        <form id="chapterForm" onsubmit="saveChapter(event)">
-                            <div class="form-group">
-                                <label><i class="fas fa-heading"></i> اسم الباب <span class="ds-inline-7">*</span></label>
-                                <input type="text" id="chapterTitle" placeholder="مثال: باب الطهارة" required>
-                            </div>
-                            <div class="form-actions">
-                                <button type="submit" class="btn btn-primary">
-                                    <i class="fas fa-save"></i> حفظ الباب
-                                </button>
-                                <button type="button" class="btn btn-secondary" onclick="clearChapterForm()">
-                                    <i class="fas fa-times"></i> إلغاء
-                                </button>
-                            </div>
-                        </form>
-
-                        <div class="sec-chapters">
-                            <h3 style="margin: 0; color: #2c3e50; font-size: 1.4em; display: flex; align-items: center; gap: 12px;">
-                                <span style="width: 45px; height: 45px; background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 4px 15px rgba(236, 176, 7, 0.3);">
-                                    <i class="fas fa-list-ol"></i>
-                                </span>
-                                أبواب الكتاب
-                            </h3>
-                            <span class="ds-inline-5">
-                                <i class="fas fa-list-ol"></i> <span id="chaptersCount">0</span> باب
-                            </span>
-                        </div>
-                        <div id="chaptersList" class="items-list">
-                            <div class="empty-state">
-                                <i class="fas fa-list-ol"></i>
-                                <h3>لا توجد أبواب</h3>
-                                <p>ابدأ بإضافة باب جديد</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Chapter Pages Manager Modal -->
-            <div id="chapterPagesModal" class="modal" style="display: none;">
-                <div class="modal-content" style="max-width: 900px;">
-                    <div class="modal-header">
-                        <h2>
-                         إدارة صفحات الباب: <span id="modalChapterTitle"></span>
-                        </h2>
-                        <button class="modal-close" onclick="closeChapterPagesModal()">
-                            <i class="fas fa-times"></i>
-                        </button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="modal-body-pages">
-                            <strong class="ds-inline-11"><i class="fas fa-hashtag"></i> اختيار بالمدى</strong>
-                                <div class="select-pages-inputs">
-                                    <div style="display: flex; align-items: center; gap: 8px;">
-                                        <label class="ds-inline-12">من</label>
-                                        <input id="chapterPagesFrom" type="number" min="1" class="ds-inline-13" placeholder="10">
-                                    </div>
-                                    <div style="display: flex; align-items: center; gap: 8px;">
-                                        <label class="ds-inline-12">إلى</label>
-                                        <input id="chapterPagesTo" type="number" min="1" class="ds-inline-13" placeholder="50">
-                                    </div>
-                                </div>
-                                <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-                                    <button class="btn btn-primary" type="button" onclick="applyChapterPagesRange('link')">
-                                        <i class="fas fa-link"></i> إضافة الصفحات
-                                    </button>
-                                    <button class="btn btn-danger" type="button" onclick="applyChapterPagesRange('unlink')">
-                                        <i class="fas fa-unlink"></i> إزالة الصفحات
-                                    </button>
-                                </div>
-                            <small class="select-pages-tip">
-                                سيتم تطبيق التغيير على صفحات هذا الكتاب/الجزء حسب سياق الباب.
-                            </small>
-                        </div>
-
-                        <div>
-                            <!-- الصفحات الحالية في الباب -->
-                            <div>
-                                <h3 class="ds-inline-14">
-                                    <i class="fas fa-check-circle"></i> الصفحات المرتبطة بالباب
-                                    <span class="ds-inline-15" id="linkedPagesCount">0</span>
-                                </h3>
-                                <div id="linkedPagesList" class="ds-inline-16">
-                                    <div class="empty-state">
-                                        <i class="fas fa-file-alt"></i>
-                                        <p>لا توجد صفحات مرتبطة</p>
-                                    </div>
-                                </div>
-                            </div>
-                            <!-- الصفحات المتاحة للإضافة -->
-                            <div>
-                                <h3 class="ds-inline-17">
-                                    <i class="fas fa-plus-circle"></i> صفحات متاحة للإضافة
-                                    <span class="ds-inline-18" id="availablePagesCount">0</span>
-                                </h3>
-                                <div id="availablePagesList" class="ds-inline-19">
-                                    <div class="empty-state">
-                                        <i class="fas fa-file-alt"></i>
-                                        <p>لا توجد صفحات متاحة</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div style="display: flex; justify-content: center; margin-top: 18px;">
-                            <button type="button" class="btn btn-secondary" onclick="closeChapterPagesModal()">
-                                <i class="fas fa-times"></i> إلغاء
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
             <!-- Books Tab -->
             <div id="books-tab" class="tab-content admin-only">
                 <div class="form-section">
-                    <h2 class="ds-inline-4">
+                    <h2 style="color: #ECB007; margin-bottom: 20px;">
                         <i class="fas fa-plus-circle"></i> إضافة كتاب جديد
                     </h2>
                     <form id="bookForm" onsubmit="saveBook(event)">
@@ -344,7 +2624,7 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label><i class="fas fa-image"></i> صورة الغلاف <span class="ds-inline-7">*</span></label>
+                            <label><i class="fas fa-image"></i> صورة الغلاف <span style="color: red;">*</span></label>
                             <div class="file-upload-wrapper">
                                 <input type="file" id="bookCover" accept="image/*" required onchange="handleFileSelect(event, 'bookCoverPreview')">
                                 <label for="bookCover" class="file-upload-label">
@@ -380,14 +2660,14 @@
                     </form>
                 </div>
 
-                <div class="sec-book">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin: 30px 0 20px 0; padding: 20px; background: linear-gradient(135deg, rgba(236, 176, 7, 0.08) 0%, rgba(245, 200, 66, 0.12) 100%); border-radius: 15px; border-right: 5px solid #ECB007;">
                     <h3 style="margin: 0; color: #2c3e50; font-size: 1.4em; display: flex; align-items: center; gap: 12px;">
                         <span style="width: 45px; height: 45px; background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 4px 15px rgba(236, 176, 7, 0.3);">
                             <i class="fas fa-book"></i>
                         </span>
                         قائمة الكتب
                     </h3>
-                    <span class="ds-inline-5">
+                    <span style="background: white; padding: 8px 16px; border-radius: 25px; font-weight: 600; color: #ECB007; box-shadow: 0 2px 10px rgba(0,0,0,0.08); font-size: 0.9em;">
                         <i class="fas fa-book-open"></i> <span id="booksCount">0</span> كتاب
                     </span>
                 </div>
@@ -402,7 +2682,7 @@
             <!-- Parts Management Tab -->
             <div id="parts-tab" class="tab-content admin-only">
                 <div class="form-section">
-                    <h2 class="ds-inline-4">
+                    <h2 style="color: #ECB007; margin-bottom: 20px;">
                         <i class="fas fa-bookmark"></i> إدارة أجزاء الكتاب
                     </h2>
                     
@@ -414,7 +2694,7 @@
                     </div>
 
                     <div id="partEditorSection" style="display: none;">
-                        <h3 class="ds-inline-6">
+                        <h3 style="color: #ECB007; margin: 30px 0 20px;">
                             <i class="fas fa-plus-circle"></i> إضافة جزء جديد
                         </h3>
                         <form id="partForm" onsubmit="savePart(event)">
@@ -432,14 +2712,14 @@
                             </div>
                         </form>
 
-                        <div class="sec-parts">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin: 30px 0 20px 0; padding: 20px; background: linear-gradient(135deg, rgba(236, 176, 7, 0.08) 0%, rgba(245, 200, 66, 0.12) 100%); border-radius: 15px; border-right: 5px solid #ECB007;">
                             <h3 style="margin: 0; color: #2c3e50; font-size: 1.4em; display: flex; align-items: center; gap: 12px;">
                                 <span style="width: 45px; height: 45px; background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 4px 15px rgba(236, 176, 7, 0.3);">
                                     <i class="fas fa-bookmark"></i>
                                 </span>
                                 أجزاء الكتاب
                             </h3>
-                            <span class="ds-inline-5">
+                            <span style="background: white; padding: 8px 16px; border-radius: 25px; font-weight: 600; color: #ECB007; box-shadow: 0 2px 10px rgba(0,0,0,0.08); font-size: 0.9em;">
                                 <i class="fas fa-layer-group"></i> <span id="partsCount">0</span> جزء
                             </span>
                         </div>
@@ -454,10 +2734,82 @@
                 </div>
             </div>
 
+            <div id="chapters-tab" class="tab-content admin-only">
+                <div class="form-section">
+                    <h2 style="color: #ECB007; margin-bottom: 20px;">
+                        <i class="fas fa-list"></i> إدارة أبواب الكتاب
+                    </h2>
+                    
+                    <div class="form-group">
+                        <label><i class="fas fa-book"></i> اختر الكتاب</label>
+                        <select id="chapterBookSelect" onchange="onBookSelectForChapters()" required>
+                            <option value="">اختر كتاباً لإدارة أبوابه</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group" id="chapterPartSelectGroup" style="display: none;">
+                        <label><i class="fas fa-bookmark"></i> اختر الجزء <span style="color: red;">*</span></label>
+                        <select id="chapterPartSelect" onchange="onPartSelectForChapters()">
+                            <option value="">اختر الجزء...</option>
+                        </select>
+                        <small style="color: #d32f2f; display: block; margin-top: 5px; font-weight: bold;">
+                            ⚠️ هذا الكتاب مقسم إلى أجزاء - يجب اختيار الجزء
+                        </small>
+                    </div>
+
+                    <div id="chapterEditorSection" style="display: none;">
+                        <h3 style="color: #ECB007; margin: 30px 0 20px;">
+                            <i class="fas fa-plus-circle"></i> إضافة باب جديد
+                        </h3>
+                        <form id="chapterForm" onsubmit="saveChapter(event)">
+                            <div class="form-group">
+                                <label><i class="fas fa-tag"></i> اسم الباب</label>
+                                <input type="text" id="chapterTitle" placeholder="مثال: باب الطهارة" required>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-hashtag"></i> رقم صفحة البداية</label>
+                                <input type="number" id="chapterPageStart" min="1" placeholder="مثال: 10" required>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-hashtag"></i> رقم صفحة النهاية</label>
+                                <input type="number" id="chapterPageEnd" min="1" placeholder="مثال: 25" required>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-save"></i> حفظ الباب
+                                </button>
+                                <button type="button" class="btn btn-secondary" onclick="clearChapterForm()">
+                                    <i class="fas fa-times"></i> إلغاء
+                                </button>
+                            </div>
+                        </form>
+
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin: 30px 0 20px 0; padding: 20px; background: linear-gradient(135deg, rgba(236, 176, 7, 0.08) 0%, rgba(245, 200, 66, 0.12) 100%); border-radius: 15px; border-right: 5px solid #ECB007;">
+                            <h3 style="margin: 0; color: #2c3e50; font-size: 1.4em; display: flex; align-items: center; gap: 12px;">
+                                <span style="width: 45px; height: 45px; background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 4px 15px rgba(236, 176, 7, 0.3);">
+                                    <i class="fas fa-list"></i>
+                                </span>
+                                أبواب الكتاب
+                            </h3>
+                            <span style="background: white; padding: 8px 16px; border-radius: 25px; font-weight: 600; color: #ECB007; box-shadow: 0 2px 10px rgba(0,0,0,0.08); font-size: 0.9em;">
+                                <i class="fas fa-list"></i> <span id="chaptersCount">0</span> باب
+                            </span>
+                        </div>
+                        <div id="chaptersList" class="items-list">
+                            <div class="empty-state">
+                                <i class="fas fa-list"></i>
+                                <h3>لا توجد أبواب</h3>
+                                <p>ابدأ بإضافة باب جديد</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Pages Management Tab -->
             <div id="pages-tab" class="tab-content">
                 <div class="form-section">
-                    <h2 class="ds-inline-4">
+                    <h2 style="color: #ECB007; margin-bottom: 20px;">
                         <i class="fas fa-book-open"></i> إدارة صفحات الكتاب
                     </h2>
                     
@@ -469,8 +2821,8 @@
                     </div>
 
                     <div class="form-group" id="pagePartSelectGroup" style="display: none;">
-                        <label><i class="fas fa-bookmark"></i> اختر الجزء <span class="ds-inline-7">*</span></label>
-                        <select id="pagePartSelect" onchange="onPartSelectForPages()">
+                        <label><i class="fas fa-bookmark"></i> اختر الجزء <span style="color: red;">*</span></label>
+                        <select id="pagePartSelect">
                             <option value="">اختر الجزء...</option>
                         </select>
                         <small style="color: #d32f2f; display: block; margin-top: 5px; font-weight: bold;">
@@ -478,18 +2830,8 @@
                         </small>
                     </div>
 
-                    <div class="form-group" id="pageChapterSelectGroup" style="display: none;">
-                        <label><i class="fas fa-list-ol"></i> اختر الباب <span class="ds-inline-7">*</span></label>
-                        <select id="pageChapterSelect">
-                            <option value="">اختر الباب...</option>
-                        </select>
-                        <small style="color: #d32f2f; display: block; margin-top: 5px; font-weight: bold; display:none;" id="pageChapterRequiredHint">
-                            ⚠️ هذا السياق يحتوي على أبواب - يجب اختيار الباب
-                        </small>
-                    </div>
-
                     <div id="pageEditorSection" style="display: none;">
-                        <h3 class="ds-inline-6">
+                        <h3 style="color: #ECB007; margin: 30px 0 20px;">
                             <i class="fas fa-plus-circle"></i> إضافة صفحة جديدة
                         </h3>
                         <form id="pageForm" onsubmit="savePage(event)">
@@ -510,14 +2852,14 @@
                             </div>
                         </form>
 
-                        <div class="sec-pages">
+                        <div style="display: flex; align-items: center; justify-content: space-between; margin: 30px 0 20px 0; padding: 20px; background: linear-gradient(135deg, rgba(236, 176, 7, 0.08) 0%, rgba(245, 200, 66, 0.12) 100%); border-radius: 15px; border-right: 5px solid #ECB007;">
                             <h3 style="margin: 0; color: #2c3e50; font-size: 1.4em; display: flex; align-items: center; gap: 12px;">
                                 <span style="width: 45px; height: 45px; background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 4px 15px rgba(236, 176, 7, 0.3);">
                                     <i class="fas fa-file-alt"></i>
                                 </span>
                                 صفحات الكتاب
                             </h3>
-                            <span class="ds-inline-5">
+                            <span style="background: white; padding: 8px 16px; border-radius: 25px; font-weight: 600; color: #ECB007; box-shadow: 0 2px 10px rgba(0,0,0,0.08); font-size: 0.9em;">
                                 <i class="fas fa-file-alt"></i> <span id="pagesCount">0</span> صفحة
                             </span>
                         </div>
@@ -555,21 +2897,21 @@
             <!-- Publish Tab -->
             <div id="publish-tab" class="tab-content admin-only">
                 <div class="form-section">
-                    <h2 class="ds-inline-4">
+                    <h2 style="color: #ECB007; margin-bottom: 20px;">
                         <i class="fas fa-globe"></i> نشر الكتب
                     </h2>
-                    <p class="ds-inline-20">
+                    <p style="color: #666; margin-bottom: 30px;">
                         <i class="fas fa-info-circle"></i> يمكنك نشر أو إلغاء نشر الكتب من هنا. الكتب المنشورة فقط تظهر للزوار.
                     </p>
 
-                    <div class="sec-allBooks">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin: 30px 0 20px 0; padding: 20px; background: linear-gradient(135deg, rgba(236, 176, 7, 0.08) 0%, rgba(245, 200, 66, 0.12) 100%); border-radius: 15px; border-right: 5px solid #ECB007;">
                         <h3 style="margin: 0; color: #2c3e50; font-size: 1.4em; display: flex; align-items: center; gap: 12px;">
                             <span style="width: 45px; height: 45px; background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 4px 15px rgba(236, 176, 7, 0.3);">
                                 <i class="fas fa-globe"></i>
                             </span>
                             جميع الكتب
                         </h3>
-                        <span class="ds-inline-5">
+                        <span style="background: white; padding: 8px 16px; border-radius: 25px; font-weight: 600; color: #ECB007; box-shadow: 0 2px 10px rgba(0,0,0,0.08); font-size: 0.9em;">
                             <i class="fas fa-book"></i> <span id="publishBooksCount">0</span> كتاب
                         </span>
                     </div>
@@ -585,14 +2927,14 @@
             <!-- Analytics Tab -->
             <div id="analytics-tab" class="tab-content admin-only">
                 <div class="form-section">
-                    <h2 class="ds-inline-4">
+                    <h2 style="color: #ECB007; margin-bottom: 20px;">
                         <i class="fas fa-chart-bar"></i> إحصائيات الزوار
                     </h2>
 
                     <!-- إحصائيات عامة -->
-                    <div class="stats-grid ds-inline-21">
+                    <div class="stats-grid" style="margin-bottom: 30px;">
                         <div class="stat-card">
-                            <div class="stat-icon ds-inline-3">
+                            <div class="stat-icon" style="background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);">
                                 <i class="fas fa-users"></i>
                             </div>
                             <div class="stat-info">
@@ -601,7 +2943,7 @@
                             </div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-icon ds-inline-22">
+                            <div class="stat-icon" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);">
                                 <i class="fas fa-user-plus"></i>
                             </div>
                             <div class="stat-info">
@@ -610,7 +2952,7 @@
                             </div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-icon ds-inline-23">
+                            <div class="stat-icon" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);">
                                 <i class="fas fa-user-check"></i>
                             </div>
                             <div class="stat-info">
@@ -621,16 +2963,16 @@
                     </div>
 
                     <!-- الزوار حسب الدولة -->
-                    <div class="ds-inline-21">
-                        <h3 class="ds-inline-24">
+                    <div style="margin-bottom: 30px;">
+                        <h3 style="color: #333; margin-bottom: 15px;">
                             <i class="fas fa-globe-americas"></i> الزوار حسب الدولة
                         </h3>
                         <div id="countriesChart" class="chart-container"></div>
                     </div>
 
                     <!-- الزوار حسب نوع الجهاز -->
-                    <div class="ds-inline-21">
-                        <h3 class="ds-inline-24">
+                    <div style="margin-bottom: 30px;">
+                        <h3 style="color: #333; margin-bottom: 15px;">
                             <i class="fas fa-mobile-alt"></i> الزوار حسب نوع الجهاز
                         </h3>
                         <div id="devicesChart" class="chart-container"></div>
@@ -638,7 +2980,7 @@
 
                     <!-- جدول تفاصيل الزوار -->
                     <div>
-                        <h3 class="ds-inline-24">
+                        <h3 style="color: #333; margin-bottom: 15px;">
                             <i class="fas fa-list"></i> تفاصيل الزوار
                         </h3>
                         <div id="visitorsTable" class="visitors-table"></div>
@@ -648,7 +2990,7 @@
 
             <!-- Messages Tab -->
             <div id="messages-tab" class="tab-content admin-only">
-                <h3 class="ds-inline-25">
+                <h3 style="margin-bottom: 20px; color: #333;">
                     <i class="fas fa-envelope"></i> رسائل التواصل
                 </h3>
                 <div id="messagesList" class="items-list">
@@ -662,7 +3004,7 @@
             <!-- Team Tab -->
             <div id="team-tab" class="tab-content admin-only">
                 <div class="form-section">
-                    <h2 class="ds-inline-4">
+                    <h2 style="color: #ECB007; margin-bottom: 20px;">
                         <i class="fas fa-user-plus"></i> دعوة عضو جديد
                     </h2>
                     <form id="invitationForm" onsubmit="sendInvitation(event)">
@@ -687,14 +3029,14 @@
                     </form>
                 </div>
 
-                <div class="sec-team">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin: 30px 0 20px 0; padding: 20px; background: linear-gradient(135deg, rgba(236, 176, 7, 0.08) 0%, rgba(245, 200, 66, 0.12) 100%); border-radius: 15px; border-right: 5px solid #ECB007;">
                     <h3 style="margin: 0; color: #2c3e50; font-size: 1.4em; display: flex; align-items: center; gap: 12px;">
                         <span style="width: 45px; height: 45px; background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; color: white; box-shadow: 0 4px 15px rgba(236, 176, 7, 0.3);">
                             <i class="fas fa-users"></i>
                         </span>
                         فريق العمل
                     </h3>
-                    <span class="ds-inline-5">
+                    <span style="background: white; padding: 8px 16px; border-radius: 25px; font-weight: 600; color: #ECB007; box-shadow: 0 2px 10px rgba(0,0,0,0.08); font-size: 0.9em;">
                         <i class="fas fa-user"></i> <span id="teamMembersCount">0</span> عضو
                     </span>
                 </div>
@@ -712,7 +3054,7 @@
                         </span>
                         الدعوات المرسلة
                     </h3>
-                    <span class="ds-inline-5">
+                    <span style="background: white; padding: 8px 16px; border-radius: 25px; font-weight: 600; color: #ECB007; box-shadow: 0 2px 10px rgba(0,0,0,0.08); font-size: 0.9em;">
                         <i class="fas fa-envelope"></i> <span id="invitationsCount">0</span> دعوة
                     </span>
                 </div>
@@ -730,7 +3072,7 @@
                         </span>
                         الحسابات المحذوفة
                     </h3>
-                    <span class="ds-inline-26">
+                    <span style="background: white; padding: 8px 16px; border-radius: 25px; font-weight: 600; color: #dc3545; box-shadow: 0 2px 10px rgba(0,0,0,0.08); font-size: 0.9em;">
                         <i class="fas fa-user-times"></i> <span id="deletedAccountsCount">0</span> حساب
                     </span>
                 </div>
@@ -745,17 +3087,17 @@
             <!-- Profile Tab -->
             <div id="profile-tab" class="tab-content">
                 <div class="form-section">
-                    <h2 class="ds-inline-4">
+                    <h2 style="color: #ECB007; margin-bottom: 20px;">
                         <i class="fas fa-user-circle"></i> معلومات الملف الشخصي
                     </h2>
                     
-                    <div class="ds-inline-27">
+                    <div style="text-align: center; margin-bottom: 30px;">
                         <div id="profileAvatarContainer" style="width: 120px; height: 120px; margin: 0 auto 20px; border-radius: 50%; background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%); display: flex; align-items: center; justify-content: center; box-shadow: 0 5px 20px rgba(236, 176, 7, 0.3); overflow: hidden; position: relative;">
-                            <i id="profileAvatarIcon" class="fas fa-user ds-inline-28"></i>
+                            <i id="profileAvatarIcon" class="fas fa-user" style="font-size: 60px; color: white;"></i>
                             <img id="profileAvatarImg" src="" alt="صورة المستخدم" style="display: none; width: 100%; height: 100%; object-fit: cover;">
                         </div>
-                        <h3 id="profileUserName" class="ds-inline-29">جاري التحميل...</h3>
-                        <p id="profileUserEmail" class="ds-inline-30"></p>
+                        <h3 id="profileUserName" style="color: #333; margin-bottom: 5px;">جاري التحميل...</h3>
+                        <p id="profileUserEmail" style="color: #666; font-size: 0.95em;"></p>
                         <p id="profileUserRole" style="display: inline-block; margin-top: 10px; padding: 8px 20px; background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%); color: white; border-radius: 20px; font-size: 0.9em; font-weight: bold;"></p>
                     </div>
 
@@ -767,7 +3109,7 @@
                         
                         <div class="form-group">
                             <label><i class="fas fa-envelope"></i> البريد الإلكتروني</label>
-                            <input type="email" id="profileEmail" disabled class="ds-inline-31">
+                            <input type="email" id="profileEmail" disabled style="background: #f5f5f5; cursor: not-allowed;">
                             <small style="color: #666; display: block; margin-top: 5px;">
                                 <i class="fas fa-info-circle"></i> لا يمكن تغيير البريد الإلكتروني
                             </small>
@@ -811,8 +3153,8 @@
                     </form>
                 </div>
 
-                <div class="form-section ds-inline-32">
-                    <h2 class="ds-inline-4">
+                <div class="form-section" style="margin-top: 30px;">
+                    <h2 style="color: #ECB007; margin-bottom: 20px;">
                         <i class="fas fa-key"></i> تغيير كلمة المرور
                     </h2>
                     
@@ -1385,7 +3727,7 @@
                                     ${category.name}
                                     <span class="item-badge">#${index + 1}</span>
                                 </h3>
-                                <p><i class="fas fa-align-right ds-inline-33"></i> ${category.description || 'لا يوجد وصف لهذا القسم'}</p>
+                                <p><i class="fas fa-align-right" style="color: #ECB007; margin-left: 5px;"></i> ${category.description || 'لا يوجد وصف لهذا القسم'}</p>
                             </div>
                         </div>
                         <div class="item-actions">
@@ -1559,14 +3901,14 @@
                                     <span class="item-badge">#${index + 1}</span>
                                 </h3>
                                 <p>
-                                    <span class="book-meta ds-inline-34">
+                                    <span class="book-meta" style="background: linear-gradient(135deg, rgba(236, 176, 7, 0.1) 0%, rgba(245, 200, 66, 0.12) 100%); color: #ECB007 ;">
                                         <i class="fas fa-folder"></i>
                                         ${categoryMap[book.category_id] || 'غير محدد'}
                                     </span>
                                     ${book.published ? 
-                                        '<span class="book-meta ds-inline-35"><i class="fas fa-check-circle"></i> منشور</span>' : 
-                                        '<span class="book-meta ds-inline-36"><i class="fas fa-clock"></i> غير منشور</span>'}
-                                    ${book.views ? `<span class="book-meta ds-inline-37"><i class="fas fa-eye"></i> ${book.views} مشاهدة</span>` : ''}
+                                        '<span class="book-meta" style="background: rgba(40, 167, 69, 0.1); color: #28a745;"><i class="fas fa-check-circle"></i> منشور</span>' : 
+                                        '<span class="book-meta" style="background: rgba(220, 53, 69, 0.1); color: #dc3545;"><i class="fas fa-clock"></i> غير منشور</span>'}
+                                    ${book.views ? `<span class="book-meta" style="background: rgba(127, 140, 141, 0.1); color: #7f8c8d;"><i class="fas fa-eye"></i> ${book.views} مشاهدة</span>` : ''}
                                 </p>
                             </div>
                         </div>
@@ -1659,14 +4001,14 @@
 
                 // إنشاء قائمة الأقسام مع تحديد القسم الحالي
                 const categoriesList = categories.map((cat, index) => 
-                    `<div class="ds-inline-38" onclick="selectCategory('${cat.id}')">
-                        <strong>${index + 1}.</strong> ${cat.name} ${cat.id === currentCategoryId ? '<span class="ds-inline-39">✓ (القسم الحالي)</span>' : ''}
+                    `<div style="padding: 10px; margin: 5px 0; background: ${cat.id === currentCategoryId ? 'rgba(236, 176, 7, 0.1)' : '#f8f9fa'}; border-radius: 8px; cursor: pointer; border: 2px solid ${cat.id === currentCategoryId ? '#ECB007' : 'transparent'};" onclick="selectCategory('${cat.id}')">
+                        <strong>${index + 1}.</strong> ${cat.name} ${cat.id === currentCategoryId ? '<span style="color: #ECB007;">✓ (القسم الحالي)</span>' : ''}
                     </div>`
                 ).join('');
 
                 // عرض نافذة اختيار القسم
                 const selectedCategoryId = await showCategorySelector(
-                    `<div class="ds-inline-40">${categoriesList}</div>`,
+                    `<div style="max-height: 300px; overflow-y: auto;">${categoriesList}</div>`,
                     'اختر القسم الجديد للكتاب'
                 );
 
@@ -1747,7 +4089,7 @@
             const container = document.getElementById('countriesChart');
             
             if (countries.length === 0) {
-                container.innerHTML = '<p class="ds-inline-41">لا توجد بيانات</p>';
+                container.innerHTML = '<p style="text-align: center; color: #999;">لا توجد بيانات</p>';
                 return;
             }
 
@@ -1757,7 +4099,7 @@
                 <div class="chart-bar">
                     <div class="chart-label">${item.country}</div>
                     <div class="chart-bar-container">
-                        <div class="chart-bar-fill ds-inline-42">
+                        <div class="chart-bar-fill" style="width: ${(item.count / maxCount) * 100}%">
                             ${item.count}
                         </div>
                     </div>
@@ -1769,7 +4111,7 @@
             const container = document.getElementById('devicesChart');
             
             if (devices.length === 0) {
-                container.innerHTML = '<p class="ds-inline-41">لا توجد بيانات</p>';
+                container.innerHTML = '<p style="text-align: center; color: #999;">لا توجد بيانات</p>';
                 return;
             }
 
@@ -1786,7 +4128,7 @@
                         <i class="fas ${deviceIcons[item.device] || 'fa-question'}"></i> ${item.device}
                     </div>
                     <div class="chart-bar-container">
-                        <div class="chart-bar-fill ds-inline-42">
+                        <div class="chart-bar-fill" style="width: ${(item.count / maxCount) * 100}%">
                             ${item.count}
                         </div>
                     </div>
@@ -1798,7 +4140,7 @@
             const container = document.getElementById('visitorsTable');
             
             if (visitors.length === 0) {
-                container.innerHTML = '<p class="ds-inline-43">لا توجد زيارات مسجلة</p>';
+                container.innerHTML = '<p style="text-align: center; color: #999; padding: 20px;">لا توجد زيارات مسجلة</p>';
                 return;
             }
 
@@ -1867,8 +4209,8 @@
                         <div class="item-info">
                             <h3><i class="fas fa-user"></i> ${msg.name}</h3>
                             <p><strong>${msg.subject}</strong></p>
-                            <p class="ds-inline-44">${msg.message}</p>
-                            <p class="ds-inline-45">
+                            <p style="margin-top: 5px;">${msg.message}</p>
+                            <p style="margin-top: 10px; color: #999; font-size: 0.85em;">
                                 <i class="fas fa-envelope"></i> ${msg.email} | 
                                 <i class="fas fa-clock"></i> ${new Date(msg.created_at).toLocaleString('ar-EG')}
                             </p>
@@ -1981,41 +4323,6 @@
         let currentSelectedBookId = null;
         let currentEditingPageId = null;
 
-        async function loadChaptersForPages(bookId, partId) {
-            const chapterSelectGroup = document.getElementById('pageChapterSelectGroup');
-            const chapterSelect = document.getElementById('pageChapterSelect');
-            const chapterHint = document.getElementById('pageChapterRequiredHint');
-
-            if (!chapterSelectGroup || !chapterSelect) return;
-
-            chapterSelectGroup.style.display = 'none';
-            chapterSelect.required = false;
-            if (chapterHint) chapterHint.style.display = 'none';
-            chapterSelect.innerHTML = '<option value="">اختر الباب...</option>';
-
-            if (!bookId) return;
-
-            let chapters = [];
-            if (partId) {
-                chapters = await api.getPartChapters(partId);
-            } else {
-                chapters = await api.getBookRootChapters(bookId);
-            }
-
-            if (chapters.length === 0) {
-                chapterSelectGroup.style.display = 'none';
-                chapterSelect.required = false;
-                if (chapterHint) chapterHint.style.display = 'none';
-                chapterSelect.innerHTML = '<option value="">اختر الباب...</option>';
-            } else {
-                chapterSelectGroup.style.display = 'block';
-                chapterSelect.required = true;
-                if (chapterHint) chapterHint.style.display = 'block';
-                chapterSelect.innerHTML = '<option value="">اختر الباب...</option>' +
-                    chapters.map(ch => `<option value="${ch.id}">${ch.title}</option>`).join('');
-            }
-        }
-
         // فتح تبويب الصفحات مع تحديد كتاب
         async function openPagesTab(bookId) {
             switchTab('pages');
@@ -2047,8 +4354,6 @@
         // تحميل صفحات الكتاب المحدد
         async function loadBookPages() {
             const bookId = document.getElementById('pageBookSelect').value;
-            const partId = document.getElementById('pagePartSelect')?.value || null;
-            const chapterId = document.getElementById('pageChapterSelect')?.value || null;
             
             if (!bookId) {
                 document.getElementById('pageEditorSection').style.display = 'none';
@@ -2059,14 +4364,7 @@
             document.getElementById('pageEditorSection').style.display = 'block';
 
             try {
-                let pages;
-                if (chapterId) {
-                    pages = await api.getChapterPages(chapterId);
-                } else if (partId) {
-                    pages = await api.getPartPages(partId);
-                } else {
-                    pages = await api.getBookPages(bookId);
-                }
+                const pages = await api.getBookPages(bookId);
                 const container = document.getElementById('pagesList');
                 
                 // تحديث عداد الصفحات
@@ -2138,8 +4436,6 @@
             const content = document.getElementById('pageContent').value.trim();
             const partSelect = document.getElementById('pagePartSelect');
             const partId = partSelect?.value || null;
-            const chapterSelect = document.getElementById('pageChapterSelect');
-            const chapterId = chapterSelect?.value || null;
 
             if (!content) {
                 alert('⚠️ الرجاء إدخال محتوى الصفحة');
@@ -2152,12 +4448,6 @@
                 return;
             }
 
-            // التحقق من اختيار الباب إذا كانت هناك أبواب
-            if (chapterSelect && chapterSelect.required && !chapterId) {
-                alert('⚠️ الرجاء اختيار الباب');
-                return;
-            }
-
             try {
                 if (currentEditingPageId) {
                     // عند التعديل، نحتفظ برقم الصفحة الحالي
@@ -2166,9 +4456,7 @@
                 } else {
                     // عند الإضافة، نحسب رقم الصفحة تلقائياً
                     let pages;
-                    if (chapterId) {
-                        pages = await api.getChapterPages(chapterId);
-                    } else if (partId) {
+                    if (partId) {
                         // إذا كان هناك جزء، نحسب عدد صفحات الجزء
                         pages = await api.getPartPages(partId);
                     } else {
@@ -2176,7 +4464,7 @@
                         pages = await api.getBookPages(currentSelectedBookId);
                     }
                     const pageNumber = pages.length + 1; // الرقم التالي
-                    await api.addPage(currentSelectedBookId, pageNumber, content, partId, chapterId);
+                    await api.addPage(currentSelectedBookId, pageNumber, content, partId);
                     alert('✅ تم إضافة الصفحة بنجاح');
                 }
 
@@ -2321,6 +4609,10 @@
         let currentSelectedBookIdForParts = null;
         let currentEditingPartId = null;
 
+        let currentSelectedBookIdForChapters = null;
+        let currentSelectedPartIdForChapters = null;
+        let chaptersBookHasParts = false;
+
         // تحميل قائمة الكتب لاختيار الأجزاء
         async function loadBooksForParts() {
             try {
@@ -2332,6 +4624,307 @@
             } catch (error) {
                 console.error('خطأ في تحميل الكتب:', error);
             }
+        }
+
+        async function loadBooksForChapters() {
+            try {
+                const books = await api.getAllBooks();
+                const select = document.getElementById('chapterBookSelect');
+                if (!select) return;
+
+                select.innerHTML = '<option value="">اختر كتاباً لإدارة أبوابه</option>' +
+                    books.map(book => `<option value="${book.id}">${book.title}</option>`).join('');
+            } catch (error) {
+                console.error('خطأ في تحميل الكتب:', error);
+            }
+        }
+
+        async function onBookSelectForChapters() {
+            const bookId = document.getElementById('chapterBookSelect').value;
+            const partGroup = document.getElementById('chapterPartSelectGroup');
+            const partSelect = document.getElementById('chapterPartSelect');
+
+            if (!bookId) {
+                currentSelectedBookIdForChapters = null;
+                currentSelectedPartIdForChapters = null;
+                chaptersBookHasParts = false;
+                if (partGroup) partGroup.style.display = 'none';
+                if (partSelect) partSelect.required = false;
+                document.getElementById('chapterEditorSection').style.display = 'none';
+                return;
+            }
+
+            currentSelectedBookIdForChapters = bookId;
+            currentSelectedPartIdForChapters = null;
+
+            try {
+                const parts = await api.getBookParts(bookId);
+                chaptersBookHasParts = parts.length > 0;
+
+                if (chaptersBookHasParts) {
+                    if (partGroup) partGroup.style.display = 'block';
+                    if (partSelect) {
+                        partSelect.innerHTML = '<option value="">اختر الجزء...</option>' +
+                            parts.map(part => `<option value="${part.id}">الجزء ${part.part_number}</option>`).join('');
+                        partSelect.required = true;
+                    }
+                    document.getElementById('chapterEditorSection').style.display = 'none';
+                    await loadChaptersList();
+                    return;
+                }
+
+                if (partGroup) partGroup.style.display = 'none';
+                if (partSelect) partSelect.required = false;
+                document.getElementById('chapterEditorSection').style.display = 'block';
+                await loadChaptersList();
+            } catch (error) {
+                console.error('خطأ في تحميل الأجزاء:', error);
+            }
+        }
+
+        async function onPartSelectForChapters() {
+            const partSelect = document.getElementById('chapterPartSelect');
+            currentSelectedPartIdForChapters = partSelect?.value || null;
+
+            if (chaptersBookHasParts && !currentSelectedPartIdForChapters) {
+                document.getElementById('chapterEditorSection').style.display = 'none';
+                await loadChaptersList();
+                return;
+            }
+
+            document.getElementById('chapterEditorSection').style.display = 'block';
+            await loadChaptersList();
+        }
+
+        async function loadChaptersList() {
+            const container = document.getElementById('chaptersList');
+            const countElement = document.getElementById('chaptersCount');
+
+            if (!container) return;
+
+            if (!currentSelectedBookIdForChapters) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-list"></i>
+                        <h3>اختر كتاباً</h3>
+                        <p>اختر كتاباً لإدارة أبوابه</p>
+                    </div>
+                `;
+                if (countElement) countElement.textContent = '0';
+                return;
+            }
+
+            if (chaptersBookHasParts && !currentSelectedPartIdForChapters) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-bookmark"></i>
+                        <h3>اختر الجزء</h3>
+                        <p>هذا الكتاب مقسم إلى أجزاء - اختر جزءاً لعرض أبوابه</p>
+                    </div>
+                `;
+                if (countElement) countElement.textContent = '0';
+                return;
+            }
+
+            try {
+                const chapters = await api.getBookChapters(currentSelectedBookIdForChapters, currentSelectedPartIdForChapters);
+                if (countElement) countElement.textContent = chapters.length;
+
+                if (chapters.length === 0) {
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-list"></i>
+                            <h3>لا توجد أبواب</h3>
+                            <p>ابدأ بإضافة باب جديد</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                container.innerHTML = chapters.map((chapter, index) => `
+                    <div class="part-card">
+                        <div class="item-info">
+                            <div class="item-icon">
+                                <i class="fas fa-list"></i>
+                            </div>
+                            <div class="item-details">
+                                <h3>
+                                    ${chapter.title}
+                                    <span class="item-badge">#${index + 1}</span>
+                                </h3>
+                                <p><i class="fas fa-file-alt" style="color: #ECB007; margin-left: 5px;"></i> الصفحات: ${chapter.page_start} → ${chapter.page_end}</p>
+                            </div>
+                        </div>
+                        <div class="item-actions">
+                            <button class="btn btn-warning btn-small" onclick="editChapter('${chapter.id}', ${JSON.stringify(chapter.title)}, ${chapter.page_start}, ${chapter.page_end})" title="تعديل الباب">
+                                <i class="fas fa-edit"></i> تعديل
+                            </button>
+                            <button class="btn btn-danger btn-small" onclick="deleteChapter('${chapter.id}')" title="حذف الباب">
+                                <i class="fas fa-trash-alt"></i> حذف
+                            </button>
+                        </div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                console.error('خطأ في تحميل الأبواب:', error);
+            }
+        }
+
+        async function saveChapter(event) {
+            event.preventDefault();
+
+            if (!currentSelectedBookIdForChapters) {
+                alert('⚠️ الرجاء اختيار كتاب أولاً');
+                return;
+            }
+
+            if (chaptersBookHasParts && !currentSelectedPartIdForChapters) {
+                alert('⚠️ الرجاء اختيار الجزء - هذا الكتاب مقسم إلى أجزاء');
+                return;
+            }
+
+            const title = document.getElementById('chapterTitle').value.trim();
+            const pageStart = parseInt(document.getElementById('chapterPageStart').value, 10);
+            const pageEnd = parseInt(document.getElementById('chapterPageEnd').value, 10);
+
+            if (!title) {
+                alert('⚠️ الرجاء إدخال اسم الباب');
+                return;
+            }
+
+            if (Number.isNaN(pageStart) || Number.isNaN(pageEnd)) {
+                alert('⚠️ الرجاء إدخال أرقام صفحات صحيحة');
+                return;
+            }
+
+            if (pageStart > pageEnd) {
+                alert('⚠️ صفحة البداية يجب أن تكون أصغر أو تساوي صفحة النهاية');
+                return;
+            }
+
+            try {
+                let pages = [];
+                if (currentSelectedPartIdForChapters) {
+                    pages = await api.getPartPages(currentSelectedPartIdForChapters);
+                } else {
+                    pages = await api.getBookPages(currentSelectedBookIdForChapters);
+                }
+
+                if (!pages || pages.length === 0) {
+                    alert('⚠️ لا توجد صفحات للتحقق من النطاق');
+                    return;
+                }
+
+                const pageNumbers = pages.map(p => p.page_number);
+                const minPage = Math.min(...pageNumbers);
+                const maxPage = Math.max(...pageNumbers);
+
+                if (pageStart < minPage || pageEnd > maxPage) {
+                    alert(`⚠️ نطاق الصفحات يجب أن يكون بين ${minPage} و ${maxPage}`);
+                    return;
+                }
+
+                await api.addChapter({
+                    book_id: currentSelectedBookIdForChapters,
+                    part_id: currentSelectedPartIdForChapters,
+                    title: title,
+                    page_start: pageStart,
+                    page_end: pageEnd
+                });
+
+                alert('✅ تم إضافة الباب بنجاح');
+                clearChapterForm();
+                await loadChaptersList();
+            } catch (error) {
+                console.error('خطأ في حفظ الباب:', error);
+                alert('❌ حدث خطأ: ' + error.message);
+            }
+        }
+
+        async function editChapter(chapterId, title, pageStart, pageEnd) {
+            try {
+                const result = await showEditDialog({
+                    title: 'تعديل الباب',
+                    fields: [
+                        {
+                            id: 'editChapterTitle',
+                            label: 'اسم الباب',
+                            type: 'text',
+                            value: title,
+                            required: true,
+                            icon: 'fas fa-tag'
+                        },
+                        {
+                            id: 'editChapterStart',
+                            label: 'صفحة البداية',
+                            type: 'number',
+                            value: pageStart,
+                            required: true,
+                            icon: 'fas fa-hashtag'
+                        },
+                        {
+                            id: 'editChapterEnd',
+                            label: 'صفحة النهاية',
+                            type: 'number',
+                            value: pageEnd,
+                            required: true,
+                            icon: 'fas fa-hashtag'
+                        }
+                    ]
+                });
+
+                if (!result) return;
+
+                const newTitle = (result.editChapterTitle || '').trim();
+                const newStart = parseInt(result.editChapterStart, 10);
+                const newEnd = parseInt(result.editChapterEnd, 10);
+
+                if (!newTitle) {
+                    await showAlert('اسم الباب مطلوب', 'error');
+                    return;
+                }
+
+                if (Number.isNaN(newStart) || Number.isNaN(newEnd)) {
+                    await showAlert('أرقام الصفحات غير صحيحة', 'error');
+                    return;
+                }
+
+                if (newStart > newEnd) {
+                    await showAlert('صفحة البداية يجب أن تكون أصغر أو تساوي صفحة النهاية', 'error');
+                    return;
+                }
+
+                await api.updateChapter(chapterId, {
+                    title: newTitle,
+                    page_start: newStart,
+                    page_end: newEnd
+                });
+
+                await showAlert('تم تحديث الباب بنجاح', 'success');
+                await loadChaptersList();
+            } catch (error) {
+                console.error('خطأ في تعديل الباب:', error);
+                await showAlert('حدث خطأ: ' + error.message, 'error');
+            }
+        }
+
+        async function deleteChapter(chapterId) {
+            const confirmed = await showConfirm('هل أنت متأكد من حذف هذا الباب؟', 'تأكيد حذف الباب');
+            if (!confirmed) return;
+
+            try {
+                await api.deleteChapter(chapterId);
+                await showAlert('تم حذف الباب بنجاح', 'success');
+                await loadChaptersList();
+            } catch (error) {
+                console.error('خطأ في حذف الباب:', error);
+                await showAlert('حدث خطأ: ' + error.message, 'error');
+            }
+        }
+
+        function clearChapterForm() {
+            const form = document.getElementById('chapterForm');
+            if (form) form.reset();
         }
 
         // تحميل أجزاء الكتاب المحدد
@@ -2491,7 +5084,6 @@
             if (!bookId) {
                 document.getElementById('pagePartSelectGroup').style.display = 'none';
                 document.getElementById('pageEditorSection').style.display = 'none';
-                document.getElementById('pageChapterSelectGroup').style.display = 'none';
                 return;
             }
 
@@ -2508,17 +5100,10 @@
                     partSelect.innerHTML = '<option value="">اختر الجزء...</option>' +
                         parts.map(part => `<option value="${part.id}">الجزء ${part.part_number}</option>`).join('');
                     partSelect.required = true;
-
-                    // لا نحمّل أبواب إلا بعد اختيار جزء
-                    document.getElementById('pageChapterSelectGroup').style.display = 'none';
-                    await loadChaptersForPages(bookId, null);
                 } else {
                     // الكتاب ليس له أجزاء - إخفاء القائمة
                     document.getElementById('pagePartSelectGroup').style.display = 'none';
                     partSelect.required = false;
-
-                    // تحميل أبواب بدون جزء مباشرة
-                    await loadChaptersForPages(bookId, null);
                 }
             } catch (error) {
                 console.error('خطأ في تحميل الأجزاء:', error);
@@ -2526,415 +5111,6 @@
 
             // تحميل الصفحات
             await loadBookPages();
-        }
-
-        async function onPartSelectForPages() {
-            const bookId = document.getElementById('pageBookSelect').value;
-            const partId = document.getElementById('pagePartSelect')?.value || null;
-            await loadChaptersForPages(bookId, partId);
-            await loadBookPages();
-        }
-
-        document.addEventListener('change', function(event) {
-            if (event.target && event.target.id === 'pageChapterSelect') {
-                loadBookPages();
-            }
-        });
-
-        // ===================================
-        // إدارة الأبواب
-        // ===================================
-
-        let currentSelectedBookIdForChapters = null;
-        let currentEditingChapterId = null;
-
-        async function loadBooksForChapters() {
-            try {
-                const books = await api.getAllBooks();
-                const select = document.getElementById('chapterBookSelect');
-                if (!select) return;
-
-                select.innerHTML = '<option value="">اختر كتاباً لإدارة أبوابه</option>' +
-                    books.map(book => `<option value="${book.id}">${book.title}</option>`).join('');
-            } catch (error) {
-                console.error('خطأ في تحميل الكتب:', error);
-            }
-        }
-
-        async function onBookSelectForChapters() {
-            const bookId = document.getElementById('chapterBookSelect').value;
-            const chapterPartSelectGroup = document.getElementById('chapterPartSelectGroup');
-            const chapterPartSelect = document.getElementById('chapterPartSelect');
-            const editor = document.getElementById('chapterEditorSection');
-
-            if (!bookId) {
-                if (chapterPartSelectGroup) chapterPartSelectGroup.style.display = 'none';
-                if (editor) editor.style.display = 'none';
-                currentSelectedBookIdForChapters = null;
-                return;
-            }
-
-            currentSelectedBookIdForChapters = bookId;
-            if (editor) editor.style.display = 'block';
-
-            try {
-                const parts = await api.getBookParts(bookId);
-                if (chapterPartSelectGroup && chapterPartSelect) {
-                    if (parts.length > 0) {
-                        chapterPartSelectGroup.style.display = 'block';
-                        chapterPartSelect.innerHTML = '<option value="">أبواب بدون جزء</option>' +
-                            parts.map(p => `<option value="${p.id}">الجزء ${p.part_number}</option>`).join('');
-                    } else {
-                        chapterPartSelectGroup.style.display = 'none';
-                        chapterPartSelect.innerHTML = '<option value="">أبواب بدون جزء</option>';
-                    }
-                }
-            } catch (error) {
-                console.error('خطأ في تحميل الأجزاء:', error);
-            }
-
-            await loadSelectedChapters();
-        }
-
-        async function loadSelectedChapters() {
-            const container = document.getElementById('chaptersList');
-            const countElement = document.getElementById('chaptersCount');
-            const partId = document.getElementById('chapterPartSelect')?.value || null;
-
-            if (!currentSelectedBookIdForChapters) {
-                if (container) {
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-list-ol"></i>
-                            <h3>اختر كتاباً أولاً</h3>
-                            <p>اختر كتاباً لإدارة أبوابه</p>
-                        </div>
-                    `;
-                }
-                if (countElement) countElement.textContent = '0';
-                return;
-            }
-
-            try {
-                const chapters = partId
-                    ? await api.getPartChapters(partId)
-                    : await api.getBookRootChapters(currentSelectedBookIdForChapters);
-
-                if (countElement) countElement.textContent = chapters.length;
-
-                if (!container) return;
-
-                if (chapters.length === 0) {
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-list-ol"></i>
-                            <h3>لا توجد أبواب</h3>
-                            <p>ابدأ بإضافة باب جديد</p>
-                        </div>
-                    `;
-                    return;
-                }
-
-                const escapeForOnclick = (value) => {
-                    return String(value || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\r?\n/g, ' ');
-                };
-
-                container.innerHTML = chapters.map((ch, index) => `
-                    <div class="item-card">
-                        <div class="item-info">
-                            <div class="item-icon"><i class="fas fa-list-ol"></i></div>
-                            <div class="item-details">
-                                <h3>
-                                    ${ch.title}
-                                    <span class="item-badge">#${index + 1}</span>
-                                </h3>
-                            </div>
-                        </div>
-                        <div class="item-actions">
-                            <button class="btn btn-primary btn-small" onclick="openChapterPagesManager('${ch.id}', '${escapeForOnclick(ch.title)}')" title="إدارة صفحات الباب">
-                                <i class="fas fa-file-alt"></i> الصفحات
-                            </button>
-                            <button class="btn btn-warning btn-small" onclick="editChapter('${ch.id}', ${JSON.stringify(partId || null)}, '${escapeForOnclick(ch.title)}')" title="تعديل الباب">
-                                <i class="fas fa-edit"></i> تعديل
-                            </button>
-                            <button class="btn btn-danger btn-small" onclick="deleteChapter('${ch.id}')" title="حذف الباب">
-                                <i class="fas fa-trash-alt"></i> حذف
-                            </button>
-                        </div>
-                    </div>
-                `).join('');
-            } catch (error) {
-                console.error('خطأ في تحميل الأبواب:', error);
-            }
-        }
-
-        async function saveChapter(event) {
-            event.preventDefault();
-
-            if (!currentSelectedBookIdForChapters) {
-                alert('⚠️ الرجاء اختيار كتاب أولاً');
-                return;
-            }
-
-            const title = document.getElementById('chapterTitle').value.trim();
-            const partId = document.getElementById('chapterPartSelect')?.value || null;
-
-            if (!title) {
-                alert('⚠️ الرجاء إدخال اسم الباب');
-                return;
-            }
-
-            try {
-                if (currentEditingChapterId) {
-                    await api.updateChapter(currentEditingChapterId, {
-                        title: title,
-                        part_id: partId || null
-                    });
-                    alert('✅ تم تحديث الباب بنجاح');
-                } else {
-                    await api.addChapter(currentSelectedBookIdForChapters, title, partId || null);
-                    alert('✅ تم إضافة الباب بنجاح');
-                }
-
-                clearChapterForm();
-                await loadSelectedChapters();
-            } catch (error) {
-                console.error('خطأ في حفظ الباب:', error);
-                alert('❌ حدث خطأ: ' + error.message);
-            }
-        }
-
-        async function editChapter(chapterId, partId, title) {
-            try {
-                document.getElementById('chapterTitle').value = title || '';
-
-                const chapterPartSelect = document.getElementById('chapterPartSelect');
-                if (chapterPartSelect) {
-                    chapterPartSelect.value = partId || '';
-                }
-
-                currentEditingChapterId = chapterId;
-                document.querySelector('#chapterForm button[type="submit"]').innerHTML = '<i class="fas fa-save"></i> حفظ الباب';
-            } catch (error) {
-                console.error('خطأ في تجهيز تعديل الباب:', error);
-            }
-        }
-
-        async function deleteChapter(chapterId) {
-            const confirmed = await showConfirm(
-                'هل أنت متأكد من حذف هذا الباب؟<br>يجب التأكد أن الصفحات لم تعد مرتبطة به.',
-                'تأكيد حذف الباب'
-            );
-            if (!confirmed) return;
-
-            try {
-                await api.deleteChapter(chapterId);
-                await showAlert('تم حذف الباب بنجاح', 'success');
-                await loadSelectedChapters();
-            } catch (error) {
-                console.error('خطأ في حذف الباب:', error);
-                await showAlert('حدث خطأ: ' + error.message, 'error');
-            }
-        }
-
-        function clearChapterForm() {
-            document.getElementById('chapterForm').reset();
-            currentEditingChapterId = null;
-            const submitBtn = document.querySelector('#chapterForm button[type="submit"]');
-            if (submitBtn) submitBtn.innerHTML = '<i class="fas fa-save"></i> حفظ الباب';
-        }
-
-        // ===================================
-        // إدارة صفحات الباب
-        // ===================================
-
-        let currentChapterIdForPages = null;
-        let currentChapterAllPagesCache = [];
-
-        async function openChapterPagesManager(chapterId, chapterTitle) {
-            currentChapterIdForPages = chapterId;
-            document.getElementById('modalChapterTitle').textContent = chapterTitle;
-            document.getElementById('chapterPagesModal').style.display = 'flex';
-            await loadChapterPagesData();
-        }
-
-        function closeChapterPagesModal() {
-            document.getElementById('chapterPagesModal').style.display = 'none';
-            currentChapterIdForPages = null;
-            currentChapterAllPagesCache = [];
-        }
-
-        async function loadChapterPagesData() {
-            if (!currentChapterIdForPages) return;
-
-            try {
-                // جلب الباب للحصول على book_id و part_id
-                const chapter = await api.getChapter(currentChapterIdForPages);
-                if (!chapter) return;
-
-                // جلب الصفحات المرتبطة بالباب
-                const linkedPages = await api.getChapterPages(currentChapterIdForPages);
-
-                // جلب جميع صفحات الكتاب/الجزء
-                let allPages = [];
-                if (chapter.part_id) {
-                    allPages = await api.getPartPages(chapter.part_id);
-                } else {
-                    allPages = await api.getBookPages(chapter.book_id);
-                }
-
-                currentChapterAllPagesCache = allPages;
-
-                // الصفحات المتاحة = صفحات بدون باب أو صفحات من أبواب أخرى
-                const availablePages = allPages.filter(p => !p.chapter_id || p.chapter_id !== currentChapterIdForPages);
-
-                // عرض الصفحات المرتبطة
-                const linkedContainer = document.getElementById('linkedPagesList');
-                const linkedCount = document.getElementById('linkedPagesCount');
-                linkedCount.textContent = linkedPages.length;
-
-                if (linkedPages.length === 0) {
-                    linkedContainer.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-file-alt"></i>
-                            <p>لا توجد صفحات مرتبطة</p>
-                        </div>
-                    `;
-                } else {
-                    linkedContainer.innerHTML = linkedPages
-                        .sort((a, b) => (a.page_number || 0) - (b.page_number || 0))
-                        .map(page => `
-                            <div style="padding: 10px; margin-bottom: 8px; background: #f8f9fa; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; border-right: 3px solid #ECB007;">
-                                <strong class="ds-inline-11">صفحة ${page.page_number}</strong>
-                                <button class="btn btn-danger btn-small" onclick="unlinkPageFromChapter('${page.id}')" title="فك ربط الصفحة من الباب">
-                                    <i class="fas fa-unlink"></i> فك
-                                </button>
-                            </div>
-                        `).join('');
-                }
-
-                // عرض الصفحات المتاحة
-                const availableContainer = document.getElementById('availablePagesList');
-                const availableCount = document.getElementById('availablePagesCount');
-                availableCount.textContent = availablePages.length;
-
-                if (availablePages.length === 0) {
-                    availableContainer.innerHTML = `
-                        <div class="empty-state">
-                            <i class="fas fa-file-alt"></i>
-                            <p>لا توجد صفحات متاحة</p>
-                        </div>
-                    `;
-                } else {
-                    availableContainer.innerHTML = availablePages
-                        .sort((a, b) => (a.page_number || 0) - (b.page_number || 0))
-                        .map(page => `
-                            <div style="padding: 10px; margin-bottom: 8px; background: #f8f9fa; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; border-right: 3px solid #6c757d;">
-                                <strong class="ds-inline-11">صفحة ${page.page_number}</strong>
-                                <button class="btn btn-primary btn-small" onclick="linkPageToChapter('${page.id}')" title="ربط الصفحة بالباب">
-                                    <i class="fas fa-link"></i> ربط
-                                </button>
-                            </div>
-                        `).join('');
-                }
-            } catch (error) {
-                console.error('خطأ في تحميل صفحات الباب:', error);
-                await showAlert('حدث خطأ في تحميل البيانات', 'error');
-            }
-        }
-
-        async function linkPageToChapter(pageId) {
-            if (!currentChapterIdForPages) return;
-
-            try {
-                await api.updatePageChapter(pageId, currentChapterIdForPages);
-                await showAlert('تم إضافة الصفحة للباب بنجاح', 'success');
-                await loadChapterPagesData();
-            } catch (error) {
-                console.error('خطأ في ربط الصفحة:', error);
-                await showAlert('حدث خطأ: ' + error.message, 'error');
-            }
-        }
-
-        async function unlinkPageFromChapter(pageId) {
-            const confirmed = await showConfirm(
-                'هل تريد إزالة هذه الصفحة من الباب؟<br>ستبقى الصفحة موجودة لكن غير مرتبطة بأي باب.',
-                'تأكيد الإزالة'
-            );
-            if (!confirmed) return;
-
-            try {
-                await api.updatePageChapter(pageId, null);
-                await showAlert('تم إزالة الصفحة من الباب', 'success');
-                await loadChapterPagesData();
-            } catch (error) {
-                console.error('خطأ في فك ربط الصفحة:', error);
-                await showAlert('حدث خطأ: ' + error.message, 'error');
-            }
-        }
-
-        function getChapterPagesRangeValues() {
-            const fromEl = document.getElementById('chapterPagesFrom');
-            const toEl = document.getElementById('chapterPagesTo');
-            const from = fromEl && fromEl.value !== '' ? parseInt(fromEl.value, 10) : null;
-            const to = toEl && toEl.value !== '' ? parseInt(toEl.value, 10) : null;
-            return { from, to };
-        }
-
-        async function applyChapterPagesRange(action) {
-            if (!currentChapterIdForPages) return;
-
-            const { from, to } = getChapterPagesRangeValues();
-            if (!from || !to || isNaN(from) || isNaN(to) || from <= 0 || to <= 0) {
-                await showAlert('الرجاء إدخال رقمين صحيحين (من/إلى).', 'warning');
-                return;
-            }
-
-            let start = from;
-            let end = to;
-            if (start > end) {
-                const tmp = start;
-                start = end;
-                end = tmp;
-            }
-
-            if (!currentChapterAllPagesCache || currentChapterAllPagesCache.length === 0) {
-                await loadChapterPagesData();
-            }
-
-            const targetPages = (currentChapterAllPagesCache || [])
-                .filter(p => typeof p.page_number === 'number' && p.page_number >= start && p.page_number <= end)
-                .sort((a, b) => a.page_number - b.page_number);
-
-            if (targetPages.length === 0) {
-                await showAlert('لا توجد صفحات ضمن هذا المدى في سياق الباب الحالي.', 'info');
-                return;
-            }
-
-            const msg = action === 'unlink'
-                ? `هل تريد إزالة الصفحات من ${start} إلى ${end} من هذا الباب؟`
-                : `هل تريد إضافة الصفحات من ${start} إلى ${end} إلى هذا الباب؟`;
-
-            const confirmed = await showConfirm(msg, 'تأكيد العملية');
-            if (!confirmed) return;
-
-            try {
-                for (const page of targetPages) {
-                    if (action === 'unlink') {
-                        if (page.chapter_id === currentChapterIdForPages) {
-                            await api.updatePageChapter(page.id, null);
-                        }
-                    } else {
-                        await api.updatePageChapter(page.id, currentChapterIdForPages);
-                    }
-                }
-
-                await showAlert('تم تنفيذ العملية بنجاح', 'success');
-                await loadChapterPagesData();
-            } catch (error) {
-                console.error('خطأ في تنفيذ عملية المدى:', error);
-                await showAlert('حدث خطأ: ' + error.message, 'error');
-            }
         }
 
         // ===================================
@@ -2991,7 +5167,7 @@
                     
                     // رابط الصورة أو الحرف الأول
                     const avatarContent = user.avatar_url 
-                        ? `<img src="${user.avatar_url}" alt="${user.full_name || user.email}" class="ds-inline-46">` 
+                        ? `<img src="${user.avatar_url}" alt="${user.full_name || user.email}" style="width: 100%; height: 100%; border-radius: 50%; object-fit: cover;">` 
                         : avatarLetter;
                     
                     return `
@@ -3014,7 +5190,7 @@
                                 </div>
                                 <div class="info-item">
                                     <i class="fas fa-${user.is_active ? 'check-circle' : 'pause-circle'}"></i>
-                                    <span class="ds-inline-47">
+                                    <span style="color: ${user.is_active ? '#28a745' : '#ffc107'}; font-weight: 600;">
                                         ${user.is_active ? 'حساب نشط' : 'حساب غير نشط'}
                                     </span>
                                 </div>
@@ -3025,7 +5201,7 @@
                             ${authGuard.isAdmin() && user.id !== authGuard.getCurrentUser()?.id ? `
                                 <div class="user-actions">
                                     ${user.user_roles?.name === 'admin' ? `
-                                        <div class="ds-inline-48">
+                                        <div style=" text-align: center; color: #6c757d; font-size: 0.9em;">
                                             <i class="fas fa-shield-alt"></i>
                                             ولا يمكنك حذفه أو تعطيله حساب إداري محمي
                                         </div>
@@ -3050,7 +5226,7 @@
                 // عرض الإداريين
                 if (admins.length > 0) {
                     html += `
-                        <div class="ds-inline-21">
+                        <div style="margin-bottom: 30px;">
                             <h4 style="color: #28a745; margin-bottom: 15px; padding: 10px 15px; background: rgba(40, 167, 69, 0.1); border-radius: 10px; border-right: 4px solid #28a745; display: flex; align-items: center; gap: 10px;">
                                 <i class="fas fa-user-shield"></i>
                                 الإداريون (${admins.length})
@@ -4087,19 +6263,19 @@
                 titleEl.textContent = config.title || 'تعديل';
                 
                 // إنشاء الحقول
-                let fieldsHTML = '<form id="editDialogForm" class="ds-inline-49">';
+                let fieldsHTML = '<form id="editDialogForm" style="text-align: right;">';
                 config.fields.forEach(field => {
                     fieldsHTML += `
-                        <div class="form-group ds-inline-50">
+                        <div class="form-group" style="margin-bottom: 20px;">
                             <label style="display: block; margin-bottom: 8px; color: #333; font-weight: 600;">
                                 <i class="${field.icon}"></i> ${field.label}
-                                ${field.required ? '<span class="ds-inline-7">*</span>' : ''}
+                                ${field.required ? '<span style="color: red;">*</span>' : ''}
                             </label>
                             ${field.type === 'textarea' 
                                 ? `<textarea 
                                     id="${field.id}" 
-                                    class="custom-dialog-input ds-inline-51" 
-                                   
+                                    class="custom-dialog-input" 
+                                    style="min-height: 100px; resize: vertical;"
                                     ${field.required ? 'required' : ''}
                                     placeholder="${field.placeholder || ''}"
                                 >${field.value || ''}</textarea>`
@@ -4168,5 +6344,3 @@
     </script>
 </body>
 </html>
-
-

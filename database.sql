@@ -88,6 +88,113 @@ CREATE TABLE IF NOT EXISTS pages (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
+ CREATE EXTENSION IF NOT EXISTS btree_gist;
+
+ CREATE TABLE IF NOT EXISTS chapters (
+     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+     book_id UUID NOT NULL REFERENCES books(id) ON DELETE CASCADE,
+     part_id UUID REFERENCES parts(id) ON DELETE CASCADE,
+     title TEXT NOT NULL,
+     page_start INTEGER NOT NULL,
+     page_end INTEGER NOT NULL,
+     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+     CONSTRAINT chapters_page_range_valid CHECK (page_start <= page_end)
+ );
+
+ CREATE OR REPLACE FUNCTION book_has_parts(book_uuid UUID)
+ RETURNS BOOLEAN AS $$
+ BEGIN
+     RETURN EXISTS (
+         SELECT 1 FROM parts p WHERE p.book_id = book_uuid
+     );
+ END;
+ $$ LANGUAGE plpgsql;
+
+ CREATE OR REPLACE FUNCTION enforce_chapter_consistency()
+ RETURNS TRIGGER AS $$
+ DECLARE
+     has_parts BOOLEAN;
+     book_min_page INTEGER;
+     book_max_page INTEGER;
+     part_min_page INTEGER;
+     part_max_page INTEGER;
+     chapter_part_book UUID;
+ BEGIN
+     has_parts := book_has_parts(NEW.book_id);
+
+     IF has_parts AND NEW.part_id IS NULL THEN
+         RAISE EXCEPTION 'part_id is required for chapters when the book has parts';
+     END IF;
+
+     IF (NOT has_parts) AND NEW.part_id IS NOT NULL THEN
+         RAISE EXCEPTION 'part_id must be NULL for chapters when the book has no parts';
+     END IF;
+
+     IF NEW.part_id IS NOT NULL THEN
+         SELECT p.book_id INTO chapter_part_book
+         FROM parts p
+         WHERE p.id = NEW.part_id;
+
+         IF chapter_part_book IS NULL THEN
+             RAISE EXCEPTION 'part_id does not exist';
+         END IF;
+
+         IF chapter_part_book <> NEW.book_id THEN
+             RAISE EXCEPTION 'part_id does not belong to the given book_id';
+         END IF;
+     END IF;
+
+     SELECT MIN(pg.page_number), MAX(pg.page_number)
+     INTO book_min_page, book_max_page
+     FROM pages pg
+     WHERE pg.book_id = NEW.book_id;
+
+     IF NEW.part_id IS NOT NULL THEN
+         SELECT MIN(pg.page_number), MAX(pg.page_number)
+         INTO part_min_page, part_max_page
+         FROM pages pg
+         WHERE pg.book_id = NEW.book_id
+         AND pg.part_id = NEW.part_id;
+
+         IF part_min_page IS NOT NULL THEN
+             IF NEW.page_start < part_min_page OR NEW.page_end > part_max_page THEN
+                 RAISE EXCEPTION 'chapter page range is outside the part page range';
+             END IF;
+         END IF;
+     END IF;
+
+     IF book_min_page IS NOT NULL THEN
+         IF NEW.page_start < book_min_page OR NEW.page_end > book_max_page THEN
+             RAISE EXCEPTION 'chapter page range is outside the book page range';
+         END IF;
+     END IF;
+
+     RETURN NEW;
+ END;
+ $$ LANGUAGE plpgsql;
+
+ DROP TRIGGER IF EXISTS trg_chapters_enforce_consistency ON chapters;
+ CREATE TRIGGER trg_chapters_enforce_consistency
+     BEFORE INSERT OR UPDATE ON chapters
+     FOR EACH ROW
+     EXECUTE FUNCTION enforce_chapter_consistency();
+
+ DO $$
+ BEGIN
+     IF NOT EXISTS (
+         SELECT 1 FROM pg_constraint WHERE conname = 'chapters_no_overlap'
+     ) THEN
+         ALTER TABLE chapters
+             ADD CONSTRAINT chapters_no_overlap
+             EXCLUDE USING gist (
+                 book_id WITH =,
+                 (COALESCE(part_id, '00000000-0000-0000-0000-000000000000'::uuid)) WITH =,
+                 int4range(page_start, page_end, '[]') WITH &&
+             );
+     END IF;
+ END $$;
+
 -- جدول رسائل التواصل
 CREATE TABLE IF NOT EXISTS contact_messages (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -127,6 +234,8 @@ CREATE INDEX IF NOT EXISTS idx_books_published ON books(published);
 CREATE INDEX IF NOT EXISTS idx_parts_book ON parts(book_id);
 CREATE INDEX IF NOT EXISTS idx_pages_book ON pages(book_id);
 CREATE INDEX IF NOT EXISTS idx_pages_part ON pages(part_id);
+ CREATE INDEX IF NOT EXISTS idx_chapters_book_part ON chapters(book_id, part_id);
+ CREATE INDEX IF NOT EXISTS idx_chapters_book_range ON chapters(book_id, page_start, page_end);
 
 -- ===================================
 -- الدوال (Functions)
@@ -173,6 +282,12 @@ CREATE TRIGGER update_pages_updated_at
     BEFORE UPDATE ON pages
     FOR EACH ROW
     EXECUTE FUNCTION update_updated_at_column();
+
+ DROP TRIGGER IF EXISTS update_chapters_updated_at ON chapters;
+ CREATE TRIGGER update_chapters_updated_at
+     BEFORE UPDATE ON chapters
+     FOR EACH ROW
+     EXECUTE FUNCTION update_updated_at_column();
 
 -- ===================================
 -- دوال مساعدة للسياسات

@@ -54,99 +54,44 @@ class SupabaseAPI {
         }
     }
 
-    // ===================================
-    // دوال الأبواب (Chapters)
-    // ===================================
-
-    // جلب أبواب كتاب (بما فيها الأبواب التي لا تتبع جزء)
-    async getBookChapters(bookId) {
+    async getBookChapters(bookId, partId = null) {
         try {
-            const { data, error } = await this.supabase
+            let query = this.supabase
                 .from(SUPABASE_CONFIG.tables.chapters)
                 .select('*')
                 .eq('book_id', bookId)
-                .order('part_id', { ascending: true })
-                .order('title', { ascending: true });
-
-            if (error) throw error;
-            return data || [];
-        } catch (error) {
-            console.error('خطأ في جلب أبواب الكتاب:', error);
-            return [];
-        }
-    }
-
-    // جلب أبواب جزء معين
-    async getPartChapters(partId) {
-        try {
-            const { data, error } = await this.supabase
-                .from(SUPABASE_CONFIG.tables.chapters)
-                .select('*')
-                .eq('part_id', partId)
-                .order('title', { ascending: true });
-
-            if (error) throw error;
-            return data || [];
-        } catch (error) {
-            console.error('خطأ في جلب أبواب الجزء:', error);
-            return [];
-        }
-    }
-
-    // جلب أبواب كتاب غير مرتبطة بجزء (للكتب بدون أجزاء)
-    async getBookRootChapters(bookId) {
-        try {
-            const { data, error } = await this.supabase
-                .from(SUPABASE_CONFIG.tables.chapters)
-                .select('*')
-                .eq('book_id', bookId)
-                .is('part_id', null)
-                .order('title', { ascending: true });
-
-            if (error) throw error;
-            return data || [];
-        } catch (error) {
-            console.error('خطأ في جلب أبواب الكتاب (بدون أجزاء):', error);
-            return [];
-        }
-    }
-
-    // جلب باب واحد
-    async getChapter(chapterId) {
-        try {
-            const { data, error } = await this.supabase
-                .from(SUPABASE_CONFIG.tables.chapters)
-                .select('*')
-                .eq('id', chapterId)
-                .single();
-
-            if (error) throw error;
-            return data;
-        } catch (error) {
-            console.error('خطأ في جلب الباب:', error);
-            return null;
-        }
-    }
-
-    // إضافة باب
-    async addChapter(bookId, title, partId = null) {
-        try {
-            if (!title || !String(title).trim()) {
-                throw new Error('اسم الباب (title) مطلوب');
-            }
-
-            const chapterData = {
-                book_id: bookId,
-                title: String(title).trim()
-            };
+                .order('page_start', { ascending: true });
 
             if (partId) {
-                chapterData.part_id = partId;
+                query = query.eq('part_id', partId);
+            } else {
+                query = query.is('part_id', null);
+            }
+
+            const { data, error } = await query;
+            if (error) throw error;
+            return data || [];
+        } catch (error) {
+            console.error('خطأ في جلب الأبواب:', error);
+            return [];
+        }
+    }
+    async addChapter(chapterData) {
+        try {
+            const payload = {
+                book_id: chapterData.book_id,
+                title: chapterData.title,
+                page_start: chapterData.page_start,
+                page_end: chapterData.page_end
+            };
+
+            if (chapterData.part_id) {
+                payload.part_id = chapterData.part_id;
             }
 
             const { data, error } = await this.supabase
                 .from(SUPABASE_CONFIG.tables.chapters)
-                .insert([chapterData])
+                .insert([payload])
                 .select()
                 .single();
 
@@ -157,8 +102,6 @@ class SupabaseAPI {
             throw error;
         }
     }
-
-    // تحديث باب
     async updateChapter(chapterId, updates) {
         try {
             const { data, error } = await this.supabase
@@ -175,8 +118,6 @@ class SupabaseAPI {
             throw error;
         }
     }
-
-    // حذف باب
     async deleteChapter(chapterId) {
         try {
             const { error } = await this.supabase
@@ -191,21 +132,28 @@ class SupabaseAPI {
             throw error;
         }
     }
-
-    // جلب صفحات باب معين
-    async getChapterPages(chapterId) {
+    async getChapterForPage(bookId, pageNumber, partId = null) {
         try {
-            const { data, error } = await this.supabase
-                .from(SUPABASE_CONFIG.tables.pages)
-                .select('*')
-                .eq('chapter_id', chapterId)
-                .order('page_number', { ascending: true });
+            let query = this.supabase
+                .from(SUPABASE_CONFIG.tables.chapters)
+                .select('id, title, page_start, page_end, book_id, part_id')
+                .eq('book_id', bookId)
+                .lte('page_start', pageNumber)
+                .gte('page_end', pageNumber)
+                .limit(1);
 
+            if (partId) {
+                query = query.eq('part_id', partId);
+            } else {
+                query = query.is('part_id', null);
+            }
+
+            const { data, error } = await query.maybeSingle();
             if (error) throw error;
-            return data || [];
+            return data || null;
         } catch (error) {
-            console.error('خطأ في جلب صفحات الباب:', error);
-            return [];
+            console.error('خطأ في جلب باب الصفحة:', error);
+            return null;
         }
     }
 
@@ -656,7 +604,7 @@ class SupabaseAPI {
     }
 
     // إضافة صفحة
-    async addPage(bookId, pageNumber, content, partId = null, chapterId = null) {
+    async addPage(bookId, pageNumber, content, partId = null) {
         try {
             const pageData = {
                 book_id: bookId,
@@ -667,11 +615,6 @@ class SupabaseAPI {
             // إضافة part_id فقط إذا كان موجوداً
             if (partId) {
                 pageData.part_id = partId;
-            }
-
-            // إضافة chapter_id فقط إذا كان موجوداً
-            if (chapterId) {
-                pageData.chapter_id = chapterId;
             }
 
             const { data, error } = await this.supabase
@@ -720,24 +663,6 @@ class SupabaseAPI {
             return data;
         } catch (error) {
             console.error('خطأ في تحديث رقم الصفحة:', error);
-            throw error;
-        }
-    }
-
-    // تحديث chapter_id للصفحة (ربط/فك ربط صفحة بباب)
-    async updatePageChapter(pageId, chapterId) {
-        try {
-            const { data, error } = await this.supabase
-                .from(SUPABASE_CONFIG.tables.pages)
-                .update({ chapter_id: chapterId })
-                .eq('id', pageId)
-                .select()
-                .single();
-
-            if (error) throw error;
-            return data;
-        } catch (error) {
-            console.error('خطأ في تحديث باب الصفحة:', error);
             throw error;
         }
     }
