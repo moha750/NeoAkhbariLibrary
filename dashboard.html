@@ -2329,10 +2329,14 @@
             font-size: 1.05em;
             line-height: 1.6;
             text-align: center;
+            max-height: 60vh;
+            overflow-y: auto;
         }
 
         .custom-dialog-input {
+            display: block;
             width: 100%;
+            box-sizing: border-box;
             padding: 12px 15px;
             border: 2px solid #e0e0e0;
             border-radius: 10px;
@@ -2340,6 +2344,10 @@
             margin-top: 15px;
             transition: all 0.3s;
             direction: rtl;
+        }
+
+        #editDialogForm input[type="file"].custom-dialog-input {
+            display: block;
         }
 
         .custom-dialog-input:focus {
@@ -2822,7 +2830,7 @@
 
                     <div class="form-group" id="pagePartSelectGroup" style="display: none;">
                         <label><i class="fas fa-bookmark"></i> اختر الجزء <span style="color: red;">*</span></label>
-                        <select id="pagePartSelect">
+                        <select id="pagePartSelect" onchange="loadBookPages()">
                             <option value="">اختر الجزء...</option>
                         </select>
                         <small style="color: #d32f2f; display: block; margin-top: 5px; font-weight: bold;">
@@ -2841,6 +2849,15 @@
                                 <small style="color: #999; display: block; margin-top: 5px;">
                                     <i class="fas fa-info-circle"></i> سيتم ترقيم الصفحات تلقائياً حسب ترتيب الإضافة
                                 </small>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-image"></i> رفع صورة وإدراجها داخل المحتوى</label>
+                                <div style="display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                                    <input type="file" id="pageImageFile" accept="image/*" style="flex: 1; min-width: 240px;" />
+                                    <button type="button" class="btn btn-info" id="pageImageUploadBtn" onclick="uploadAndInsertPageImage()" style="white-space: nowrap;">
+                                        <i class="fas fa-upload"></i> رفع وإدراج
+                                    </button>
+                                </div>
                             </div>
                             <div class="form-actions">
                                 <button type="submit" class="btn btn-primary">
@@ -3913,6 +3930,9 @@
                             </div>
                         </div>
                         <div class="item-actions">
+                            <button class="btn btn-warning btn-small" onclick="editBook('${book.id}')" title="تعديل الكتاب">
+                                <i class="fas fa-edit"></i> تعديل
+                            </button>
                             <button class="btn btn-info btn-small" onclick="changeBookCategory('${book.id}', '${book.category_id}')" title="تغيير قسم الكتاب">
                                 <i class="fas fa-exchange-alt"></i> تغيير القسم
                             </button>
@@ -3986,6 +4006,80 @@
             } catch (error) {
                 console.error('خطأ في حفظ الكتاب:', error);
                 alert('❌ حدث خطأ: ' + error.message);
+            }
+        }
+
+        async function editBook(id) {
+            try {
+                const book = await api.getBook(id);
+                if (!book) return;
+
+                const currentCover = book.cover_image || book.cover_url || book.coverImage || null;
+                const coverField = Object.prototype.hasOwnProperty.call(book, 'cover_image')
+                    ? 'cover_image'
+                    : (Object.prototype.hasOwnProperty.call(book, 'cover_url') ? 'cover_url' : 'cover_image');
+
+                const result = await showEditDialog({
+                    title: 'تعديل الكتاب',
+                    fields: [
+                        {
+                            id: 'editBookTitle',
+                            label: 'اسم الكتاب',
+                            type: 'text',
+                            value: book.title,
+                            required: true,
+                            icon: 'fas fa-book'
+                        },
+                        {
+                            id: 'editBookCover',
+                            label: 'صورة الغلاف (اختياري)',
+                            type: 'file',
+                            value: '',
+                            required: false,
+                            icon: 'fas fa-image',
+                            accept: 'image/*',
+                            previewUrl: currentCover
+                        }
+                    ]
+                });
+
+                if (!result) return;
+
+                const title = (result.editBookTitle || '').trim();
+                if (!title) {
+                    await showAlert('⚠️ الرجاء إدخال اسم الكتاب', 'error');
+                    return;
+                }
+
+                const updates = { title };
+
+                const coverFile = result.editBookCover;
+                if (coverFile) {
+                    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
+                    if (!allowedTypes.includes(coverFile.type)) {
+                        await showAlert('⚠️ يُرجى اختيار صورة بصيغة صحيحة (JPG, PNG, WEBP, GIF)', 'error');
+                        return;
+                    }
+
+                    const maxSize = 5 * 1024 * 1024;
+                    if (coverFile.size > maxSize) {
+                        await showAlert('⚠️ حجم الصورة كبير جداً. الرجاء اختيار صورة أقل من 5 ميجابايت', 'error');
+                        return;
+                    }
+
+                    const coverUrl = await api.uploadBookCover(coverFile, id);
+                    updates[coverField] = coverUrl;
+                }
+
+                await api.updateBook(id, updates);
+                await showAlert('تم تحديث الكتاب بنجاح', 'success');
+
+                await loadBooks();
+                await loadBooksForPublish();
+                await loadStats();
+            } catch (error) {
+                console.error('خطأ في تعديل الكتاب:', error);
+                await showAlert('حدث خطأ: ' + error.message, 'error');
             }
         }
 
@@ -4354,6 +4448,8 @@
         // تحميل صفحات الكتاب المحدد
         async function loadBookPages() {
             const bookId = document.getElementById('pageBookSelect').value;
+            const partSelect = document.getElementById('pagePartSelect');
+            const partId = partSelect?.value || '';
             
             if (!bookId) {
                 document.getElementById('pageEditorSection').style.display = 'none';
@@ -4364,7 +4460,26 @@
             document.getElementById('pageEditorSection').style.display = 'block';
 
             try {
-                const pages = await api.getBookPages(bookId);
+                const parts = await api.getBookParts(bookId);
+                const hasParts = Array.isArray(parts) && parts.length > 0;
+
+                if (hasParts && !partId) {
+                    const container = document.getElementById('pagesList');
+                    const countElement = document.getElementById('pagesCount');
+                    if (countElement) {
+                        countElement.textContent = '0';
+                    }
+                    container.innerHTML = `
+                        <div class="empty-state">
+                            <i class="fas fa-bookmark"></i>
+                            <h3>الرجاء اختيار الجزء</h3>
+                            <p>هذا الكتاب مقسم إلى أجزاء، اختر الجزء لعرض صفحاته</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                const pages = hasParts ? await api.getPartPages(partId) : await api.getBookPages(bookId);
                 const container = document.getElementById('pagesList');
                 
                 // تحديث عداد الصفحات
@@ -4463,7 +4578,12 @@
                         // إذا لم يكن هناك جزء، نحسب عدد صفحات الكتاب
                         pages = await api.getBookPages(currentSelectedBookId);
                     }
-                    const pageNumber = pages.length + 1; // الرقم التالي
+                    const maxPageNumber = (pages || []).reduce((max, page) => {
+                        const n = Number(page?.page_number);
+                        if (!Number.isFinite(n)) return max;
+                        return Math.max(max, n);
+                    }, 0);
+                    const pageNumber = maxPageNumber + 1; // الرقم التالي
                     await api.addPage(currentSelectedBookId, pageNumber, content, partId);
                     alert('✅ تم إضافة الصفحة بنجاح');
                 }
@@ -4506,14 +4626,33 @@
                             required: true,
                             icon: 'fas fa-align-right',
                             placeholder: 'اكتب محتوى الصفحة هنا... يمكنك استخدام HTML'
+                        },
+                        {
+                            id: 'editPageImageFile',
+                            label: 'إضافة صورة (اختياري)',
+                            type: 'file',
+                            required: false,
+                            icon: 'fas fa-image',
+                            accept: 'image/*'
                         }
                     ]
                 });
 
                 if (!result) return;
 
+                let updatedContent = result.editPageContent;
+                if (result.editPageImageFile) {
+                    if (!currentSelectedBookId) {
+                        await showAlert('الرجاء اختيار كتاب أولاً قبل رفع الصورة', 'error');
+                        return;
+                    }
+
+                    const imageUrl = await api.uploadPageImage(result.editPageImageFile, currentSelectedBookId);
+                    updatedContent = `${updatedContent}\n<div style="text-align:center; margin: 12px 0;"><img src="${imageUrl}" alt="" style="max-width:100%; height:auto;" /></div>\n`;
+                }
+
                 // تحديث الصفحة
-                await api.updatePage(pageId, result.editPageContent);
+                await api.updatePage(pageId, updatedContent);
                 await showAlert('تم تحديث الصفحة بنجاح', 'success');
                 await loadBookPages();
 
@@ -4526,7 +4665,14 @@
         // تحريك صفحة لأعلى
         async function movePageUp(index) {
             try {
-                const pages = await api.getBookPages(currentSelectedBookId);
+                const partSelect = document.getElementById('pagePartSelect');
+                const partId = partSelect?.value || '';
+                const parts = await api.getBookParts(currentSelectedBookId);
+                const hasParts = Array.isArray(parts) && parts.length > 0;
+
+                if (hasParts && !partId) return;
+
+                const pages = hasParts ? await api.getPartPages(partId) : await api.getBookPages(currentSelectedBookId);
                 if (index === 0) return;
 
                 // تبديل أرقام الصفحات باستخدام رقم مؤقت لتجنب التعارض
@@ -4554,7 +4700,14 @@
         // تحريك صفحة لأسفل
         async function movePageDown(index) {
             try {
-                const pages = await api.getBookPages(currentSelectedBookId);
+                const partSelect = document.getElementById('pagePartSelect');
+                const partId = partSelect?.value || '';
+                const parts = await api.getBookParts(currentSelectedBookId);
+                const hasParts = Array.isArray(parts) && parts.length > 0;
+
+                if (hasParts && !partId) return;
+
+                const pages = hasParts ? await api.getPartPages(partId) : await api.getBookPages(currentSelectedBookId);
                 if (index === pages.length - 1) return;
 
                 // تبديل أرقام الصفحات باستخدام رقم مؤقت لتجنب التعارض
@@ -4600,6 +4753,70 @@
             document.getElementById('pageForm').reset();
             currentEditingPageId = null;
             document.querySelector('#pageForm button[type="submit"]').innerHTML = '<i class="fas fa-save"></i> حفظ الصفحة';
+
+            const imageInput = document.getElementById('pageImageFile');
+            if (imageInput) imageInput.value = '';
+        }
+
+        function insertTextAtCursor(textarea, text) {
+            if (!textarea) return;
+
+            const start = textarea.selectionStart ?? textarea.value.length;
+            const end = textarea.selectionEnd ?? textarea.value.length;
+            const before = textarea.value.substring(0, start);
+            const after = textarea.value.substring(end);
+
+            textarea.value = before + text + after;
+            const nextPos = start + text.length;
+            textarea.selectionStart = nextPos;
+            textarea.selectionEnd = nextPos;
+            textarea.focus();
+        }
+
+        async function uploadAndInsertPageImage() {
+            if (!currentSelectedBookId) {
+                alert('⚠️ الرجاء اختيار كتاب أولاً');
+                return;
+            }
+
+            const input = document.getElementById('pageImageFile');
+            const btn = document.getElementById('pageImageUploadBtn');
+            const textarea = document.getElementById('pageContent');
+            const file = input?.files?.[0] || null;
+
+            if (!file) {
+                if (input) {
+                    // افتح نافذة اختيار الصورة ثم أكمل الرفع تلقائياً بعد الاختيار
+                    input.onchange = () => {
+                        input.onchange = null;
+                        uploadAndInsertPageImage();
+                    };
+                    input.click();
+                    return;
+                }
+
+                alert('⚠️ الرجاء اختيار صورة أولاً');
+                return;
+            }
+
+            if (file.type && !file.type.startsWith('image/')) {
+                alert('⚠️ الرجاء اختيار ملف صورة صالح');
+                return;
+            }
+
+            try {
+                if (btn) btn.disabled = true;
+                const imageUrl = await api.uploadPageImage(file, currentSelectedBookId);
+                const html = `\n<div style="text-align:center; margin: 12px 0;"><img src="${imageUrl}" alt="" style="max-width:100%; height:auto;" /></div>\n`;
+                insertTextAtCursor(textarea, html);
+                if (input) input.value = '';
+                alert('✅ تم رفع الصورة وإدراجها في المحتوى');
+            } catch (error) {
+                console.error('خطأ في رفع صورة الصفحة:', error);
+                alert('❌ حدث خطأ في رفع الصورة: ' + (error?.message || error));
+            } finally {
+                if (btn) btn.disabled = false;
+            }
         }
 
         // ===================================
@@ -6265,6 +6482,12 @@
                 // إنشاء الحقول
                 let fieldsHTML = '<form id="editDialogForm" style="text-align: right;">';
                 config.fields.forEach(field => {
+                    const acceptAttr = field.accept ? `accept="${field.accept}"` : '';
+                    const previewHtml = (field.type === 'file' && field.previewUrl)
+                        ? `<div style="margin: 10px 0 12px; text-align: center;">
+                            <img src="${field.previewUrl}" alt="" style="max-width: 100%; max-height: 180px; border-radius: 12px; border: 2px solid rgba(236, 176, 7, 0.25);" />
+                           </div>`
+                        : '';
                     fieldsHTML += `
                         <div class="form-group" style="margin-bottom: 20px;">
                             <label style="display: block; margin-bottom: 8px; color: #333; font-weight: 600;">
@@ -6279,12 +6502,13 @@
                                     ${field.required ? 'required' : ''}
                                     placeholder="${field.placeholder || ''}"
                                 >${field.value || ''}</textarea>`
-                                : `<input 
+                                : `${previewHtml}<input 
                                     type="${field.type}" 
                                     id="${field.id}" 
                                     class="custom-dialog-input"
-                                    value="${field.value || ''}"
+                                    ${field.type === 'file' ? '' : `value="${field.value || ''}"`}
                                     ${field.required ? 'required' : ''}
+                                    ${acceptAttr}
                                     placeholder="${field.placeholder || ''}"
                                 />`
                             }
@@ -6327,7 +6551,11 @@
             const formData = {};
             const inputs = form.querySelectorAll('input, textarea');
             inputs.forEach(input => {
-                formData[input.id] = input.value;
+                if (input.tagName === 'INPUT' && input.type === 'file') {
+                    formData[input.id] = input.files && input.files.length > 0 ? input.files[0] : null;
+                } else {
+                    formData[input.id] = input.value;
+                }
             });
 
             const overlay = document.getElementById('customDialogOverlay');

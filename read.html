@@ -1488,6 +1488,7 @@
         let isSanadHidden = false;
         let originalContent = {}; // حفظ المحتوى الأصلي لكل صفحة
         let currentRenderToken = 0;
+        let lastTrackedPageKey = null;
         let hadithCountCache = {};
         let searchIndexCache = new Map();
         let searchDebounceTimer = null;
@@ -1517,8 +1518,7 @@
             }
 
             if (matches.length === 0) {
-                const trimmed = normalizeBlankLines(content);
-                return trimmed ? [{ text: trimmed }] : [];
+                return [];
             }
 
             const blocks = [];
@@ -1694,6 +1694,20 @@
             return urlParams.get('page');
         }
 
+        function dedupePagesByNumber(pages) {
+            if (!Array.isArray(pages)) return [];
+            const seen = new Set();
+            const result = [];
+            for (const p of pages) {
+                const n = Number(p?.page_number);
+                if (!Number.isFinite(n)) continue;
+                if (seen.has(n)) continue;
+                seen.add(n);
+                result.push(p);
+            }
+            return result;
+        }
+
         // الحصول على كلمة البحث من URL
         function getSearchQuery() {
             const urlParams = new URLSearchParams(window.location.search);
@@ -1729,10 +1743,14 @@
                     currentBookPages = await api.getBookPages(bookId);
                 }
 
+                currentBookPages = dedupePagesByNumber(currentBookPages)
+                    .slice()
+                    .sort((a, b) => Number(a.page_number) - Number(b.page_number));
+
                 searchIndexCache = new Map();
 
                 // تحديث عدد المشاهدات
-                await api.incrementBookViews(bookId);
+                lastTrackedPageKey = null;
 
                 // الانتقال إلى الصفحة المحددة إذا كانت موجودة في URL
                 if (pageNumber) {
@@ -1865,7 +1883,15 @@
             partsNavigation.classList.add('active');
 
             // تحديث معلومات الجزء الحالي
-            document.getElementById('currentPartInfo').textContent = `الجزء ${currentPart.part_number} من ${bookParts.length}`;
+            let partPagesCountText = '';
+            try {
+                const partPages = await api.getPartPages(partId);
+                const count = dedupePagesByNumber(partPages).length;
+                partPagesCountText = ` - ${count} صفحة`;
+            } catch (e) {
+            }
+
+            document.getElementById('currentPartInfo').textContent = `الجزء ${currentPart.part_number} من ${bookParts.length}${partPagesCountText}`;
 
             // تحديث أزرار التنقل
             const currentIndex = bookParts.findIndex(p => p.id === partId);
@@ -1982,6 +2008,17 @@
             const partId = getPartId();
             const effectivePartId = partId || page?.part_id || null;
             const initialPageContent = normalizeBlankLines(page?.content || '');
+
+            if (bookId && page?.page_number) {
+                const pageKey = `${bookId}|${effectivePartId || ''}|${page.page_number}`;
+                if (pageKey !== lastTrackedPageKey) {
+                    lastTrackedPageKey = pageKey;
+                    try {
+                        await api.incrementBookViews(bookId);
+                    } catch (e) {
+                    }
+                }
+            }
             
             pagesContainer.innerHTML = `
                 <div class="page-content" id="pageContent">
@@ -2093,6 +2130,10 @@
             const totalPages = currentBookPages.length;
             const current = currentPageIndex;
             let pages = [];
+
+            const allPageNumbers = currentBookPages.map(p => Number(p?.page_number)).filter(n => Number.isFinite(n));
+            const minPageNumber = allPageNumbers.length ? Math.min(...allPageNumbers) : 1;
+            const maxPageNumber = allPageNumbers.length ? Math.max(...allPageNumbers) : totalPages;
             
             // إذا كان عدد الصفحات قليل، عرض كل الأرقام
             if (totalPages <= 7) {
@@ -2134,12 +2175,18 @@
             const pageJump = `
                 <div class="page-jump">
                     <span class="page-jump-label"><i class="fas fa-search"></i> انتقل إلى صفحة:</span>
-                    <input type="number" class="page-jump-input" id="pageJumpInput" min="1" max="${totalPages}" placeholder="${currentPageNumber}">
+                    <input type="number" class="page-jump-input" id="pageJumpInput" min="${minPageNumber}" max="${maxPageNumber}" placeholder="${currentPageNumber}">
                     <button class="page-jump-btn" onclick="jumpToPage()"><i class="fas fa-arrow-left"></i> اذهب</button>
                 </div>
             `;
             
             // تجميع أرقام الصفحات في container
+            const scopeLabel = getPartId() ? 'عدد صفحات الجزء' : 'عدد صفحات الكتاب';
+            const totalCountInfo = `
+                <div style="text-align:center; margin: 10px 0 0; color:#666; font-weight:700;">
+                    ${scopeLabel}: ${totalPages}
+                </div>
+            `;
             const pageNumbersContainer = `
                 <div class="page-numbers-container">
                     ${prevButton}
@@ -2148,7 +2195,7 @@
                 </div>
             `;
             
-            return pageNumbersContainer + pageJump;
+            return pageNumbersContainer + totalCountInfo + pageJump;
         }
 
         // الذهاب لصفحة محددة
@@ -2171,13 +2218,17 @@
                 return;
             }
             
-            if (pageNumber < 1 || pageNumber > currentBookPages.length) {
-                alert(`⚠️ رقم الصفحة يجب أن يكون بين 1 و ${currentBookPages.length}`);
+            const allPageNumbers = currentBookPages.map(p => Number(p?.page_number)).filter(n => Number.isFinite(n));
+            const minPageNumber = allPageNumbers.length ? Math.min(...allPageNumbers) : 1;
+            const maxPageNumber = allPageNumbers.length ? Math.max(...allPageNumbers) : currentBookPages.length;
+
+            if (pageNumber < minPageNumber || pageNumber > maxPageNumber) {
+                alert(`⚠️ رقم الصفحة يجب أن يكون بين ${minPageNumber} و ${maxPageNumber}`);
                 return;
             }
             
             // البحث عن الصفحة برقمها
-            const targetIndex = currentBookPages.findIndex(page => page.page_number === pageNumber);
+            const targetIndex = currentBookPages.findIndex(page => Number(page?.page_number) === pageNumber);
             
             if (targetIndex !== -1) {
                 goToPage(targetIndex);

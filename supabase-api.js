@@ -256,12 +256,12 @@ class SupabaseAPI {
                 .from(SUPABASE_CONFIG.tables.books)
                 .select('*')
                 .eq('published', true)
-                .order('created_at', { ascending: false });
+                .order('created_at', { ascending: true });
 
             if (error) throw error;
             return data || [];
         } catch (error) {
-            console.error('خطأ في جلب الكتب:', error);
+            console.error('خطأ في جلب الكتب المنشورة:', error);
             return [];
         }
     }
@@ -272,7 +272,7 @@ class SupabaseAPI {
             const { data, error } = await this.supabase
                 .from(SUPABASE_CONFIG.tables.books)
                 .select('*')
-                .order('created_at', { ascending: false });
+                .order('created_at', { ascending: true });
 
             if (error) throw error;
             return data || [];
@@ -290,7 +290,7 @@ class SupabaseAPI {
                 .select('*')
                 .eq('category_id', categoryId)
                 .eq('published', true)
-                .order('created_at', { ascending: false });
+                .order('created_at', { ascending: true });
 
             if (error) throw error;
             return data || [];
@@ -572,14 +572,24 @@ class SupabaseAPI {
     // جلب صفحات كتاب
     async getBookPages(bookId) {
         try {
-            const { data, error } = await this.supabase
-                .from(SUPABASE_CONFIG.tables.pages)
-                .select('*')
-                .eq('book_id', bookId)
-                .order('page_number', { ascending: true });
+            const all = [];
+            const pageSize = 1000;
+            let from = 0;
+            while (true) {
+                const { data, error } = await this.supabase
+                    .from(SUPABASE_CONFIG.tables.pages)
+                    .select('*')
+                    .eq('book_id', bookId)
+                    .order('page_number', { ascending: true })
+                    .range(from, from + pageSize - 1);
 
-            if (error) throw error;
-            return data || [];
+                if (error) throw error;
+                const batch = data || [];
+                all.push(...batch);
+                if (batch.length < pageSize) break;
+                from += pageSize;
+            }
+            return all;
         } catch (error) {
             console.error('خطأ في جلب صفحات الكتاب:', error);
             return [];
@@ -589,14 +599,24 @@ class SupabaseAPI {
     // جلب صفحات جزء معين
     async getPartPages(partId) {
         try {
-            const { data, error } = await this.supabase
-                .from(SUPABASE_CONFIG.tables.pages)
-                .select('*')
-                .eq('part_id', partId)
-                .order('page_number', { ascending: true });
+            const all = [];
+            const pageSize = 1000;
+            let from = 0;
+            while (true) {
+                const { data, error } = await this.supabase
+                    .from(SUPABASE_CONFIG.tables.pages)
+                    .select('*')
+                    .eq('part_id', partId)
+                    .order('page_number', { ascending: true })
+                    .range(from, from + pageSize - 1);
 
-            if (error) throw error;
-            return data || [];
+                if (error) throw error;
+                const batch = data || [];
+                all.push(...batch);
+                if (batch.length < pageSize) break;
+                from += pageSize;
+            }
+            return all;
         } catch (error) {
             console.error('خطأ في جلب صفحات الجزء:', error);
             return [];
@@ -911,6 +931,30 @@ class SupabaseAPI {
             // الحصول على URL العام للصورة
             const { data: urlData } = this.supabase.storage
                 .from('book-covers')
+                .getPublicUrl(filePath);
+
+            return urlData.publicUrl;
+        } catch (error) {
+            console.error('خطأ في رفع الصورة:', error);
+            throw error;
+        }
+    }
+
+    async uploadPageImage(file, bookId) {
+        try {
+            const fileExt = (file.name || '').split('.').pop() || 'png';
+            const rand = Math.random().toString(16).slice(2);
+            const fileName = `${bookId}-${Date.now()}-${rand}.${fileExt}`;
+            const filePath = `pages/${bookId}/${fileName}`;
+
+            const { error } = await this.supabase.storage
+                .from('page-images')
+                .upload(filePath, file);
+
+            if (error) throw error;
+
+            const { data: urlData } = this.supabase.storage
+                .from('page-images')
                 .getPublicUrl(filePath);
 
             return urlData.publicUrl;
