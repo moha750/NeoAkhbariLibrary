@@ -330,6 +330,7 @@
     </div>
 
     <script src="supabase-api.js"></script>
+    <script src="auth-guard.js"></script>
     <script>
         let importStats = {
             processedFiles: 0,
@@ -714,7 +715,11 @@
         }
 
         // تحميل البيانات عند بدء الصفحة
-        window.addEventListener('DOMContentLoaded', loadCategories);
+        window.addEventListener('DOMContentLoaded', async () => {
+            const ok = await authGuard.protectPage('admin');
+            if (!ok) return;
+            await loadCategories();
+        });
     </script>
 </body>
 </html>

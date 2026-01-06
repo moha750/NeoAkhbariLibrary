@@ -64,7 +64,7 @@ class AuthGuard {
     // التحويل إلى صفحة تسجيل الدخول
     redirectToLogin() {
         const currentPath = window.location.pathname;
-        const loginPath = '/login.html';
+        const loginPath = 'login.html';
 
         // تجنب التكرار إذا كنا بالفعل في صفحة تسجيل الدخول
         if (!currentPath.includes('login.html')) {
