@@ -315,7 +315,7 @@
     </footer>
 
     <!-- ملفات Supabase -->
-    <script src="supabase-api.js"></script>
+    <script src="supabase-api.js?v=2"></script>
     <script src="visitor-tracker.js"></script>
     
     <script>
@@ -452,48 +452,43 @@
                 return;
             }
 
+            if (String(searchTerm).length < 3) {
+                searchDropdown.innerHTML = `
+                    <div class="search-dropdown-empty">
+                        <i class="fas fa-keyboard"></i>
+                        <h3>أكمل الكتابة</h3>
+                        <p>اكتب 3 أحرف على الأقل للبحث في الأحاديث</p>
+                    </div>
+                `;
+                searchDropdown.classList.add('active');
+                return;
+            }
+
             // تأخير البحث لتحسين الأداء
             searchTimeout = setTimeout(async () => {
                 // عرض مؤشر التحميل في القائمة المنسدلة
                 searchDropdown.innerHTML = `
                     <div class="search-dropdown-loading">
                         <i class="fas fa-spinner fa-spin"></i>
-                        <p>جاري البحث في العناوين والمحتوى...</p>
+                        <p>جاري البحث في الأحاديث...</p>
                     </div>
                 `;
                 searchDropdown.classList.add('active');
 
                 try {
-                    // البحث في العناوين والمحتوى معاً
-                    const [bookResults, contentResults] = await Promise.all([
-                        api.searchBooks(searchTerm),
-                        api.searchInContent(searchTerm)
-                    ]);
+                    // البحث فقط في الأحاديث (داخل محتوى الصفحات)
+                    const contentResults = await api.searchInContent(searchTerm);
                     
-                    if (bookResults.length === 0 && contentResults.length === 0) {
+                    if (contentResults.length === 0) {
                         searchDropdown.innerHTML = `
                             <div class="search-dropdown-empty">
                                 <i class="fas fa-search"></i>
                                 <h3>لا توجد نتائج</h3>
-                                <p>لم يتم العثور على كتب أو محتوى يطابق بحثك</p>
+                                <p>لم يتم العثور على أحاديث تطابق بحثك</p>
                             </div>
                         `;
                     } else {
                         let resultsHTML = '';
-                        
-                        // عرض نتائج الكتب (العناوين)
-                        if (bookResults.length > 0) {
-                            const booksHTML = bookResults.map(book => createBookResultItem(book)).join('');
-                            resultsHTML += `
-                                <div class="search-section-divider">
-                                    <div class="search-section-title">
-                                        <i class="fas fa-book"></i>
-                                        <span>الكتب (${bookResults.length})</span>
-                                    </div>
-                                </div>
-                                ${booksHTML}
-                            `;
-                        }
                         
                         // عرض نتائج المحتوى
                         if (contentResults.length > 0) {
@@ -501,15 +496,15 @@
                             resultsHTML += `
                                 <div class="search-section-divider">
                                     <div class="search-section-title">
-                                        <i class="fas fa-file-alt"></i>
-                                        <span>المحتوى (${contentResults.length})</span>
+                                        <i class="fas fa-quote-right"></i>
+                                        <span>الأحاديث (${contentResults.length})</span>
                                     </div>
                                 </div>
                                 ${contentHTML}
                             `;
                         }
-                        
-                        const totalResults = bookResults.length + contentResults.length;
+
+                        const totalResults = contentResults.length;
                         searchDropdown.innerHTML = `
                             <div class="search-dropdown-header">
                                 <span><i class="fas fa-search"></i> ${totalResults} نتيجة</span>
@@ -532,39 +527,6 @@
                 }
             }, 500);
         });
-
-        // إنشاء عنصر نتيجة كتاب (من العنوان)
-        function createBookResultItem(book) {
-            const coverImage = book.cover_image || book.coverImage;
-            const coverHTML = coverImage 
-                ? `<img src="${coverImage}" alt="${book.title}" class="search-book-cover">`
-                : `<div class="search-book-icon"><i class="fas fa-book"></i></div>`;
-            
-            return `
-                <div class="search-result-item search-book-item" onclick="goToBook('${book.id}')">
-                    ${coverHTML}
-                    <div class="search-book-details">
-                        <div class="search-result-book">
-                            <i class="fas fa-book"></i>
-                            ${book.title}
-                        </div>
-                        <div class="search-result-meta">
-                            <div class="search-result-meta-item">
-                                <i class="fas fa-tag"></i>
-                                <span>${book.category || 'عام'}</span>
-                            </div>
-                            ${book.author ? `
-                            <div class="search-result-meta-item">
-                                <i class="fas fa-user"></i>
-                                <span>${book.author}</span>
-                            </div>
-                            ` : ''}
-                        </div>
-                    </div>
-                    <i class="fas fa-chevron-left search-arrow"></i>
-                </div>
-            `;
-        }
 
         // إنشاء عنصر نتيجة محتوى (من الصفحات)
         function createContentResultItem(result) {
@@ -598,11 +560,6 @@
         function highlightSearchTerm(text, searchTerm) {
             const regex = new RegExp(`(${searchTerm})`, 'gi');
             return text.replace(regex, '<span class="highlight">$1</span>');
-        }
-
-        // الانتقال إلى كتاب (من نتائج العناوين)
-        function goToBook(bookId) {
-            window.location.href = `parts.html?id=${bookId}`;
         }
 
         // الانتقال إلى نتيجة البحث (من نتائج المحتوى)

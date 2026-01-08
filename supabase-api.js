@@ -19,6 +19,9 @@ const SUPABASE_CONFIG = {
     }
 };
 
+window.__SUPABASE_API_VERSION__ = '2026-01-09T01:30+03:00';
+console.log('📦 supabase-api.js version:', window.__SUPABASE_API_VERSION__);
+
 class SupabaseAPI {
     constructor() {
         this.supabase = null;
@@ -440,34 +443,92 @@ class SupabaseAPI {
     // البحث التفصيلي في المحتوى مع معلومات الصفحات والأجزاء
     async searchInContent(searchTerm) {
         try {
-            // البحث في محتوى الصفحات مع جلب معلومات الكتاب والجزء
-            const { data: pages, error } = await this.supabase
-                .from(SUPABASE_CONFIG.tables.pages)
-                .select(`
-                    id,
-                    content,
-                    page_number,
-                    book_id,
-                    part_id,
-                    books!inner(id, title, published),
-                    parts(id, part_number)
-                `)
-                .eq('books.published', true)
-                .ilike('content', `%${searchTerm}%`)
-                .limit(50);
+            if (!searchTerm || String(searchTerm).trim().length < 3) {
+                return [];
+            }
 
-            if (error) throw error;
+            const normalizedSearchTerm = String(searchTerm).trim();
+
+            let pageHits;
+            let error;
+
+            // مرحلة 1: بحث سريع يجلب IDs فقط (تجنب نقل content الضخم أثناء البحث)
+            // نفضل RPC لأننا نستطيع ضبط statement_timeout محلياً داخل Postgres.
+            ({ data: pageHits, error } = await this.supabase
+                .rpc('search_pages_content', {
+                    q: normalizedSearchTerm,
+                    max_results: 20
+                }));
+
+            if (error) {
+                console.error('فشل RPC search_pages_content:', error);
+                throw error;
+            }
+
+            const pageIds = [...new Set((pageHits || []).map(p => p.id).filter(Boolean))];
+            const bookIds = [...new Set((pageHits || []).map(p => p.book_id).filter(Boolean))];
+            const partIds = [...new Set((pageHits || []).map(p => p.part_id).filter(Boolean))];
+
+            let booksById = {};
+            if (bookIds.length > 0) {
+                const { data: books, error: booksError } = await this.supabase
+                    .from(SUPABASE_CONFIG.tables.books)
+                    .select('id, title')
+                    .eq('published', true)
+                    .in('id', bookIds);
+
+                if (booksError) throw booksError;
+                booksById = (books || []).reduce((acc, b) => {
+                    acc[b.id] = b;
+                    return acc;
+                }, {});
+            }
+
+            let partsById = {};
+            if (partIds.length > 0) {
+                const { data: parts, error: partsError } = await this.supabase
+                    .from(SUPABASE_CONFIG.tables.parts)
+                    .select('id, part_number')
+                    .in('id', partIds);
+
+                if (partsError) throw partsError;
+                partsById = (parts || []).reduce((acc, p) => {
+                    acc[p.id] = p;
+                    return acc;
+                }, {});
+            }
+
+            // مرحلة 2: جلب content فقط للنتائج المحدودة لاستخراج السياق
+            let pagesById = {};
+            if (pageIds.length > 0) {
+                const { data: pagesData, error: pagesError } = await this.supabase
+                    .from(SUPABASE_CONFIG.tables.pages)
+                    .select('id, content')
+                    .in('id', pageIds);
+
+                if (pagesError) throw pagesError;
+                pagesById = (pagesData || []).reduce((acc, p) => {
+                    acc[p.id] = p;
+                    return acc;
+                }, {});
+            }
 
             // معالجة النتائج لاستخراج السياق
-            const results = pages.map(page => {
+            const results = (pageHits || []).map(hit => {
+                const book = booksById[hit.book_id];
+                if (!book) return null;
+
+                const page = pagesById[hit.id];
+                if (!page || !page.content) return null;
+
                 const content = page.content;
-                const searchLower = searchTerm.toLowerCase();
+                const searchLower = normalizedSearchTerm.toLowerCase();
                 const contentLower = content.toLowerCase();
                 const index = contentLower.indexOf(searchLower);
                 
                 // استخراج السياق (50 حرف قبل وبعد)
                 const start = Math.max(0, index - 50);
-                const end = Math.min(content.length, index + searchTerm.length + 50);
+                const end = Math.min(content.length, index + normalizedSearchTerm.length + 50);
                 let context = content.substring(start, end);
                 
                 // إضافة ... في البداية والنهاية إذا لزم الأمر
@@ -475,18 +536,18 @@ class SupabaseAPI {
                 if (end < content.length) context = context + '...';
 
                 return {
-                    pageId: page.id,
-                    bookId: page.book_id,
-                    bookTitle: page.books.title,
-                    partId: page.part_id,
-                    partNumber: page.parts ? page.parts.part_number : null,
-                    pageNumber: page.page_number,
+                    pageId: hit.id,
+                    bookId: hit.book_id,
+                    bookTitle: book.title,
+                    partId: hit.part_id,
+                    partNumber: hit.part_id ? (partsById[hit.part_id] ? partsById[hit.part_id].part_number : null) : null,
+                    pageNumber: hit.page_number,
                     context: context,
-                    searchTerm: searchTerm
+                    searchTerm: normalizedSearchTerm
                 };
             });
 
-            return results;
+            return results.filter(Boolean);
         } catch (error) {
             console.error('خطأ في البحث التفصيلي:', error);
             return [];

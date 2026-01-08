@@ -89,6 +89,7 @@ CREATE TABLE IF NOT EXISTS pages (
 );
 
  CREATE EXTENSION IF NOT EXISTS btree_gist;
+ CREATE EXTENSION IF NOT EXISTS pg_trgm;
 
  CREATE TABLE IF NOT EXISTS chapters (
      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
@@ -234,6 +235,8 @@ CREATE INDEX IF NOT EXISTS idx_books_published ON books(published);
 CREATE INDEX IF NOT EXISTS idx_parts_book ON parts(book_id);
 CREATE INDEX IF NOT EXISTS idx_pages_book ON pages(book_id);
 CREATE INDEX IF NOT EXISTS idx_pages_part ON pages(part_id);
+CREATE INDEX IF NOT EXISTS idx_pages_content_trgm ON pages USING gin (content gin_trgm_ops);
+CREATE INDEX IF NOT EXISTS idx_pages_content_fts ON pages USING gin (to_tsvector('simple', content));
  CREATE INDEX IF NOT EXISTS idx_chapters_book_part ON chapters(book_id, part_id);
  CREATE INDEX IF NOT EXISTS idx_chapters_book_range ON chapters(book_id, page_start, page_end);
 
@@ -257,6 +260,34 @@ BEGIN
     RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
+
+-- بحث في محتوى الصفحات مع ضبط statement_timeout محلياً (لتجنب timeout من PostgREST)
+CREATE OR REPLACE FUNCTION search_pages_content(q text, max_results integer DEFAULT 20)
+RETURNS TABLE (
+    id uuid,
+    page_number integer,
+    book_id uuid,
+    part_id uuid
+) AS $$
+BEGIN
+    PERFORM set_config('statement_timeout', '60000', true);
+
+    RETURN QUERY
+    SELECT p.id, p.page_number, p.book_id, p.part_id
+    FROM pages p
+    WHERE p.content ILIKE ('%' || q || '%')
+      AND EXISTS (
+        SELECT 1
+        FROM books b
+        WHERE b.id = p.book_id
+          AND b.published = true
+      )
+    LIMIT GREATEST(1, LEAST(max_results, 50));
+END;
+$$ LANGUAGE plpgsql STABLE SECURITY DEFINER SET search_path = public;
+
+GRANT EXECUTE ON FUNCTION search_pages_content(text, integer) TO anon;
+GRANT EXECUTE ON FUNCTION search_pages_content(text, integer) TO authenticated;
 
 -- ===================================
 -- المحفزات (Triggers)
