@@ -26,6 +26,12 @@ class SupabaseAPI {
     constructor() {
         this.supabase = null;
         this.initialized = false;
+        this._loadingUiInitialized = false;
+        this.flags = {
+            loadingText: 'جاري تحميل الصفحة...',
+            loadingAnimationPath: 'flag.json',
+            lottieCdn: 'https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js'
+        };
     }
 
     // تهيئة الاتصال بـ Supabase
@@ -51,10 +57,82 @@ class SupabaseAPI {
 
             this.initialized = true;
             console.log('✅ تم الاتصال بـ Supabase بنجاح');
+
+            await this.initLoadingUI();
         } catch (error) {
             console.error('❌ خطأ في الاتصال بـ Supabase:', error);
             throw error;
         }
+    }
+
+    async initLoadingUI() {
+        if (this._loadingUiInitialized) return;
+
+        try {
+            const loadingDiv = document.getElementById('loadingDiv');
+            if (!loadingDiv) return;
+
+            const textEl = loadingDiv.querySelector('h2, p') || null;
+            if (textEl) {
+                textEl.textContent = this.flags.loadingText;
+            } else {
+                const h2 = document.createElement('h2');
+                h2.textContent = this.flags.loadingText;
+                loadingDiv.appendChild(h2);
+            }
+
+            let animationContainer = loadingDiv.querySelector('.loading-icon');
+            if (!animationContainer) {
+                animationContainer = document.createElement('div');
+                animationContainer.className = 'loading-icon';
+                loadingDiv.insertBefore(animationContainer, loadingDiv.firstChild);
+            }
+
+            animationContainer.innerHTML = '';
+            animationContainer.style.width = '220px';
+            animationContainer.style.height = '220px';
+            animationContainer.style.margin = '0 auto 20px';
+
+            await this._ensureLottieLoaded();
+            if (!window.lottie || typeof window.lottie.loadAnimation !== 'function') return;
+
+            window.lottie.loadAnimation({
+                container: animationContainer,
+                renderer: 'svg',
+                loop: true,
+                autoplay: true,
+                path: this.flags.loadingAnimationPath
+            });
+
+            this._loadingUiInitialized = true;
+        } catch (e) {
+            console.warn('⚠️ تعذر تهيئة شاشة التحميل الموحدة:', e);
+        }
+    }
+
+    _ensureLottieLoaded() {
+        if (window.lottie) return Promise.resolve();
+
+        return new Promise((resolve) => {
+            try {
+                const existing = document.querySelector('script[data-lottie-web="1"]');
+                if (existing) {
+                    existing.addEventListener('load', () => resolve());
+                    existing.addEventListener('error', () => resolve());
+                    return;
+                }
+
+                const script = document.createElement('script');
+                script.src = this.flags.lottieCdn;
+                script.async = true;
+                script.setAttribute('data-lottie-web', '1');
+                script.addEventListener('load', () => resolve());
+                script.addEventListener('error', () => resolve());
+                document.head.appendChild(script);
+            } catch (_) {
+                resolve();
+            }
+        });
     }
 
     async getBookChapters(bookId, partId = null) {

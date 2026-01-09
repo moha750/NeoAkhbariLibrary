@@ -19,9 +19,9 @@
 
         <div class="home-search-section">
             <div class="home-search-container">
-                <input type="text" id="homeSearchInput" class="search-input home-search-input" placeholder="ابحث عن حديث في جميع الكتب المنشورة..." autocomplete="off">
-                <button type="button" id="homeSearchBtn" class="home-search-btn"><i class="fas fa-search"></i> بحث</button>
-                <button type="button" id="homeSearchClearBtn" class="home-search-clear-btn" style="display: none;"><i class="fas fa-times"></i> مسح</button>
+                <input type="text" id="homeSearchInput" class="search-input home-search-input" placeholder="ابحث عن حديث ..." autocomplete="off">
+                <button type="button" id="homeSearchBtn" class="home-search-btn"><i class="fas fa-search"></i> أبحث عن الحديث</button>
+                <button type="button" id="homeSearchClearBtn" class="home-search-clear-btn" style="display: none;"><i class="fas fa-times"></i> مسح البحث</button>
             </div>
             <div id="homeSearchStatus" class="home-search-status" style="display: none;"></div>
             <div id="homeSearchResults" class="home-search-results" style="display: none;"></div>
@@ -94,6 +94,9 @@
 
         let homeSearchDebounceTimer = null;
         let homeSearchToken = 0;
+        let homeSearchCurrentPage = 1;
+        let homeSearchLastQuery = '';
+        const homeSearchPageSize = 30;
 
         function escapeHtml(str) {
             if (str == null) return '';
@@ -132,7 +135,10 @@
             return `read.html?${params.toString()}`;
         }
 
-        function renderHomeSearchResults(results, searchTerm) {
+        function renderHomeSearchResults(results, searchTerm, options = {}) {
+            const page = Number.isFinite(options.page) ? Math.max(1, options.page) : 1;
+            const hasNext = Boolean(options.hasNext);
+            const scrollToResults = Boolean(options.scrollToResults);
             const resultsEl = document.getElementById('homeSearchResults');
             const clearBtn = document.getElementById('homeSearchClearBtn');
             const categoriesContainer = document.getElementById('categoriesContainer');
@@ -177,21 +183,47 @@
                             <div class="home-search-meta">${partLabel}${pageLabel ? ` - ${pageLabel}` : ''}</div>
                         </div>
                         <div class="home-search-context">${highlighted}</div>
-                        <div class="home-search-open">فتح <i class="fas fa-arrow-left"></i></div>
+                        <div class="home-search-open">رؤية الحديث<i class="fas fa-arrow-left"></i></div>
                     </a>
                 `;
             }).join('');
 
-            resultsEl.innerHTML = `<div class="home-search-results-grid">${html}</div>`;
+            const paginationHtml = (page > 1 || hasNext) ? `
+                <div class="home-search-pagination">
+                    <button type="button" class="home-search-page-btn home-search-page-btn-secondary" onclick="setHomeSearchPage(${page - 1})" ${page <= 1 ? 'disabled' : ''}>
+                        <i class="fas fa-chevron-right"></i>
+                        الصفحة السابقة
+                    </button>
+                    <div class="home-search-page-indicator">الصفحة ${page}</div>
+                    <button type="button" class="home-search-page-btn home-search-page-btn-primary" onclick="setHomeSearchPage(${page + 1})" ${hasNext ? '' : 'disabled'}>
+                        الصفحة التالية
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                </div>
+            ` : '';
+
+            resultsEl.innerHTML = `<div class="home-search-results-grid">${html}</div>${paginationHtml}`;
             resultsEl.style.display = 'block';
-            setHomeSearchStatus(`نتائج البحث عن: ${safeTerm} (${results.length})`, 'info');
+            setHomeSearchStatus(`نتائج البحث عن: ${safeTerm} (${results.length}) - الصفحة ${page}`, 'info');
+
+            if (scrollToResults) {
+                requestAnimationFrame(() => {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                });
+            }
         }
 
-        async function performHomeSearch({ force = false } = {}) {
+        function setHomeSearchPage(page) {
+            performHomeSearch({ force: true, page, scrollToResults: true });
+        }
+
+        async function performHomeSearch({ force = false, page = null, scrollToResults = false } = {}) {
             const input = document.getElementById('homeSearchInput');
             const q = String(input.value || '').trim();
 
             if (!q) {
+                homeSearchLastQuery = '';
+                homeSearchCurrentPage = 1;
                 renderHomeSearchResults([], '');
                 return;
             }
@@ -204,18 +236,34 @@
                 return;
             }
 
+            if (q !== homeSearchLastQuery) {
+                homeSearchLastQuery = q;
+                homeSearchCurrentPage = 1;
+            } else {
+                if (Number.isFinite(page)) {
+                    homeSearchCurrentPage = Math.max(1, page);
+                } else {
+                    homeSearchCurrentPage = 1;
+                }
+            }
+
+            const offset = (homeSearchCurrentPage - 1) * homeSearchPageSize;
+            const limit = homeSearchPageSize + 1;
+
             const myToken = ++homeSearchToken;
             setHomeSearchStatus('جاري البحث...', 'info');
 
             try {
-                const results = await api.searchInContent(q, { limit: 30, offset: 0 });
+                const rawResults = await api.searchInContent(q, { limit, offset });
                 if (myToken !== homeSearchToken) return;
-                renderHomeSearchResults(results, q);
+                const hasNext = Array.isArray(rawResults) && rawResults.length > homeSearchPageSize;
+                const results = (rawResults || []).slice(0, homeSearchPageSize);
+                renderHomeSearchResults(results, q, { page: homeSearchCurrentPage, hasNext, scrollToResults });
             } catch (error) {
                 if (myToken !== homeSearchToken) return;
                 console.error('خطأ في البحث:', error);
                 setHomeSearchStatus('حدث خطأ أثناء البحث. حاول مرة أخرى.', 'error');
-                renderHomeSearchResults([], q);
+                renderHomeSearchResults([], q, { page: homeSearchCurrentPage, hasNext: false, scrollToResults });
             }
         }
 
@@ -249,6 +297,8 @@
             if (homeSearchDebounceTimer) clearTimeout(homeSearchDebounceTimer);
             document.getElementById('homeSearchInput').value = '';
             document.getElementById('homeSearchClearBtn').style.display = 'none';
+            homeSearchLastQuery = '';
+            homeSearchCurrentPage = 1;
             renderHomeSearchResults([], '');
         }
 
