@@ -441,13 +441,16 @@ class SupabaseAPI {
     }
 
     // البحث التفصيلي في المحتوى مع معلومات الصفحات والأجزاء
-    async searchInContent(searchTerm) {
+    async searchInContent(searchTerm, options = {}) {
         try {
-            if (!searchTerm || String(searchTerm).trim().length < 3) {
+            if (!searchTerm || String(searchTerm).trim().length < 4) {
                 return [];
             }
 
             const normalizedSearchTerm = String(searchTerm).trim();
+
+            const limit = Number.isFinite(options.limit) ? options.limit : 20;
+            const offset = Number.isFinite(options.offset) ? options.offset : 0;
 
             let pageHits;
             let error;
@@ -457,7 +460,8 @@ class SupabaseAPI {
             ({ data: pageHits, error } = await this.supabase
                 .rpc('search_pages_content', {
                     q: normalizedSearchTerm,
-                    max_results: 20
+                    max_results: limit,
+                    offset_rows: offset
                 }));
 
             if (error) {
@@ -524,7 +528,25 @@ class SupabaseAPI {
                 const content = page.content;
                 const searchLower = normalizedSearchTerm.toLowerCase();
                 const contentLower = content.toLowerCase();
-                const index = contentLower.indexOf(searchLower);
+                const tokens = normalizedSearchTerm
+                    .split(/\s+/)
+                    .map(t => t.trim())
+                    .filter(t => t.length >= 2)
+                    .slice(0, 8);
+
+                let index = -1;
+                for (const t of tokens) {
+                    const i = contentLower.indexOf(t.toLowerCase());
+                    if (i !== -1 && (index === -1 || i < index)) {
+                        index = i;
+                    }
+                }
+                if (index === -1) {
+                    index = contentLower.indexOf(searchLower);
+                }
+                if (index === -1) {
+                    index = 0;
+                }
                 
                 // استخراج السياق (50 حرف قبل وبعد)
                 const start = Math.max(0, index - 50);

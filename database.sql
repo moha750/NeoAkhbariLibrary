@@ -221,22 +221,24 @@ CREATE TABLE IF NOT EXISTS visitors (
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
--- ===================================
--- الفهارس (Indexes)
--- ===================================
+ -- ===================================
+ -- الفهارس (Indexes)
+ -- ===================================
 
-CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
-CREATE INDEX IF NOT EXISTS idx_users_role ON users(role_id);
-CREATE INDEX IF NOT EXISTS idx_invitations_email ON invitations(email);
-CREATE INDEX IF NOT EXISTS idx_invitations_token ON invitations(token);
-CREATE INDEX IF NOT EXISTS idx_invitations_status ON invitations(status);
-CREATE INDEX IF NOT EXISTS idx_books_category ON books(category_id);
-CREATE INDEX IF NOT EXISTS idx_books_published ON books(published);
-CREATE INDEX IF NOT EXISTS idx_parts_book ON parts(book_id);
-CREATE INDEX IF NOT EXISTS idx_pages_book ON pages(book_id);
-CREATE INDEX IF NOT EXISTS idx_pages_part ON pages(part_id);
-CREATE INDEX IF NOT EXISTS idx_pages_content_trgm ON pages USING gin (content gin_trgm_ops);
-CREATE INDEX IF NOT EXISTS idx_pages_content_fts ON pages USING gin (to_tsvector('simple', content));
+ CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+ CREATE INDEX IF NOT EXISTS idx_users_role ON users(role_id);
+ CREATE INDEX IF NOT EXISTS idx_invitations_email ON invitations(email);
+ CREATE INDEX IF NOT EXISTS idx_invitations_token ON invitations(token);
+ CREATE INDEX IF NOT EXISTS idx_invitations_status ON invitations(status);
+ CREATE INDEX IF NOT EXISTS idx_books_category ON books(category_id);
+ CREATE INDEX IF NOT EXISTS idx_books_published ON books(published);
+ CREATE INDEX IF NOT EXISTS idx_parts_book ON parts(book_id);
+ CREATE INDEX IF NOT EXISTS idx_pages_book ON pages(book_id);
+ CREATE INDEX IF NOT EXISTS idx_pages_part ON pages(part_id);
+
+ CREATE EXTENSION IF NOT EXISTS pg_trgm;
+ CREATE INDEX IF NOT EXISTS idx_pages_content_trgm ON pages USING gin (content gin_trgm_ops);
+ CREATE INDEX IF NOT EXISTS idx_pages_content_fts ON pages USING gin (to_tsvector('simple', content));
  CREATE INDEX IF NOT EXISTS idx_chapters_book_part ON chapters(book_id, part_id);
  CREATE INDEX IF NOT EXISTS idx_chapters_book_range ON chapters(book_id, page_start, page_end);
 
@@ -262,32 +264,46 @@ END;
 $$ LANGUAGE plpgsql;
 
 -- بحث في محتوى الصفحات مع ضبط statement_timeout محلياً (لتجنب timeout من PostgREST)
-CREATE OR REPLACE FUNCTION search_pages_content(q text, max_results integer DEFAULT 20)
+CREATE OR REPLACE FUNCTION search_pages_content(q text, max_results integer DEFAULT 20, offset_rows integer DEFAULT 0)
 RETURNS TABLE (
     id uuid,
     page_number integer,
     book_id uuid,
     part_id uuid
 ) AS $$
+DECLARE
+    cleaned_q text;
+    tsq tsquery;
 BEGIN
-    PERFORM set_config('statement_timeout', '60000', true);
+    PERFORM set_config('statement_timeout', '120000', true);
+
+    cleaned_q := coalesce(q, '');
+    cleaned_q := regexp_replace(cleaned_q, E'[\r\n\t]+', ' ', 'g');
+    cleaned_q := regexp_replace(cleaned_q, E'[\u00A0]+', ' ', 'g');
+    cleaned_q := regexp_replace(cleaned_q, E'[\.,،؛;:!؟\-–—_\(\)\[\]{}"''«»]+', ' ', 'g');
+    cleaned_q := regexp_replace(cleaned_q, E'\s+', ' ', 'g');
+    cleaned_q := btrim(cleaned_q);
+
+    IF cleaned_q IS NULL OR length(cleaned_q) < 4 THEN
+        RETURN;
+    END IF;
+
+    tsq := websearch_to_tsquery('simple', cleaned_q);
 
     RETURN QUERY
     SELECT p.id, p.page_number, p.book_id, p.part_id
     FROM pages p
-    WHERE p.content ILIKE ('%' || q || '%')
-      AND EXISTS (
-        SELECT 1
-        FROM books b
-        WHERE b.id = p.book_id
-          AND b.published = true
-      )
-    LIMIT GREATEST(1, LEAST(max_results, 50));
+    INNER JOIN books b
+        ON b.id = p.book_id
+       AND b.published = true
+    WHERE to_tsvector('simple', p.content) @@ tsq
+    LIMIT GREATEST(1, LEAST(max_results, 50))
+    OFFSET GREATEST(offset_rows, 0);
 END;
 $$ LANGUAGE plpgsql STABLE SECURITY DEFINER SET search_path = public;
 
-GRANT EXECUTE ON FUNCTION search_pages_content(text, integer) TO anon;
-GRANT EXECUTE ON FUNCTION search_pages_content(text, integer) TO authenticated;
+GRANT EXECUTE ON FUNCTION search_pages_content(text, integer, integer) TO anon;
+GRANT EXECUTE ON FUNCTION search_pages_content(text, integer, integer) TO authenticated;
 
 -- ===================================
 -- المحفزات (Triggers)

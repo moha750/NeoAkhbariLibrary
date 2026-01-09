@@ -10,249 +10,6 @@
     
     <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
-    <style>
-        /* Search Dropdown Styles */
-        .search-dropdown {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-            margin-top: 10px;
-            max-height: 500px;
-            overflow-y: auto;
-            z-index: 1000;
-            display: none;
-            border: 2px solid rgba(236, 176, 7, 0.2);
-        }
-
-        .search-dropdown.active {
-            display: block;
-            animation: slideDown 0.3s ease-out;
-        }
-
-        @keyframes slideDown {
-            from {
-                opacity: 0;
-                transform: translateY(-10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        .search-dropdown-header {
-            padding: 15px 20px;
-            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
-            color: white;
-            font-weight: bold;
-            border-radius: 13px 13px 0 0;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .search-dropdown-close {
-            background: rgba(255, 255, 255, 0.2);
-            border: none;
-            color: white;
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s;
-        }
-
-        .search-dropdown-close:hover {
-            background: rgba(255, 255, 255, 0.3);
-            transform: rotate(90deg);
-        }
-
-        .search-result-item {
-            padding: 15px 20px;
-            border-bottom: 1px solid rgba(236, 176, 7, 0.1);
-            cursor: pointer;
-            transition: all 0.3s;
-        }
-
-        .search-result-item:hover {
-            background: rgba(236, 176, 7, 0.05);
-        }
-
-        .search-result-item:last-child {
-            border-bottom: none;
-        }
-
-        .search-result-book {
-            font-weight: bold;
-            color: #ECB007;
-            font-size: 1.05em;
-            margin-bottom: 5px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .search-result-meta {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 8px;
-            flex-wrap: wrap;
-        }
-
-        .search-result-meta-item {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            color: #666;
-            font-size: 0.9em;
-        }
-
-        .search-result-meta-item i {
-            color: #ECB007;
-        }
-
-        .search-result-context {
-            color: #555;
-            font-size: 0.95em;
-            line-height: 1.6;
-            background: rgba(236, 176, 7, 0.05);
-            padding: 10px;
-            border-radius: 8px;
-            border-right: 3px solid #ECB007;
-        }
-
-        .search-result-context .highlight {
-            background: rgba(236, 176, 7, 0.3);
-            font-weight: bold;
-            padding: 2px 4px;
-            border-radius: 3px;
-        }
-
-        .search-dropdown-empty {
-            padding: 40px 20px;
-            text-align: center;
-            color: #999;
-        }
-
-        .search-dropdown-empty i {
-            font-size: 3em;
-            color: #ECB007;
-            margin-bottom: 15px;
-        }
-
-        .search-dropdown-loading {
-            padding: 40px 20px;
-            text-align: center;
-            color: #ECB007;
-        }
-
-        .search-dropdown-loading i {
-            font-size: 2em;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        /* Search Section Divider */
-        .search-section-divider {
-            background: linear-gradient(135deg, rgba(236, 176, 7, 0.1) 0%, rgba(245, 200, 66, 0.1) 100%);
-            padding: 10px 20px;
-            border-top: 2px solid rgba(236, 176, 7, 0.2);
-            border-bottom: 2px solid rgba(236, 176, 7, 0.2);
-            margin: 10px 0;
-        }
-
-        .search-section-title {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            color: #ECB007;
-            font-weight: bold;
-            font-size: 1.05em;
-        }
-
-        .search-section-title i {
-            font-size: 1.2em;
-        }
-
-        /* Book Result Item Styles */
-        .search-book-item {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 15px 20px;
-        }
-
-        .search-book-cover {
-            width: 60px;
-            height: 80px;
-            object-fit: cover;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .search-book-icon {
-            width: 60px;
-            height: 80px;
-            background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 2em;
-        }
-
-        .search-book-details {
-            flex: 1;
-        }
-
-        .search-arrow {
-            color: #ECB007;
-            font-size: 1.2em;
-            transition: transform 0.3s;
-        }
-
-        .search-book-item:hover .search-arrow {
-            transform: translateX(-5px);
-        }
-
-        @media (max-width: 768px) {
-            .search-dropdown {
-                max-height: 400px;
-            }
-
-            .search-result-meta {
-                flex-direction: column;
-                gap: 5px;
-            }
-
-            .search-result-context {
-                font-size: 0.9em;
-            }
-
-            .search-book-cover,
-            .search-book-icon {
-                width: 50px;
-                height: 70px;
-            }
-
-            .search-book-icon {
-                font-size: 1.5em;
-            }
-        }
-    </style>
 </head>
 <body>
     <div class="container">
@@ -260,21 +17,20 @@
         <!-- Header Image -->
         <img src="tape.png" alt="شعار المكتبة الرقمية" class="header-image">
 
-        <div style="position: relative;" id="searchContainer">
-            <input type="text" class="search-input" id="searchInput" placeholder="ابحث في العناوين والمحتوى..." style="padding-right: 50px;">
-            <i class="fas fa-search" style="position: absolute; right: 20px; top: 50%; transform: translateY(-50%); color: #ECB007; font-size: 1.2em; pointer-events: none;"></i>
-            
-            <!-- Search Dropdown -->
-            <div class="search-dropdown" id="searchDropdown">
-                <!-- سيتم ملؤها ديناميكياً -->
+        <div class="home-search-section">
+            <div class="home-search-container">
+                <input type="text" id="homeSearchInput" class="search-input home-search-input" placeholder="ابحث عن حديث في جميع الكتب المنشورة..." autocomplete="off">
+                <button type="button" id="homeSearchBtn" class="home-search-btn"><i class="fas fa-search"></i> بحث</button>
+                <button type="button" id="homeSearchClearBtn" class="home-search-clear-btn" style="display: none;"><i class="fas fa-times"></i> مسح</button>
             </div>
+            <div id="homeSearchStatus" class="home-search-status" style="display: none;"></div>
+            <div id="homeSearchResults" class="home-search-results" style="display: none;"></div>
         </div>
 
         <div id="categoriesContainer">
             <!-- سيتم عرض الأقسام والكتب هنا ديناميكياً -->
         </div>
 
-        <!-- فورم تواصل معنا -->
         <div class="contact-section">
             <h2 class="contact-title">يسعدنا تواصلكم معنا</h2>
             <p class="contact-subtitle">نسعد بتواصلك معنا، أرسل لنا رسالتك وسنرد عليك في أقرب وقت</p>
@@ -334,6 +90,166 @@
                 console.error('خطأ في تحميل البيانات:', error);
                 displayError('حدث خطأ في تحميل البيانات. يرجى التحقق من الاتصال بالإنترنت.');
             }
+        }
+
+        let homeSearchDebounceTimer = null;
+        let homeSearchToken = 0;
+
+        function escapeHtml(str) {
+            if (str == null) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function escapeRegExp(str) {
+            return String(str).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+
+        function setHomeSearchStatus(text, type = 'info') {
+            const el = document.getElementById('homeSearchStatus');
+            if (!text) {
+                el.style.display = 'none';
+                el.textContent = '';
+                el.classList.remove('is-error', 'is-info');
+                return;
+            }
+            el.textContent = text;
+            el.style.display = 'block';
+            el.classList.toggle('is-error', type === 'error');
+            el.classList.toggle('is-info', type !== 'error');
+        }
+
+        function buildReadUrl(result, searchTerm) {
+            const params = new URLSearchParams();
+            params.set('id', result.bookId);
+            if (result.partId) params.set('part', result.partId);
+            if (result.pageNumber != null) params.set('page', String(result.pageNumber));
+            if (searchTerm) params.set('search', searchTerm);
+            return `read.html?${params.toString()}`;
+        }
+
+        function renderHomeSearchResults(results, searchTerm) {
+            const resultsEl = document.getElementById('homeSearchResults');
+            const clearBtn = document.getElementById('homeSearchClearBtn');
+            const categoriesContainer = document.getElementById('categoriesContainer');
+
+            clearBtn.style.display = searchTerm ? 'inline-flex' : 'none';
+
+            if (!searchTerm) {
+                resultsEl.style.display = 'none';
+                resultsEl.innerHTML = '';
+                categoriesContainer.style.display = '';
+                setHomeSearchStatus('', 'info');
+                return;
+            }
+
+            categoriesContainer.style.display = 'none';
+
+            const safeTerm = escapeHtml(searchTerm);
+            if (!Array.isArray(results) || results.length === 0) {
+                resultsEl.innerHTML = `
+                    <div class="home-search-empty">
+                        <div class="home-search-empty-icon"><i class="fas fa-search"></i></div>
+                        <div class="home-search-empty-title">لا توجد نتائج</div>
+                        <div class="home-search-empty-subtitle">جرّب كتابة كلمات مختلفة أو أكثر تحديداً</div>
+                    </div>
+                `;
+                resultsEl.style.display = 'block';
+                setHomeSearchStatus(`نتائج البحث عن: ${safeTerm} (0)`, 'info');
+                return;
+            }
+
+            const termRegex = new RegExp(escapeRegExp(searchTerm), 'gi');
+            const html = results.map(r => {
+                const context = escapeHtml(r.context || '');
+                const highlighted = context.replace(termRegex, match => `<mark class="home-search-highlight">${escapeHtml(match)}</mark>`);
+                const partLabel = r.partNumber != null ? `الجزء ${escapeHtml(r.partNumber)}` : 'بدون جزء';
+                const pageLabel = r.pageNumber != null ? `الصفحة ${escapeHtml(r.pageNumber)}` : '';
+                const url = buildReadUrl(r, searchTerm);
+                return `
+                    <a class="home-search-result" href="${url}">
+                        <div class="home-search-result-header">
+                            <div class="home-search-book">${escapeHtml(r.bookTitle || '')}</div>
+                            <div class="home-search-meta">${partLabel}${pageLabel ? ` - ${pageLabel}` : ''}</div>
+                        </div>
+                        <div class="home-search-context">${highlighted}</div>
+                        <div class="home-search-open">فتح <i class="fas fa-arrow-left"></i></div>
+                    </a>
+                `;
+            }).join('');
+
+            resultsEl.innerHTML = `<div class="home-search-results-grid">${html}</div>`;
+            resultsEl.style.display = 'block';
+            setHomeSearchStatus(`نتائج البحث عن: ${safeTerm} (${results.length})`, 'info');
+        }
+
+        async function performHomeSearch({ force = false } = {}) {
+            const input = document.getElementById('homeSearchInput');
+            const q = String(input.value || '').trim();
+
+            if (!q) {
+                renderHomeSearchResults([], '');
+                return;
+            }
+
+            if (q.length < 4) {
+                setHomeSearchStatus('اكتب 4 أحرف على الأقل للبحث', 'info');
+                document.getElementById('homeSearchResults').style.display = 'none';
+                document.getElementById('categoriesContainer').style.display = '';
+                document.getElementById('homeSearchClearBtn').style.display = 'inline-flex';
+                return;
+            }
+
+            const myToken = ++homeSearchToken;
+            setHomeSearchStatus('جاري البحث...', 'info');
+
+            try {
+                const results = await api.searchInContent(q, { limit: 30, offset: 0 });
+                if (myToken !== homeSearchToken) return;
+                renderHomeSearchResults(results, q);
+            } catch (error) {
+                if (myToken !== homeSearchToken) return;
+                console.error('خطأ في البحث:', error);
+                setHomeSearchStatus('حدث خطأ أثناء البحث. حاول مرة أخرى.', 'error');
+                renderHomeSearchResults([], q);
+            }
+        }
+
+        function setupHomeSearch() {
+            const input = document.getElementById('homeSearchInput');
+            const btn = document.getElementById('homeSearchBtn');
+            const clearBtn = document.getElementById('homeSearchClearBtn');
+
+            input.addEventListener('input', () => {
+                clearBtn.style.display = input.value.trim() ? 'inline-flex' : 'none';
+                if (homeSearchDebounceTimer) clearTimeout(homeSearchDebounceTimer);
+                homeSearchDebounceTimer = setTimeout(() => performHomeSearch(), 450);
+            });
+
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    performHomeSearch({ force: true });
+                }
+                if (e.key === 'Escape') {
+                    clearHomeSearch();
+                }
+            });
+
+            btn.addEventListener('click', () => performHomeSearch({ force: true }));
+            clearBtn.addEventListener('click', clearHomeSearch);
+        }
+
+        function clearHomeSearch() {
+            homeSearchToken++;
+            if (homeSearchDebounceTimer) clearTimeout(homeSearchDebounceTimer);
+            document.getElementById('homeSearchInput').value = '';
+            document.getElementById('homeSearchClearBtn').style.display = 'none';
+            renderHomeSearchResults([], '');
         }
 
         // عرض رسالة خطأ
@@ -436,162 +352,12 @@
             window.location.href = `parts.html?id=${id}`;
         }
 
-        // البحث عن الكتب مع القائمة المنسدلة
-        let searchTimeout;
-        const searchDropdown = document.getElementById('searchDropdown');
-        
-        document.getElementById('searchInput').addEventListener('input', async function(e) {
-            const searchTerm = e.target.value.trim();
-            
-            // إلغاء البحث السابق
-            clearTimeout(searchTimeout);
-            
-            if (!searchTerm) {
-                searchDropdown.classList.remove('active');
-                await loadData();
-                return;
-            }
-
-            if (String(searchTerm).length < 3) {
-                searchDropdown.innerHTML = `
-                    <div class="search-dropdown-empty">
-                        <i class="fas fa-keyboard"></i>
-                        <h3>أكمل الكتابة</h3>
-                        <p>اكتب 3 أحرف على الأقل للبحث في الأحاديث</p>
-                    </div>
-                `;
-                searchDropdown.classList.add('active');
-                return;
-            }
-
-            // تأخير البحث لتحسين الأداء
-            searchTimeout = setTimeout(async () => {
-                // عرض مؤشر التحميل في القائمة المنسدلة
-                searchDropdown.innerHTML = `
-                    <div class="search-dropdown-loading">
-                        <i class="fas fa-spinner fa-spin"></i>
-                        <p>جاري البحث في الأحاديث...</p>
-                    </div>
-                `;
-                searchDropdown.classList.add('active');
-
-                try {
-                    // البحث فقط في الأحاديث (داخل محتوى الصفحات)
-                    const contentResults = await api.searchInContent(searchTerm);
-                    
-                    if (contentResults.length === 0) {
-                        searchDropdown.innerHTML = `
-                            <div class="search-dropdown-empty">
-                                <i class="fas fa-search"></i>
-                                <h3>لا توجد نتائج</h3>
-                                <p>لم يتم العثور على أحاديث تطابق بحثك</p>
-                            </div>
-                        `;
-                    } else {
-                        let resultsHTML = '';
-                        
-                        // عرض نتائج المحتوى
-                        if (contentResults.length > 0) {
-                            const contentHTML = contentResults.map(result => createContentResultItem(result)).join('');
-                            resultsHTML += `
-                                <div class="search-section-divider">
-                                    <div class="search-section-title">
-                                        <i class="fas fa-quote-right"></i>
-                                        <span>الأحاديث (${contentResults.length})</span>
-                                    </div>
-                                </div>
-                                ${contentHTML}
-                            `;
-                        }
-
-                        const totalResults = contentResults.length;
-                        searchDropdown.innerHTML = `
-                            <div class="search-dropdown-header">
-                                <span><i class="fas fa-search"></i> ${totalResults} نتيجة</span>
-                                <button class="search-dropdown-close" onclick="closeSearchDropdown()">
-                                    <i class="fas fa-times"></i>
-                                </button>
-                            </div>
-                            ${resultsHTML}
-                        `;
-                    }
-                } catch (error) {
-                    console.error('خطأ في البحث:', error);
-                    searchDropdown.innerHTML = `
-                        <div class="search-dropdown-empty">
-                            <i class="fas fa-exclamation-triangle"></i>
-                            <h3>حدث خطأ</h3>
-                            <p>حدث خطأ أثناء البحث. يرجى المحاولة مرة أخرى</p>
-                        </div>
-                    `;
-                }
-            }, 500);
-        });
-
-        // إنشاء عنصر نتيجة محتوى (من الصفحات)
-        function createContentResultItem(result) {
-            const partInfo = result.partNumber ? `الجزء ${result.partNumber}` : 'بدون جزء';
-            const context = highlightSearchTerm(result.context, result.searchTerm);
-            
-            return `
-                <div class="search-result-item" onclick="goToSearchResult('${result.bookId}', '${result.partId}', ${result.pageNumber})">
-                    <div class="search-result-book">
-                        <i class="fas fa-book"></i>
-                        ${result.bookTitle}
-                    </div>
-                    <div class="search-result-meta">
-                        <div class="search-result-meta-item">
-                            <i class="fas fa-layer-group"></i>
-                            <span>${partInfo}</span>
-                        </div>
-                        <div class="search-result-meta-item">
-                            <i class="fas fa-file-alt"></i>
-                            <span>صفحة ${result.pageNumber}</span>
-                        </div>
-                    </div>
-                    <div class="search-result-context">
-                        ${context}
-                    </div>
-                </div>
-            `;
-        }
-
-        // تظليل كلمة البحث في السياق
-        function highlightSearchTerm(text, searchTerm) {
-            const regex = new RegExp(`(${searchTerm})`, 'gi');
-            return text.replace(regex, '<span class="highlight">$1</span>');
-        }
-
-        // الانتقال إلى نتيجة البحث (من نتائج المحتوى)
-        function goToSearchResult(bookId, partId, pageNumber) {
-            const searchTerm = document.getElementById('searchInput').value.trim();
-            const searchParam = searchTerm ? `&search=${encodeURIComponent(searchTerm)}` : '';
-            
-            if (partId && partId !== 'null') {
-                window.location.href = `read.html?id=${bookId}&part=${partId}&page=${pageNumber}${searchParam}`;
-            } else {
-                window.location.href = `read.html?id=${bookId}&page=${pageNumber}${searchParam}`;
-            }
-        }
-
-        // إغلاق القائمة المنسدلة
-        function closeSearchDropdown() {
-            searchDropdown.classList.remove('active');
-        }
-
-        // إغلاق القائمة عند النقر خارجها
-        document.addEventListener('click', function(event) {
-            const searchContainer = document.getElementById('searchContainer');
-            if (!searchContainer.contains(event.target)) {
-                closeSearchDropdown();
-            }
-        });
-
         // تهيئة التطبيق عند التحميل
         window.addEventListener('load', async function() {
             try {
                 await api.init();
                 console.log('✅ تم الاتصال بـ Supabase');
+                setupHomeSearch();
                 await loadData();
             } catch (error) {
                 console.error('❌ خطأ في الاتصال بـ Supabase:', error);

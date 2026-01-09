@@ -2462,18 +2462,33 @@
             searchResults = [];
             currentSearchIndex = 0;
 
-            const tokens = getNormalizedSearchTokens(searchTerm);
-            if (tokens.length === 0) {
+            const normalizedQuery = normalizeArabic(searchTerm, { collapseWhitespace: true, stripHtml: true });
+            if (!normalizedQuery) {
                 if (!autoSearch) {
                     alert('⚠️ الرجاء إدخال كلمة للبحث');
                 }
                 return;
             }
 
-            const primary = tokens[0];
+            const tokens = normalizedQuery.split(' ').map(t => t.trim()).filter(Boolean);
+            const usePhrase = tokens.length > 1;
+            const primary = usePhrase ? normalizedQuery : tokens[0];
             currentBookPages.forEach((page, pageIndex) => {
                 const contentNormalized = getCachedNormalizedPageText(page, pageIndex);
                 if (!contentNormalized) return;
+
+                if (usePhrase) {
+                    let position = 0;
+                    while ((position = contentNormalized.indexOf(primary, position)) !== -1) {
+                        searchResults.push({
+                            pageIndex: pageIndex,
+                            position: position,
+                            text: searchTerm
+                        });
+                        position += primary.length;
+                    }
+                    return;
+                }
 
                 const matchesAll = tokens.every(t => contentNormalized.indexOf(t) !== -1);
                 if (!matchesAll) return;
@@ -2565,9 +2580,13 @@
             // إزالة التسليط السابق
             let content = originalPageContent || pageContent.innerHTML || currentBookPages[currentPageIndex].content;
 
-            const tokens = getNormalizedSearchTokens(searchTerm);
+            const normalizedQuery = normalizeArabic(searchTerm, { collapseWhitespace: true, stripHtml: true });
+            if (!normalizedQuery) return;
+
+            const tokens = normalizedQuery.split(' ').map(t => t.trim()).filter(Boolean);
             if (tokens.length === 0) return;
-            const primary = tokens[0];
+            const usePhrase = tokens.length > 1;
+            const primary = usePhrase ? normalizedQuery : tokens[0];
 
             const resultsInPage = searchResults.filter(r => r.pageIndex === currentPageIndex);
             if (resultsInPage.length === 0) return;
@@ -2593,12 +2612,12 @@
                 textNodes.push(walker.currentNode);
             }
 
-            const normalizedNeedle = normalizeArabic(primary, { collapseWhitespace: false, stripHtml: false });
+            const normalizedNeedle = normalizeArabic(primary, { collapseWhitespace: true, stripHtml: false });
             if (!normalizedNeedle) return;
 
             for (const node of textNodes) {
                 const originalText = node.nodeValue;
-                const { normalized, map } = buildArabicNormalizationIndex(originalText, { collapseWhitespace: false, stripHtml: false });
+                const { normalized, map } = buildArabicNormalizationIndex(originalText, { collapseWhitespace: true, stripHtml: false });
                 if (!normalized) continue;
 
                 let pos = 0;

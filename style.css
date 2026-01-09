@@ -96,6 +96,176 @@ body {
     box-shadow: 0 4px 15px rgba(0,0,0,0.15);
 }
 
+ .home-search-section {
+     margin: 30px 0 20px;
+     padding: 25px;
+     background: white;
+     border-radius: 25px;
+     box-shadow: 0 10px 40px rgba(236, 176, 7, 0.15);
+     border: 3px solid #ECB007;
+ }
+
+ .home-search-container {
+     display: flex;
+     gap: 12px;
+     align-items: center;
+     flex-wrap: wrap;
+ }
+
+ .home-search-input.search-input {
+     margin: 0;
+     flex: 1;
+     min-width: 260px;
+ }
+
+ .home-search-btn,
+ .home-search-clear-btn {
+     display: inline-flex;
+     align-items: center;
+     justify-content: center;
+     gap: 8px;
+     padding: 16px 22px;
+     border-radius: 16px;
+     font-size: 1.05em;
+     font-weight: bold;
+     cursor: pointer;
+     transition: all 0.3s ease;
+     border: 2px solid transparent;
+     white-space: nowrap;
+ }
+
+ .home-search-btn {
+     background: linear-gradient(135deg, #ECB007 0%, #f5c842 100%);
+     color: white;
+     box-shadow: 0 5px 20px rgba(236, 176, 7, 0.25);
+ }
+
+ .home-search-btn:hover {
+     transform: translateY(-2px);
+     box-shadow: 0 8px 28px rgba(236, 176, 7, 0.35);
+ }
+
+ .home-search-clear-btn {
+     background: white;
+     color: #ECB007;
+     border-color: #ECB007;
+ }
+
+ .home-search-clear-btn:hover {
+     background: rgba(236, 176, 7, 0.08);
+     transform: translateY(-2px);
+ }
+
+ .home-search-status {
+     margin-top: 14px;
+     padding: 12px 15px;
+     border-radius: 14px;
+     font-weight: 600;
+     color: #555;
+     background: rgba(236, 176, 7, 0.08);
+     border: 1px solid rgba(236, 176, 7, 0.22);
+ }
+
+ .home-search-status.is-error {
+     color: #842029;
+     background: rgba(220, 53, 69, 0.10);
+     border-color: rgba(220, 53, 69, 0.25);
+ }
+
+ .home-search-results {
+     margin-top: 16px;
+ }
+
+ .home-search-results-grid {
+     display: grid;
+     grid-template-columns: repeat(auto-fill, minmax(min(520px, 100%), 1fr));
+     gap: 16px;
+ }
+
+ .home-search-result {
+     display: block;
+     text-decoration: none;
+     background: #FCFCF9;
+     border: 2px solid rgba(236, 176, 7, 0.25);
+     border-radius: 18px;
+     padding: 18px 18px 16px;
+     transition: all 0.3s ease;
+     color: inherit;
+ }
+
+ .home-search-result:hover {
+     transform: translateY(-2px);
+     border-color: rgba(236, 176, 7, 0.55);
+     box-shadow: 0 12px 35px rgba(236, 176, 7, 0.18);
+ }
+
+ .home-search-result-header {
+     display: flex;
+     justify-content: space-between;
+     gap: 12px;
+     align-items: baseline;
+     margin-bottom: 10px;
+ }
+
+ .home-search-book {
+     font-weight: 800;
+     color: #ECB007;
+     font-size: 1.15em;
+ }
+
+ .home-search-meta {
+     color: #666;
+     font-weight: 600;
+     font-size: 0.95em;
+ }
+
+ .home-search-context {
+     color: #333;
+     line-height: 1.9;
+     font-size: 1.05em;
+ }
+
+ .home-search-open {
+     margin-top: 10px;
+     color: #ECB007;
+     font-weight: 800;
+     display: inline-flex;
+     gap: 8px;
+     align-items: center;
+ }
+
+ .home-search-highlight {
+     background: rgba(236, 176, 7, 0.35);
+     padding: 2px 4px;
+     border-radius: 6px;
+ }
+
+ .home-search-empty {
+     text-align: center;
+     padding: 35px 20px;
+     background: white;
+     border-radius: 18px;
+     border: 2px dashed rgba(236, 176, 7, 0.5);
+ }
+
+ .home-search-empty-icon {
+     color: #ECB007;
+     font-size: 3em;
+     margin-bottom: 10px;
+ }
+
+ .home-search-empty-title {
+     font-weight: 900;
+     color: #ECB007;
+     font-size: 1.25em;
+     margin-bottom: 8px;
+ }
+
+ .home-search-empty-subtitle {
+     color: #666;
+     font-weight: 600;
+ }
+
 .search-input {
     width: 100%;
     padding: 20px 30px;
@@ -447,6 +617,28 @@ footer {
         font-size: 1em;
         margin: 30px 0px;
     }
+
+     .home-search-section {
+         padding: 20px 15px;
+     }
+
+     .home-search-container {
+         flex-direction: column;
+         align-items: stretch;
+     }
+
+     .home-search-input.search-input {
+         min-width: 100%;
+     }
+
+     .home-search-btn,
+     .home-search-clear-btn {
+         width: 100%;
+     }
+
+     .home-search-results-grid {
+         grid-template-columns: 1fr;
+     }
 
     .category-header {
         flex-direction: column;
