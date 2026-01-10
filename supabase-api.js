@@ -604,8 +604,13 @@ class SupabaseAPI {
                 if (!page || !page.content) return null;
 
                 const content = page.content;
+                const contentPlain = String(content)
+                    .replace(/<[^>]*>/g, ' ')
+                    .replace(/---\s*حديث\s*---/g, ' ')
+                    .replace(/\s+/g, ' ')
+                    .trim();
                 const searchLower = normalizedSearchTerm.toLowerCase();
-                const contentLower = content.toLowerCase();
+                const contentLower = contentPlain.toLowerCase();
                 const tokens = normalizedSearchTerm
                     .split(/\s+/)
                     .map(t => t.trim())
@@ -626,14 +631,15 @@ class SupabaseAPI {
                     index = 0;
                 }
                 
-                // استخراج السياق (50 حرف قبل وبعد)
-                const start = Math.max(0, index - 50);
-                const end = Math.min(content.length, index + normalizedSearchTerm.length + 50);
-                let context = content.substring(start, end);
+                // استخراج السياق (حروف قبل وبعد)
+                const contextWindow = 220;
+                const start = Math.max(0, index - contextWindow);
+                const end = Math.min(contentPlain.length, index + normalizedSearchTerm.length + contextWindow);
+                let context = contentPlain.substring(start, end);
                 
                 // إضافة ... في البداية والنهاية إذا لزم الأمر
                 if (start > 0) context = '...' + context;
-                if (end < content.length) context = context + '...';
+                if (end < contentPlain.length) context = context + '...';
 
                 return {
                     pageId: hit.id,

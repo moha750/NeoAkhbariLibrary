@@ -255,6 +255,10 @@ body {
      background: #FCFCF9;
      border-radius: 16px;
      border: 1px solid rgba(0, 0, 0, 0.06);
+     display: -webkit-box;
+     -webkit-box-orient: vertical;
+     -webkit-line-clamp: 6;
+     overflow: hidden;
  }
 
  .home-search-open {
