@@ -763,6 +763,32 @@ class SupabaseAPI {
         }
     }
 
+    async countPagesForBookIds(bookIds) {
+        try {
+            const ids = Array.isArray(bookIds) ? bookIds.filter(Boolean) : [];
+            if (ids.length === 0) return 0;
+
+            const chunkSize = 200;
+            let total = 0;
+
+            for (let i = 0; i < ids.length; i += chunkSize) {
+                const chunk = ids.slice(i, i + chunkSize);
+                const { count, error } = await this.supabase
+                    .from(SUPABASE_CONFIG.tables.pages)
+                    .select('*', { count: 'exact', head: true })
+                    .in('book_id', chunk);
+
+                if (error) throw error;
+                total += count || 0;
+            }
+
+            return total;
+        } catch (error) {
+            console.error('خطأ في حساب عدد الصفحات:', error);
+            return 0;
+        }
+    }
+
     // جلب صفحات جزء معين
     async getPartPages(partId) {
         try {
@@ -945,6 +971,20 @@ class SupabaseAPI {
         }
     }
 
+    async countContactMessages() {
+        try {
+            const { count, error } = await this.supabase
+                .from(SUPABASE_CONFIG.tables.contact_messages)
+                .select('*', { count: 'exact', head: true });
+
+            if (error) throw error;
+            return count || 0;
+        } catch (error) {
+            console.error('خطأ في حساب عدد الرسائل:', error);
+            return 0;
+        }
+    }
+
     // تحديث حالة قراءة الرسالة
     async markMessageAsRead(messageId, read = true) {
         try {
@@ -998,8 +1038,9 @@ class SupabaseAPI {
         try {
             const { data, error } = await this.supabase
                 .from(SUPABASE_CONFIG.tables.visitors)
-                .select('*')
-                .order('created_at', { ascending: false });
+                .select('created_at, is_returning, country, device_type, browser, os')
+                .order('created_at', { ascending: false })
+                .range(0, 49);
 
             if (error) throw error;
             return data || [];
@@ -1012,19 +1053,30 @@ class SupabaseAPI {
     // جلب عدد الزوار حسب النوع
     async getVisitorCounts() {
         try {
-            const { data, error } = await this.supabase
+            const { count: total, error: totalError } = await this.supabase
                 .from(SUPABASE_CONFIG.tables.visitors)
-                .select('is_returning');
+                .select('*', { count: 'exact', head: true });
 
-            if (error) throw error;
-            
-            const newVisitors = data.filter(v => !v.is_returning).length;
-            const returningVisitors = data.filter(v => v.is_returning).length;
-            
+            if (totalError) throw totalError;
+
+            const { count: returning, error: returningError } = await this.supabase
+                .from(SUPABASE_CONFIG.tables.visitors)
+                .select('*', { count: 'exact', head: true })
+                .eq('is_returning', true);
+
+            if (returningError) throw returningError;
+
+            const { count: newCount, error: newError } = await this.supabase
+                .from(SUPABASE_CONFIG.tables.visitors)
+                .select('*', { count: 'exact', head: true })
+                .or('is_returning.eq.false,is_returning.is.null');
+
+            if (newError) throw newError;
+
             return {
-                total: data.length,
-                new: newVisitors,
-                returning: returningVisitors
+                total: total || 0,
+                new: newCount || 0,
+                returning: returning || 0
             };
         } catch (error) {
             console.error('خطأ في حساب الزوار:', error);
@@ -1037,7 +1089,9 @@ class SupabaseAPI {
         try {
             const { data, error } = await this.supabase
                 .from(SUPABASE_CONFIG.tables.visitors)
-                .select('country');
+                .select('country')
+                .order('created_at', { ascending: false })
+                .range(0, 4999);
 
             if (error) throw error;
             
@@ -1060,7 +1114,9 @@ class SupabaseAPI {
         try {
             const { data, error } = await this.supabase
                 .from(SUPABASE_CONFIG.tables.visitors)
-                .select('device_type');
+                .select('device_type')
+                .order('created_at', { ascending: false })
+                .range(0, 4999);
 
             if (error) throw error;
             

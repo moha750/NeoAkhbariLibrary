@@ -3363,8 +3363,6 @@
                 await loadBooksForChapters();
                 await loadBooksForPages();
                 await loadBooksForPublish();
-                await loadAnalytics();
-                await loadMessages();
                 
                 // 6. تهيئة أزرار إظهار/إخفاء كلمة المرور
                 setupPasswordToggles();
@@ -3431,6 +3429,9 @@
             }
         }
 
+        let analyticsLoaded = false;
+        let messagesLoaded = false;
+
         // تبديل التبويبات
         function switchTab(tabName) {
             // إخفاء جميع التبويبات
@@ -3451,6 +3452,16 @@
                 loadTeamMembers();
                 loadInvitations();
                 loadDeletedAccounts();
+            } else if (tabName === 'analytics') {
+                if (!analyticsLoaded) {
+                    analyticsLoaded = true;
+                    loadAnalytics();
+                }
+            } else if (tabName === 'messages') {
+                if (!messagesLoaded) {
+                    messagesLoaded = true;
+                    loadMessages();
+                }
             } else if (tabName === 'profile') {
                 loadUserProfile();
             }
@@ -3652,17 +3663,14 @@
         // تحميل الإحصائيات
         async function loadStats() {
             try {
-                const [categories, books, messages] = await Promise.all([
+                const [categories, books, messagesCount] = await Promise.all([
                     api.getCategories(),
                     api.getPublishedBooks(),
-                    api.getContactMessages()
+                    api.countContactMessages()
                 ]);
 
-                let totalPages = 0;
-                for (const book of books) {
-                    const pages = await api.getBookPages(book.id);
-                    totalPages += pages.length;
-                }
+                const bookIds = (books || []).map(b => b.id).filter(Boolean);
+                const totalPages = await api.countPagesForBookIds(bookIds);
 
                 // تحميل عدد الزوار
                 let totalVisitors = 0;
@@ -3699,7 +3707,7 @@
                 document.getElementById('totalBooks').textContent = formatNumber(books.length);
                 document.getElementById('totalCategories').textContent = formatNumber(categories.length);
                 document.getElementById('totalPages').textContent = formatNumber(totalPages);
-                document.getElementById('totalMessages').textContent = formatNumber(messages.length);
+                document.getElementById('totalMessages').textContent = formatNumber(messagesCount);
                 document.getElementById('totalVisitors').textContent = formatNumber(totalVisitors);
                 document.getElementById('totalTeamMembers').textContent = formatNumber(totalTeam);
             } catch (error) {
