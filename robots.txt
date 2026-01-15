@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+
+Disallow: /dashboard.html
+Disallow: /import-hadiths.html
+Disallow: /login.html
+Disallow: /signup.html
+Disallow: /supabase/
+Disallow: /*.sql$
+Disallow: /*.md$
+
+Sitemap: https://www.najafdesertlibrary.com/sitemap.xml

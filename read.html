@@ -3,11 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>قراءة الكتاب - المكتبة الرقمية</title>
+    <title>قراءة الكتاب | مكتبة صحراء النجف</title>
+    <meta name="description" content="اقرأ الكتب والأحاديث في مكتبة صحراء النجف مع إمكانية البحث داخل المحتوى والتنقل بين الصفحات.">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="googlebot" content="index, follow">
+    <meta name="theme-color" content="#ECB007">
+    <link rel="canonical" href="https://www.najafdesertlibrary.com/read.html">
+    <meta property="og:type" content="article">
+    <meta property="og:site_name" content="مكتبة صحراء النجف">
+    <meta property="og:title" content="قراءة الكتاب | مكتبة صحراء النجف">
+    <meta property="og:description" content="اقرأ الكتب والأحاديث في مكتبة صحراء النجف مع إمكانية البحث داخل المحتوى والتنقل بين الصفحات.">
+    <meta property="og:url" content="https://www.najafdesertlibrary.com/read.html">
+    <meta property="og:locale" content="ar_AR">
+    <meta property="og:image" content="https://www.najafdesertlibrary.com/Thumbnail.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="قراءة الكتاب | مكتبة صحراء النجف">
+    <meta name="twitter:description" content="اقرأ الكتب والأحاديث في مكتبة صحراء النجف مع إمكانية البحث داخل المحتوى والتنقل بين الصفحات.">
+    <meta name="twitter:image" content="https://www.najafdesertlibrary.com/Thumbnail.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": "قراءة الكتاب | مكتبة صحراء النجف",
+            "url": "https://www.najafdesertlibrary.com/read.html",
+            "inLanguage": "ar",
+            "isPartOf": {
+                "@type": "WebSite",
+                "name": "مكتبة صحراء النجف",
+                "url": "https://www.najafdesertlibrary.com/"
+            }
+        }
+    </script>
     
     <style>
         * {
@@ -1496,6 +1526,66 @@
             taMarbuta: 'h'
         };
 
+        function setMetaContent(selector, content) {
+            const el = document.querySelector(selector);
+            if (el && content) el.setAttribute('content', content);
+        }
+
+        function setCanonical(url) {
+            const link = document.querySelector('link[rel="canonical"]');
+            if (link && url) link.setAttribute('href', url);
+        }
+
+        function buildReadCanonicalUrl(params) {
+            const q = new URLSearchParams();
+            if (params?.bookId) q.set('id', String(params.bookId));
+            if (params?.partId) q.set('part', String(params.partId));
+            if (params?.pageNumber != null) q.set('page', String(params.pageNumber));
+            const qs = q.toString();
+            return qs ? `https://www.najafdesertlibrary.com/read.html?${qs}` : 'https://www.najafdesertlibrary.com/read.html';
+        }
+
+        function updateReadSeo(page = null) {
+            if (!currentBook) return;
+
+            const bookId = getBookId();
+            const partId = getPartId();
+
+            const effectivePage = page || currentBookPages[currentPageIndex] || null;
+            const pageNumber = effectivePage?.page_number != null ? effectivePage.page_number : null;
+            const partNumber = (partId && currentPart?.part_number != null) ? currentPart.part_number : null;
+
+            const title = (() => {
+                const base = currentBook?.title ? `قراءة ${currentBook.title}` : 'قراءة الكتاب';
+                const partInfo = partNumber != null ? ` - الجزء ${partNumber}` : '';
+                const pageInfo = pageNumber != null ? ` - صفحة ${pageNumber}` : '';
+                return `${base}${partInfo}${pageInfo} | مكتبة صحراء النجف`;
+            })();
+
+            const desc = (() => {
+                const base = currentBook?.title ? `اقرأ كتاب ${currentBook.title} في مكتبة صحراء النجف` : 'اقرأ الكتب والأحاديث في مكتبة صحراء النجف';
+                const partInfo = partNumber != null ? ` (الجزء ${partNumber})` : '';
+                const pageInfo = pageNumber != null ? ` - صفحة ${pageNumber}` : '';
+                return `${base}${partInfo}${pageInfo}.`;
+            })();
+
+            const canonicalUrl = buildReadCanonicalUrl({ bookId, partId, pageNumber });
+            const image = currentBook?.cover_image ? String(currentBook.cover_image) : 'https://www.najafdesertlibrary.com/tape.png';
+
+            document.title = title;
+            setMetaContent('meta[name="description"]', desc);
+            setCanonical(canonicalUrl);
+
+            setMetaContent('meta[property="og:title"]', title);
+            setMetaContent('meta[property="og:description"]', desc);
+            setMetaContent('meta[property="og:url"]', canonicalUrl);
+            setMetaContent('meta[property="og:image"]', image);
+
+            setMetaContent('meta[name="twitter:title"]', title);
+            setMetaContent('meta[name="twitter:description"]', desc);
+            setMetaContent('meta[name="twitter:image"]', image);
+        }
+
         function normalizeBlankLines(text) {
             if (typeof text !== 'string') return '';
             let result = text.replace(/\r\n/g, '\n');
@@ -2003,6 +2093,8 @@
             }
 
             const page = currentBookPages[currentPageIndex];
+
+            updateReadSeo(page);
 
             const bookId = getBookId();
             const partId = getPartId();

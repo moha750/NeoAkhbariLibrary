@@ -3,7 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لوحة التحكم - المكتبة الرقمية</title>
+    <title>لوحة تحكم صحراء النجف</title>
+    <meta name="robots" content="noindex, nofollow, noarchive">
+    <meta name="googlebot" content="noindex, nofollow">
+    <link rel="canonical" href="https://www.najafdesertlibrary.com/dashboard.html">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Supabase JS Client -->
@@ -2956,7 +2959,7 @@
                             </div>
                             <div class="stat-info">
                                 <h3>إجمالي الزوار</h3>
-                                <div class="number" id="totalVisitors">0</div>
+                                <div class="number" id="totalVisitorsAnalytics">0</div>
                             </div>
                         </div>
                         <div class="stat-card">
@@ -4169,7 +4172,7 @@
                 const visitors = await api.getVisitorStats();
 
                 // تحديث الأرقام
-                document.getElementById('totalVisitors').textContent = counts.total;
+                document.getElementById('totalVisitorsAnalytics').textContent = counts.total;
                 document.getElementById('newVisitors').textContent = counts.new;
                 document.getElementById('returningVisitors').textContent = counts.returning;
 

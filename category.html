@@ -3,11 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>القسم - الإخبارية الجُدد</title>
+    <title>أقسام مكتبة صحراء النجف</title>
+    <meta name="description" content="تصفح أقسام مكتبة صحراء النجف واختر الكتب المتاحة في كل قسم.">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="googlebot" content="index, follow">
+    <meta name="theme-color" content="#ECB007">
+    <link rel="canonical" href="https://www.najafdesertlibrary.com/category.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="مكتبة صحراء النجف">
+    <meta property="og:title" content="أقسام مكتبة صحراء النجف">
+    <meta property="og:description" content="تصفح أقسام مكتبة صحراء النجف واختر الكتب المتاحة في كل قسم.">
+    <meta property="og:url" content="https://www.najafdesertlibrary.com/category.html">
+    <meta property="og:locale" content="ar_AR">
+    <meta property="og:image" content="https://www.najafdesertlibrary.com/Thumbnail.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="أقسام مكتبة صحراء النجف">
+    <meta name="twitter:description" content="تصفح أقسام مكتبة صحراء النجف واختر الكتب المتاحة في كل قسم.">
+    <meta name="twitter:image" content="https://www.najafdesertlibrary.com/Thumbnail.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": "أقسام مكتبة صحراء النجف",
+            "url": "https://www.najafdesertlibrary.com/category.html",
+            "inLanguage": "ar",
+            "isPartOf": {
+                "@type": "WebSite",
+                "name": "مكتبة صحراء النجف",
+                "url": "https://www.najafdesertlibrary.com/"
+            }
+        }
+    </script>
     
     <style>
         * {
@@ -473,6 +503,40 @@
         let currentCategory = null;
         let categoryBooks = [];
 
+        function setMetaContent(selector, content) {
+            const el = document.querySelector(selector);
+            if (el && content) el.setAttribute('content', content);
+        }
+
+        function setCanonical(url) {
+            const link = document.querySelector('link[rel="canonical"]');
+            if (link && url) link.setAttribute('href', url);
+        }
+
+        function setCategorySeo() {
+            const baseTitle = currentCategory?.name ? `${currentCategory.name} - مكتبة صحراء النجف` : 'أقسام مكتبة صحراء النجف';
+            const desc = (currentCategory?.description && String(currentCategory.description).trim())
+                ? String(currentCategory.description).trim()
+                : `تصفح قسم ${currentCategory?.name || ''} في مكتبة صحراء النجف واختر الكتب المتاحة.`.trim();
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const categoryId = urlParams.get('id');
+            const canonicalUrl = categoryId
+                ? `https://www.najafdesertlibrary.com/category.html?id=${encodeURIComponent(categoryId)}`
+                : 'https://www.najafdesertlibrary.com/category.html';
+
+            document.title = baseTitle;
+            setMetaContent('meta[name="description"]', desc);
+            setCanonical(canonicalUrl);
+
+            setMetaContent('meta[property="og:title"]', baseTitle);
+            setMetaContent('meta[property="og:description"]', desc);
+            setMetaContent('meta[property="og:url"]', canonicalUrl);
+
+            setMetaContent('meta[name="twitter:title"]', baseTitle);
+            setMetaContent('meta[name="twitter:description"]', desc);
+        }
+
         // تحميل القسم عند فتح الصفحة
         window.addEventListener('load', async function() {
             try {
@@ -518,7 +582,7 @@
             // تحديث العنوان
             document.getElementById('categoryTitle').textContent = currentCategory.name;
             document.getElementById('breadcrumbCategory').innerHTML = '<i class="fas fa-book-open"></i> ' + currentCategory.name;
-            document.title = currentCategory.name + ' - الإخبارية الجُدد';
+            setCategorySeo();
 
             // عرض الوصف
             const descriptionElement = document.getElementById('categoryDescription');

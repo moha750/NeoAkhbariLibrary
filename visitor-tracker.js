@@ -5,6 +5,17 @@ class VisitorTracker {
         this.isReturning = this.checkIfReturning();
     }
 
+    async fetchWithTimeout(url, options = {}, timeoutMs = 4500) {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+        try {
+            const res = await fetch(url, { ...options, signal: controller.signal });
+            return res;
+        } finally {
+            clearTimeout(timeoutId);
+        }
+    }
+
     // إنشاء أو جلب معرف الزائر الفريد
     getOrCreateVisitorId() {
         let visitorId = localStorage.getItem('visitor_id');
@@ -98,14 +109,59 @@ class VisitorTracker {
 
     // الحصول على الدولة (باستخدام API خارجي)
     async getCountry() {
+        const candidates = [];
+
         try {
-            const response = await fetch('https://ipapi.co/json/');
-            const data = await response.json();
-            return data.country_name || 'Unknown';
-        } catch (error) {
-            console.error('خطأ في جلب الدولة:', error);
-            return 'Unknown';
-        }
+            if (typeof SUPABASE_CONFIG !== 'undefined' && SUPABASE_CONFIG?.url && SUPABASE_CONFIG?.anonKey) {
+                const response = await this.fetchWithTimeout(`${SUPABASE_CONFIG.url}/functions/v1/geoip`, {
+                    method: 'GET',
+                    headers: {
+                        apikey: SUPABASE_CONFIG.anonKey,
+                        Authorization: `Bearer ${SUPABASE_CONFIG.anonKey}`
+                    }
+                });
+
+                if (response && response.ok) {
+                    const data = await response.json();
+                    if (data && data.country) {
+                        candidates.push(String(data.country).trim());
+                    }
+                }
+            }
+        } catch (_) {}
+
+        try {
+            const response = await this.fetchWithTimeout('https://ipapi.co/json/');
+            if (response && response.ok) {
+                const data = await response.json();
+                if (data && data.country_name) {
+                    candidates.push(String(data.country_name).trim());
+                }
+            }
+        } catch (_) {}
+
+        try {
+            const response = await this.fetchWithTimeout('https://ipwho.is/');
+            if (response && response.ok) {
+                const data = await response.json();
+                if (data && data.success !== false && data.country) {
+                    candidates.push(String(data.country).trim());
+                }
+            }
+        } catch (_) {}
+
+        try {
+            const response = await this.fetchWithTimeout('https://ipapi.co/country_name/');
+            if (response && response.ok) {
+                const text = await response.text();
+                if (text) {
+                    candidates.push(String(text).trim());
+                }
+            }
+        } catch (_) {}
+
+        const country = candidates.find(c => c && c.toLowerCase() !== 'unknown');
+        return country || 'Unknown';
     }
 
     // تسجيل الزيارة

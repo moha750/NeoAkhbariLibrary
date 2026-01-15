@@ -3,11 +3,41 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>أجزاء الكتاب - الإخبارية الجُدد</title>
+    <title>أجزاء الكتب | مكتبة صحراء النجف</title>
+    <meta name="description" content="تصفح أجزاء الكتب في مكتبة صحراء النجف وانتقل إلى قراءة الجزء أو القراءة المباشرة.">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="googlebot" content="index, follow">
+    <meta name="theme-color" content="#ECB007">
+    <link rel="canonical" href="https://www.najafdesertlibrary.com/parts.html">
+    <meta property="og:type" content="website">
+    <meta property="og:site_name" content="مكتبة صحراء النجف">
+    <meta property="og:title" content="أجزاء الكتب | مكتبة صحراء النجف">
+    <meta property="og:description" content="تصفح أجزاء الكتب في مكتبة صحراء النجف وانتقل إلى قراءة الجزء أو القراءة المباشرة.">
+    <meta property="og:url" content="https://www.najafdesertlibrary.com/parts.html">
+    <meta property="og:locale" content="ar_AR">
+    <meta property="og:image" content="https://www.najafdesertlibrary.com/Thumbnail.png">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="أجزاء الكتب | مكتبة صحراء النجف">
+    <meta name="twitter:description" content="تصفح أجزاء الكتب في مكتبة صحراء النجف وانتقل إلى قراءة الجزء أو القراءة المباشرة.">
+    <meta name="twitter:image" content="https://www.najafdesertlibrary.com/Thumbnail.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script type="application/ld+json">
+        {
+            "@context": "https://schema.org",
+            "@type": "WebPage",
+            "name": "أجزاء الكتب | مكتبة صحراء النجف",
+            "url": "https://www.najafdesertlibrary.com/parts.html",
+            "inLanguage": "ar",
+            "isPartOf": {
+                "@type": "WebSite",
+                "name": "مكتبة صحراء النجف",
+                "url": "https://www.najafdesertlibrary.com/"
+            }
+        }
+    </script>
     
     <style>
         * {
@@ -558,6 +588,43 @@
         let currentBook = null;
         let bookParts = [];
 
+        function setMetaContent(selector, content) {
+            const el = document.querySelector(selector);
+            if (el && content) el.setAttribute('content', content);
+        }
+
+        function setCanonical(url) {
+            const link = document.querySelector('link[rel="canonical"]');
+            if (link && url) link.setAttribute('href', url);
+        }
+
+        function setBookSeo() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const bookId = urlParams.get('id');
+            const canonicalUrl = bookId
+                ? `https://www.najafdesertlibrary.com/parts.html?id=${encodeURIComponent(bookId)}`
+                : 'https://www.najafdesertlibrary.com/parts.html';
+
+            const title = currentBook?.title ? `${currentBook.title} - أجزاء الكتاب | مكتبة صحراء النجف` : 'أجزاء الكتب | مكتبة صحراء النجف';
+            const desc = currentBook?.title
+                ? `تصفح أجزاء كتاب ${currentBook.title} في مكتبة صحراء النجف وانتقل إلى قراءة الجزء.`
+                : 'تصفح أجزاء الكتب في مكتبة صحراء النجف وانتقل إلى قراءة الجزء أو القراءة المباشرة.';
+            const image = currentBook?.cover_image ? String(currentBook.cover_image) : 'https://www.najafdesertlibrary.com/tape.png';
+
+            document.title = title;
+            setMetaContent('meta[name="description"]', desc);
+            setCanonical(canonicalUrl);
+
+            setMetaContent('meta[property="og:title"]', title);
+            setMetaContent('meta[property="og:description"]', desc);
+            setMetaContent('meta[property="og:url"]', canonicalUrl);
+            setMetaContent('meta[property="og:image"]', image);
+
+            setMetaContent('meta[name="twitter:title"]', title);
+            setMetaContent('meta[name="twitter:description"]', desc);
+            setMetaContent('meta[name="twitter:image"]', image);
+        }
+
         // تحميل الكتاب عند فتح الصفحة
         window.addEventListener('load', async function() {
             try {
@@ -610,7 +677,7 @@
             // تحديث العنوان
             document.getElementById('bookTitle').textContent = currentBook.title;
             document.getElementById('breadcrumbBook').innerHTML = '<i class="fas fa-book"></i> ' + currentBook.title;
-            document.title = currentBook.title + ' - الإخبارية الجُدد';
+            setBookSeo();
 
             // عرض الغلاف
             const coverContainer = document.getElementById('bookCoverContainer');
