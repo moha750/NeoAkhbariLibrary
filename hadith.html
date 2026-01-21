@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- سيتم تحديث هذه القيم ديناميكياً -->
+    <title>مكتبة صحراء النجف | الأحاديث النبوية الشريفة</title>
+    <meta name="description" content="مكتبة صحراء النجف - مكتبة رقمية موثوقة للأحاديث النبوية والكتب الإسلامية">
+    <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
+    <meta name="googlebot" content="index, follow">
+    <meta name="theme-color" content="#ECB007">
+    
+    <!-- Canonical URL - سيتم تحديثه ديناميكياً -->
+    <link rel="canonical" href="https://www.najafdesertlibrary.com/">
+    
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:type" content="article">
+    <meta property="og:site_name" content="مكتبة صحراء النجف">
+    <meta property="og:title" content="مكتبة صحراء النجف | الأحاديث النبوية">
+    <meta property="og:description" content="مكتبة صحراء النجف - مكتبة رقمية موثوقة للأحاديث النبوية">
+    <meta property="og:url" content="https://www.najafdesertlibrary.com/">
+    <meta property="og:locale" content="ar_AR">
+    <meta property="og:image" content="https://www.najafdesertlibrary.com/Thumbnail.png">
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="مكتبة صحراء النجف | الأحاديث النبوية">
+    <meta name="twitter:description" content="مكتبة صحراء النجف - مكتبة رقمية موثوقة للأحاديث النبوية">
+    <meta name="twitter:image" content="https://www.najafdesertlibrary.com/Thumbnail.png">
+    
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Structured Data - سيتم تحديثه ديناميكياً -->
+    <script type="application/ld+json" id="structuredData">
+    {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        "name": "مكتبة صحراء النجف",
+        "description": "مكتبة رقمية موثوقة للأحاديث النبوية",
+        "publisher": {
+            "@type": "Organization",
+            "name": "مكتبة صحراء النجف",
+            "url": "https://www.najafdesertlibrary.com/",
+            "logo": "https://www.najafdesertlibrary.com/Thumbnail.png"
+        }
+    }
+    </script>
+    
+    <style>
+        .hadith-container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+        }
+        
+        .hadith-header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid #ECB007;
+        }
+        
+        .hadith-header h1 {
+            color: #2c3e50;
+            font-size: 2em;
+            margin-bottom: 10px;
+        }
+        
+        .hadith-source {
+            color: #7f8c8d;
+            font-size: 1.1em;
+            margin-top: 10px;
+        }
+        
+        .hadith-content {
+            background: #f8f9fa;
+            padding: 30px;
+            border-right: 5px solid #ECB007;
+            border-radius: 10px;
+            margin: 30px 0;
+            line-height: 2.2;
+            font-size: 1.3em;
+            color: #2c3e50;
+            text-align: justify;
+        }
+        
+        .hadith-meta {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        .meta-item {
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 10px;
+        }
+        
+        .meta-item strong {
+            color: #ECB007;
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .hadith-navigation {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            gap: 15px;
+        }
+        
+        .nav-btn {
+            flex: 1;
+            padding: 15px 25px;
+            background: #ECB007;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 1.1em;
+            transition: all 0.3s;
+            text-decoration: none;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .nav-btn:hover {
+            background: #d4a006;
+            transform: translateY(-2px);
+        }
+        
+        .loading-container {
+            text-align: center;
+            padding: 100px 20px;
+        }
+        
+        .loading-spinner {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #ECB007;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .error-container {
+            text-align: center;
+            padding: 100px 20px;
+            color: #e74c3c;
+        }
+        
+        .error-container i {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+        
+        .breadcrumb {
+            margin: 20px 0;
+            padding: 15px;
+            background: #ecf0f1;
+            border-radius: 10px;
+        }
+        
+        .breadcrumb a {
+            color: #ECB007;
+            text-decoration: none;
+            margin: 0 5px;
+        }
+        
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+        
+        .share-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin: 30px 0;
+        }
+        
+        .share-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            color: white;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+        
+        .share-btn.facebook { background: #3b5998; }
+        .share-btn.twitter { background: #1da1f2; }
+        .share-btn.whatsapp { background: #25d366; }
+        .share-btn.copy { background: #95a5a6; }
+        
+        .share-btn:hover {
+            transform: translateY(-2px);
+            opacity: 0.9;
+        }
+        
+        @media (max-width: 768px) {
+            .hadith-container {
+                margin: 20px 10px;
+                padding: 15px;
+            }
+            
+            .hadith-content {
+                font-size: 1.1em;
+                padding: 20px;
+            }
+            
+            .hadith-navigation {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header Image -->
+        <img src="tape.png" alt="شعار مكتبة صحراء النجف" class="header-image">
+        
+        <!-- Loading State -->
+        <div id="loadingState" class="loading-container">
+            <div class="loading-spinner"></div>
+            <h2>جاري تحميل الحديث...</h2>
+        </div>
+        
+        <!-- Error State -->
+        <div id="errorState" class="error-container" style="display: none;">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h2>عذراً، لم نتمكن من تحميل الحديث</h2>
+            <p id="errorMessage"></p>
+            <a href="index.html" class="nav-btn" style="max-width: 300px; margin: 20px auto;">
+                <i class="fas fa-home"></i> العودة للصفحة الرئيسية
+            </a>
+        </div>
+        
+        <!-- Hadith Content -->
+        <div id="hadithContainer" style="display: none;">
+            <div class="breadcrumb">
+                <a href="index.html"><i class="fas fa-home"></i> الرئيسية</a>
+                <span>/</span>
+                <a href="#" id="bookLink">الكتاب</a>
+                <span>/</span>
+                <span>الحديث</span>
+            </div>
+            
+            <div class="hadith-container">
+                <div class="hadith-header">
+                    <h1>الحديث الشريف</h1>
+                    <div class="hadith-source">
+                        من <strong>مكتبة صحراء النجف</strong> - مكتبة رقمية موثوقة
+                    </div>
+                </div>
+                
+                <!-- نص الحديث - محتوى HTML حقيقي لمحركات البحث -->
+                <div class="hadith-content" id="hadithText">
+                    <!-- سيتم ملؤه ديناميكياً -->
+                </div>
+                
+                <div class="hadith-meta" id="hadithMeta">
+                    <!-- سيتم ملؤه ديناميكياً -->
+                </div>
+                
+                <!-- أزرار المشاركة -->
+                <div class="share-buttons">
+                    <button class="share-btn facebook" onclick="shareOnFacebook()">
+                        <i class="fab fa-facebook"></i> فيسبوك
+                    </button>
+                    <button class="share-btn twitter" onclick="shareOnTwitter()">
+                        <i class="fab fa-twitter"></i> تويتر
+                    </button>
+                    <button class="share-btn whatsapp" onclick="shareOnWhatsApp()">
+                        <i class="fab fa-whatsapp"></i> واتساب
+                    </button>
+                    <button class="share-btn copy" onclick="copyLink()">
+                        <i class="fas fa-link"></i> نسخ الرابط
+                    </button>
+                </div>
+                
+                <div class="hadith-navigation">
+                    <a href="#" id="readBookBtn" class="nav-btn">
+                        <i class="fas fa-book-open"></i> قراءة الكتاب كاملاً
+                    </a>
+                    <a href="index.html" class="nav-btn">
+                        <i class="fas fa-search"></i> البحث عن أحاديث أخرى
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>جميع الحقوق محفوظة لـ <strong>مكتبة صحراء النجف</strong> <span id="currentYear"></span> ©</p>
+    </footer>
+    
+    <!-- Scripts -->
+    <script src="supabase-api.js"></script>
+    <script src="hadith-seo.js"></script>
+    
+    <script>
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+    </script>
+</body>
+</html>

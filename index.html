@@ -162,6 +162,10 @@
         }
 
         function buildReadUrl(result, searchTerm) {
+            if (result.pageId || result.id) {
+                const hadithId = result.pageId || result.id;
+                return `hadith.html?id=${hadithId}`;
+            }
             const params = new URLSearchParams();
             params.set('id', result.bookId);
             if (result.partId) params.set('part', result.partId);
