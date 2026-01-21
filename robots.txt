@@ -1,6 +1,11 @@
 User-agent: *
 Allow: /
+Allow: /read.html
+Allow: /parts.html
+Allow: /category.html
+Allow: /index.html
 
+# منع الزحف للصفحات الإدارية
 Disallow: /dashboard.html
 Disallow: /import-hadiths.html
 Disallow: /login.html
@@ -8,5 +13,14 @@ Disallow: /signup.html
 Disallow: /supabase/
 Disallow: /*.sql$
 Disallow: /*.md$
+Disallow: /node_modules/
 
+# السماح بالزحف لملفات CSS و JS
+Allow: /*.css$
+Allow: /*.js$
+
+# Sitemap
 Sitemap: https://www.najafdesertlibrary.com/sitemap.xml
+
+# معلومات إضافية
+# مكتبة صحراء النجف - مكتبة رقمية شاملة تحتوي على أكثر من 50,000 حديث إسلامي

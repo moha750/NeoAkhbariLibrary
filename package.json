@@ -1,20 +1,5 @@
 {
-  "name": "najaf-desert-library-sitemap",
-  "version": "1.0.0",
-  "description": "سكربت توليد Sitemap لمكتبة صحراء النجف",
-  "main": "generate-sitemap.js",
-  "scripts": {
-    "generate-sitemap": "node generate-sitemap.js"
-  },
-  "keywords": [
-    "sitemap",
-    "seo",
-    "hadith",
-    "library"
-  ],
-  "author": "مكتبة صحراء النجف",
-  "license": "MIT",
   "dependencies": {
-    "@supabase/supabase-js": "^2.39.0"
+    "@supabase/supabase-js": "^2.91.0"
   }
 }

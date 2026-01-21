@@ -1555,18 +1555,27 @@
             const pageNumber = effectivePage?.page_number != null ? effectivePage.page_number : null;
             const partNumber = (partId && currentPart?.part_number != null) ? currentPart.part_number : null;
 
+            const pageContent = effectivePage?.content || '';
+            const hadithBlocks = parseHadithBlocks(pageContent);
+            const hadithCount = hadithBlocks.length;
+            const firstHadithPreview = hadithBlocks.length > 0 ? hadithBlocks[0].text.substring(0, 150) : '';
+
             const title = (() => {
-                const base = currentBook?.title ? `قراءة ${currentBook.title}` : 'قراءة الكتاب';
+                const base = currentBook?.title ? `${currentBook.title}` : 'قراءة الكتاب';
                 const partInfo = partNumber != null ? ` - الجزء ${partNumber}` : '';
                 const pageInfo = pageNumber != null ? ` - صفحة ${pageNumber}` : '';
-                return `${base}${partInfo}${pageInfo} | مكتبة صحراء النجف`;
+                const hadithInfo = hadithCount > 0 ? ` (${hadithCount} حديث)` : '';
+                return `${base}${partInfo}${pageInfo}${hadithInfo} | مكتبة صحراء النجف`;
             })();
 
             const desc = (() => {
-                const base = currentBook?.title ? `اقرأ كتاب ${currentBook.title} في مكتبة صحراء النجف` : 'اقرأ الكتب والأحاديث في مكتبة صحراء النجف';
+                if (firstHadithPreview) {
+                    return `${firstHadithPreview}... - من كتاب ${currentBook.title} في مكتبة صحراء النجف الرقمية. تحتوي على أكثر من 50,000 حديث.`;
+                }
+                const base = currentBook?.title ? `اقرأ كتاب ${currentBook.title} في مكتبة صحراء النجف الرقمية` : 'اقرأ الكتب والأحاديث في مكتبة صحراء النجف';
                 const partInfo = partNumber != null ? ` (الجزء ${partNumber})` : '';
                 const pageInfo = pageNumber != null ? ` - صفحة ${pageNumber}` : '';
-                return `${base}${partInfo}${pageInfo}.`;
+                return `${base}${partInfo}${pageInfo}. مكتبة رقمية شاملة تحتوي على أكثر من 50,000 حديث.`;
             })();
 
             const canonicalUrl = buildReadCanonicalUrl({ bookId, partId, pageNumber });
@@ -1574,16 +1583,150 @@
 
             document.title = title;
             setMetaContent('meta[name="description"]', desc);
+            setMetaContent('meta[name="keywords"]', `أحاديث, ${currentBook.title}, مكتبة صحراء النجف, أحاديث إسلامية, كتب دينية, مكتبة رقمية`);
             setCanonical(canonicalUrl);
 
             setMetaContent('meta[property="og:title"]', title);
             setMetaContent('meta[property="og:description"]', desc);
             setMetaContent('meta[property="og:url"]', canonicalUrl);
             setMetaContent('meta[property="og:image"]', image);
+            setMetaContent('meta[property="og:type"]', 'article');
 
             setMetaContent('meta[name="twitter:title"]', title);
             setMetaContent('meta[name="twitter:description"]', desc);
             setMetaContent('meta[name="twitter:image"]', image);
+
+            updateStructuredData({
+                book: currentBook,
+                page: effectivePage,
+                pageNumber,
+                partNumber,
+                hadithBlocks,
+                canonicalUrl,
+                image
+            });
+        }
+
+        function updateStructuredData(data) {
+            const { book, page, pageNumber, partNumber, hadithBlocks, canonicalUrl, image } = data;
+            
+            let existingScript = document.getElementById('dynamic-structured-data');
+            if (existingScript) {
+                existingScript.remove();
+            }
+
+            const structuredData = {
+                "@context": "https://schema.org",
+                "@graph": []
+            };
+
+            structuredData["@graph"].push({
+                "@type": "WebSite",
+                "@id": "https://www.najafdesertlibrary.com/#website",
+                "url": "https://www.najafdesertlibrary.com/",
+                "name": "مكتبة صحراء النجف",
+                "description": "مكتبة رقمية شاملة تحتوي على أكثر من 50,000 حديث وكتب دينية",
+                "inLanguage": "ar",
+                "publisher": {
+                    "@type": "Organization",
+                    "name": "مكتبة صحراء النجف",
+                    "logo": {
+                        "@type": "ImageObject",
+                        "url": "https://www.najafdesertlibrary.com/tape.png"
+                    }
+                }
+            });
+
+            const breadcrumbList = {
+                "@type": "BreadcrumbList",
+                "@id": canonicalUrl + "#breadcrumb",
+                "itemListElement": [
+                    {
+                        "@type": "ListItem",
+                        "position": 1,
+                        "name": "الصفحة الرئيسية",
+                        "item": "https://www.najafdesertlibrary.com/"
+                    },
+                    {
+                        "@type": "ListItem",
+                        "position": 2,
+                        "name": book.title,
+                        "item": canonicalUrl
+                    }
+                ]
+            };
+
+            if (partNumber) {
+                breadcrumbList.itemListElement.push({
+                    "@type": "ListItem",
+                    "position": 3,
+                    "name": `الجزء ${partNumber}`,
+                    "item": canonicalUrl
+                });
+            }
+
+            structuredData["@graph"].push(breadcrumbList);
+
+            const articleData = {
+                "@type": "Article",
+                "@id": canonicalUrl + "#article",
+                "headline": book.title + (partNumber ? ` - الجزء ${partNumber}` : '') + (pageNumber ? ` - صفحة ${pageNumber}` : ''),
+                "description": `صفحة من كتاب ${book.title} في مكتبة صحراء النجف الرقمية`,
+                "image": image,
+                "author": {
+                    "@type": "Organization",
+                    "name": "مكتبة صحراء النجف"
+                },
+                "publisher": {
+                    "@type": "Organization",
+                    "name": "مكتبة صحراء النجف",
+                    "logo": {
+                        "@type": "ImageObject",
+                        "url": "https://www.najafdesertlibrary.com/tape.png"
+                    }
+                },
+                "mainEntityOfPage": {
+                    "@type": "WebPage",
+                    "@id": canonicalUrl
+                },
+                "inLanguage": "ar",
+                "isPartOf": {
+                    "@type": "Book",
+                    "name": book.title,
+                    "bookFormat": "EBook",
+                    "inLanguage": "ar"
+                }
+            };
+
+            if (hadithBlocks && hadithBlocks.length > 0) {
+                articleData.articleBody = hadithBlocks.map(h => h.text).join('\n\n');
+                articleData.about = {
+                    "@type": "Thing",
+                    "name": "أحاديث إسلامية",
+                    "description": `مجموعة من ${hadithBlocks.length} حديث من كتاب ${book.title}`
+                };
+            }
+
+            structuredData["@graph"].push(articleData);
+
+            if (hadithBlocks && hadithBlocks.length > 0) {
+                const collectionData = {
+                    "@type": "Collection",
+                    "@id": canonicalUrl + "#hadiths",
+                    "name": `أحاديث من ${book.title}`,
+                    "description": `مجموعة من ${hadithBlocks.length} حديث`,
+                    "numberOfItems": hadithBlocks.length,
+                    "about": "أحاديث إسلامية",
+                    "inLanguage": "ar"
+                };
+                structuredData["@graph"].push(collectionData);
+            }
+
+            const script = document.createElement('script');
+            script.id = 'dynamic-structured-data';
+            script.type = 'application/ld+json';
+            script.textContent = JSON.stringify(structuredData, null, 2);
+            document.head.appendChild(script);
         }
 
         function normalizeBlankLines(text) {
